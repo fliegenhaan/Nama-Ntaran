@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(if exist \".next\\dev\\lock\" del /F /Q \".next\\dev\\lock\")"
-    ],
-    "deny": [],
-    "ask": []
-  }
-}

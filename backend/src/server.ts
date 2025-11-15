@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 import { pool } from './config/database.js';
 import { testBlockchainConnection } from './config/blockchain.js';
 import { setSocketIO } from './config/socket.js';
+import { startBlockchainListener } from './services/blockchainListener.js';
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -15,6 +16,8 @@ import verificationsRoutes from './routes/verifications.js';
 import cateringsRoutes from './routes/caterings.js';
 import issuesRoutes from './routes/issues.js';
 import analyticsRoutes from './routes/analytics.js';
+import blockchainRoutes from './routes/blockchain.js';
+import escrowRoutes from './routes/escrow.js';
 
 dotenv.config();
 
@@ -49,6 +52,8 @@ app.use('/api/verifications', verificationsRoutes);
 app.use('/api/caterings', cateringsRoutes);
 app.use('/api/issues', issuesRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/blockchain', blockchainRoutes);
+app.use('/api/escrow', escrowRoutes);
 
 // Health check route
 app.get('/api/health', async (req, res) => {
@@ -139,8 +144,17 @@ io.on('connection', (socket) => {
 });
 
 // Start server
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT, async () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
   console.log(`🔌 WebSocket server ready`);
+
+  // Start blockchain event listener
+  try {
+    console.log('\n🎧 Starting blockchain event listener...');
+    startBlockchainListener();
+    console.log('✅ Blockchain listener started successfully!\n');
+  } catch (error) {
+    console.error('❌ Failed to start blockchain listener:', error);
+  }
 });
