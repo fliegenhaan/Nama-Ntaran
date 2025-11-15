@@ -396,6 +396,9 @@ async function seedIssues() {
 
     for (const delivery of deliveries.rows) {
       const issue = issueTypes[Math.floor(Math.random() * issueTypes.length)];
+
+      if (!issue) continue; // Skip if no issue (shouldn't happen)
+
       const status = Math.random() > 0.5 ? 'resolved' : 'investigating';
 
       let resolvedAt = null;

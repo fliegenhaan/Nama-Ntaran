@@ -132,10 +132,10 @@ export default function SchoolDashboard() {
   // Loading state
   if (authLoading || deliveriesLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center mesh-gradient">
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 blockchain-mesh">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Memuat data...</p>
+          <Loader2 className="w-12 h-12 text-white animate-spin mx-auto mb-4" />
+          <p className="text-gray-300">Memuat data...</p>
         </div>
       </div>
     );
@@ -154,7 +154,7 @@ export default function SchoolDashboard() {
   };
 
   return (
-    <div className="flex min-h-screen mesh-gradient">
+    <div className="flex min-h-screen bg-gray-950 blockchain-mesh">
       {/* Sidebar */}
       <ModernSidebar
         navItems={navItems}
@@ -177,17 +177,17 @@ export default function SchoolDashboard() {
           />
 
           {/* School Info Card */}
-          <GlassPanel className="mb-8 gradient-overlay">
+          <GlassPanel className="mb-8">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                <h2 className="text-2xl font-bold text-white mb-1">
                   {schoolInfo.name}
                 </h2>
-                <p className="text-gray-600">NPSN: {schoolInfo.npsn}</p>
-                <p className="text-sm text-gray-500 mt-1">{schoolInfo.address}</p>
+                <p className="text-gray-300">NPSN: {schoolInfo.npsn}</p>
+                <p className="text-sm text-gray-400 mt-1">{schoolInfo.address}</p>
               </div>
               <div className="text-right">
-                <div className="inline-flex items-center gap-2 px-4 py-2 gradient-bg-4 text-white rounded-xl shadow-modern">
+                <div className="inline-flex items-center gap-2 px-4 py-2 gradient-bg-4 text-white rounded-xl shadow-modern transition-smooth">
                   <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
                   <span className="text-sm font-semibold">Status: Aktif</span>
                 </div>
@@ -231,16 +231,16 @@ export default function SchoolDashboard() {
           <section className="mb-8">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                <h2 className="text-2xl font-bold text-white mb-1">
                   Tugas Hari Ini
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-gray-300">
                   {todayDeliveries.length} pengiriman perlu diverifikasi
                 </p>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 glass-subtle rounded-xl">
-                <Calendar className="w-5 h-5 text-blue-600" />
-                <span className="font-semibold text-gray-900">
+                <Calendar className="w-5 h-5 text-blue-400" />
+                <span className="font-semibold text-white">
                   {new Date().toLocaleDateString('id-ID', {
                     day: 'numeric',
                     month: 'long',
@@ -253,8 +253,8 @@ export default function SchoolDashboard() {
             {todayDeliveries.length === 0 ? (
               <GlassPanel>
                 <div className="text-center py-12">
-                  <CheckCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">Tidak ada pengiriman hari ini</p>
+                  <CheckCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-300">Tidak ada pengiriman hari ini</p>
                 </div>
               </GlassPanel>
             ) : (
@@ -281,16 +281,16 @@ export default function SchoolDashboard() {
           <section>
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                <h2 className="text-2xl font-bold text-white mb-1">
                   Riwayat Terkini
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-gray-300">
                   Verifikasi terakhir
                 </p>
               </div>
               <button
                 onClick={() => router.push('/school/history')}
-                className="px-4 py-2 glass-subtle rounded-xl font-semibold hover:shadow-modern transition-smooth"
+                className="px-4 py-2 glass-subtle rounded-xl font-semibold text-white hover:shadow-modern transition-smooth"
               >
                 Lihat Semua
               </button>
@@ -299,7 +299,7 @@ export default function SchoolDashboard() {
             <GlassPanel>
               {recentHistory.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-500">Belum ada riwayat verifikasi</p>
+                  <p className="text-gray-300">Belum ada riwayat verifikasi</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -309,19 +309,19 @@ export default function SchoolDashboard() {
                       className="flex items-center justify-between p-4 glass-subtle rounded-xl hover:shadow-modern transition-smooth"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-green-100">
-                          <CheckCircle className="w-6 h-6 text-green-600" />
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-green-500/20">
+                          <CheckCircle className="w-6 h-6 text-green-400" />
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-900">
+                          <p className="font-semibold text-white">
                             {item.catering_name || 'Katering'}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-gray-300">
                             {item.portions} porsi • {new Date(item.delivery_date).toLocaleDateString('id-ID')}
                           </p>
                         </div>
                       </div>
-                      <div className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                      <div className="px-3 py-1 rounded-full text-xs font-semibold bg-green-500/20 text-green-400">
                         Terverifikasi
                       </div>
                     </div>
@@ -333,30 +333,30 @@ export default function SchoolDashboard() {
 
           {/* Quick Stats */}
           <section className="mt-8">
-            <GlassPanel className="gradient-overlay">
+            <GlassPanel>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center p-6">
                   <div className="w-16 h-16 gradient-bg-1 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-modern">
                     <TrendingUp className="w-8 h-8 text-white" />
                   </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-1">
+                  <p className="text-3xl font-bold text-white mb-1">
                     {totalVerified > 0 ? ((totalVerified / deliveries.length) * 100).toFixed(1) : 0}%
                   </p>
-                  <p className="text-sm text-gray-600">Tingkat Verifikasi</p>
+                  <p className="text-sm text-gray-300">Tingkat Verifikasi</p>
                 </div>
                 <div className="text-center p-6">
                   <div className="w-16 h-16 gradient-bg-4 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-modern">
                     <CheckCircle className="w-8 h-8 text-white" />
                   </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-1">{totalVerified}</p>
-                  <p className="text-sm text-gray-600">Total Verifikasi</p>
+                  <p className="text-3xl font-bold text-white mb-1">{totalVerified}</p>
+                  <p className="text-sm text-gray-300">Total Verifikasi</p>
                 </div>
                 <div className="text-center p-6">
                   <div className="w-16 h-16 gradient-bg-5 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-modern">
                     <Package className="w-8 h-8 text-white" />
                   </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-1">{thisMonthPortions}</p>
-                  <p className="text-sm text-gray-600">Porsi Bulan Ini</p>
+                  <p className="text-3xl font-bold text-white mb-1">{thisMonthPortions}</p>
+                  <p className="text-sm text-gray-300">Porsi Bulan Ini</p>
                 </div>
               </div>
             </GlassPanel>

@@ -54,6 +54,10 @@ router.get('/anomalies', requireRole('admin'), async (req: AuthRequest, res: Res
 // ============================================
 router.get('/vendor-risk/:cateringId', requireRole('admin'), async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.params.cateringId) {
+      return res.status(400).json({ error: 'Invalid catering ID' });
+    }
+
     const cateringId = parseInt(req.params.cateringId);
 
     if (isNaN(cateringId)) {

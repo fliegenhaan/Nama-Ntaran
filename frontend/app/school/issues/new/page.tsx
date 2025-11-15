@@ -15,6 +15,8 @@ import {
   Send,
   ArrowLeft,
   Loader2,
+  LayoutDashboard,
+  History,
 } from 'lucide-react';
 
 function ReportIssueContent() {
@@ -121,20 +123,20 @@ function ReportIssueContent() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center mesh-gradient">
-        <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 blockchain-mesh">
+        <Loader2 className="w-12 h-12 text-white animate-spin" />
       </div>
     );
   }
 
   const navItems = [
-    { label: 'Dashboard', path: '/school' },
-    { label: 'Riwayat', path: '/school/history' },
-    { label: 'Laporan Masalah', path: '/school/issues' },
+    { label: 'Dashboard', path: '/school', icon: LayoutDashboard },
+    { label: 'Riwayat', path: '/school/history', icon: History },
+    { label: 'Laporan Masalah', path: '/school/issues', icon: AlertTriangle },
   ];
 
   return (
-    <div className="flex min-h-screen mesh-gradient">
+    <div className="flex min-h-screen bg-gray-950 blockchain-mesh">
       <ModernSidebar
         navItems={navItems}
         userRole="School"
@@ -157,7 +159,7 @@ function ReportIssueContent() {
           <GlassPanel className="mb-6">
             <button
               onClick={() => router.back()}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-smooth mb-6"
+              className="flex items-center gap-2 text-gray-300 hover:text-white transition-smooth mb-6"
             >
               <ArrowLeft className="w-5 h-5" />
               Kembali
@@ -165,27 +167,27 @@ function ReportIssueContent() {
 
             {selectedDelivery && (
               <div className="mb-6 p-4 glass-subtle rounded-xl">
-                <h3 className="font-semibold text-gray-900 mb-2">
+                <h3 className="font-semibold text-white mb-2">
                   Detail Pengiriman
                 </h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-gray-600">Katering</p>
-                    <p className="font-semibold">{selectedDelivery.catering_name}</p>
+                    <p className="text-gray-400">Katering</p>
+                    <p className="font-semibold text-white">{selectedDelivery.catering_name}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Tanggal</p>
-                    <p className="font-semibold">
+                    <p className="text-gray-400">Tanggal</p>
+                    <p className="font-semibold text-white">
                       {new Date(selectedDelivery.delivery_date).toLocaleDateString('id-ID')}
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Porsi</p>
-                    <p className="font-semibold">{selectedDelivery.portions}</p>
+                    <p className="text-gray-400">Porsi</p>
+                    <p className="font-semibold text-white">{selectedDelivery.portions}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Status</p>
-                    <p className="font-semibold capitalize">{selectedDelivery.status}</p>
+                    <p className="text-gray-400">Status</p>
+                    <p className="font-semibold text-white capitalize">{selectedDelivery.status}</p>
                   </div>
                 </div>
               </div>
@@ -194,13 +196,13 @@ function ReportIssueContent() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Issue Type */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-3">
-                  Jenis Masalah <span className="text-red-500">*</span>
+                <label className="block text-sm font-semibold text-white mb-3">
+                  Jenis Masalah <span className="text-red-400">*</span>
                 </label>
                 <select
                   value={issueType}
                   onChange={(e) => setIssueType(e.target.value)}
-                  className="w-full glass-subtle rounded-xl p-4 outline-none focus-ring"
+                  className="w-full bg-white/10 border border-white/20 rounded-xl p-4 text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-smooth"
                   required
                 >
                   <option value="late_delivery">Keterlambatan Pengiriman</option>
@@ -213,15 +215,15 @@ function ReportIssueContent() {
 
               {/* Severity */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-3">
+                <label className="block text-sm font-semibold text-white mb-3">
                   Tingkat Keparahan
                 </label>
                 <div className="grid grid-cols-4 gap-3">
                   {[
-                    { value: 'low', label: 'Rendah', color: 'bg-green-100 text-green-700 hover:bg-green-200' },
-                    { value: 'medium', label: 'Sedang', color: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' },
-                    { value: 'high', label: 'Tinggi', color: 'bg-orange-100 text-orange-700 hover:bg-orange-200' },
-                    { value: 'critical', label: 'Kritis', color: 'bg-red-100 text-red-700 hover:bg-red-200' },
+                    { value: 'low', label: 'Rendah', color: 'bg-green-500/20 text-green-400 hover:bg-green-500/30' },
+                    { value: 'medium', label: 'Sedang', color: 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30' },
+                    { value: 'high', label: 'Tinggi', color: 'bg-orange-500/20 text-orange-400 hover:bg-orange-500/30' },
+                    { value: 'critical', label: 'Kritis', color: 'bg-red-500/20 text-red-400 hover:bg-red-500/30' },
                   ].map((item) => (
                     <button
                       key={item.value}
@@ -229,8 +231,8 @@ function ReportIssueContent() {
                       onClick={() => setSeverity(item.value)}
                       className={`p-3 rounded-xl font-semibold transition-smooth ${
                         severity === item.value
-                          ? `${item.color} ring-2 ring-offset-2 ring-blue-500`
-                          : 'glass-subtle hover:shadow-modern'
+                          ? `${item.color} ring-2 ring-offset-2 ring-blue-400`
+                          : 'bg-white/10 text-white hover:bg-white/20'
                       }`}
                     >
                       {item.label}
@@ -241,35 +243,35 @@ function ReportIssueContent() {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-3">
-                  Deskripsi Masalah <span className="text-red-500">*</span>
+                <label className="block text-sm font-semibold text-white mb-3">
+                  Deskripsi Masalah <span className="text-red-400">*</span>
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={6}
                   placeholder="Jelaskan masalah secara detail..."
-                  className="w-full glass-subtle rounded-xl p-4 outline-none focus-ring resize-none"
+                  className="w-full bg-white/10 border border-white/20 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-smooth resize-none"
                   required
                 />
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-gray-400 mt-2">
                   {description.length} / 500 karakter
                 </p>
               </div>
 
               {/* Photo Upload */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-3">
+                <label className="block text-sm font-semibold text-white mb-3">
                   Upload Foto Bukti (Opsional)
                 </label>
                 {!photoPreview ? (
                   <label className="block cursor-pointer">
-                    <div className="glass-subtle rounded-2xl p-8 border-2 border-dashed border-gray-300 hover:border-blue-500 transition-smooth text-center">
+                    <div className="bg-white/10 rounded-2xl p-8 border-2 border-dashed border-white/30 hover:border-blue-400 transition-smooth text-center">
                       <Upload className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                      <p className="font-semibold text-gray-700 mb-1">
+                      <p className="font-semibold text-white mb-1">
                         Klik untuk upload foto
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-400">
                         PNG, JPG, WebP hingga 5MB
                       </p>
                     </div>
@@ -293,7 +295,7 @@ function ReportIssueContent() {
                         setPhoto(null);
                         setPhotoPreview(null);
                       }}
-                      className="absolute top-4 right-4 p-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-smooth"
+                      className="absolute top-4 right-4 p-2 gradient-bg-3 text-white rounded-xl hover:shadow-glow transition-smooth"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -306,7 +308,7 @@ function ReportIssueContent() {
                 <button
                   type="button"
                   onClick={() => router.back()}
-                  className="flex-1 py-3 glass-subtle rounded-xl font-semibold hover:shadow-modern transition-smooth"
+                  className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-semibold transition-smooth"
                   disabled={isSubmitting}
                 >
                   Batal
@@ -314,16 +316,16 @@ function ReportIssueContent() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 gradient-bg-2 text-white py-3 rounded-xl font-semibold hover:shadow-glow transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 gradient-bg-2 text-white py-3 rounded-xl font-bold hover:shadow-glow transition-smooth disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="w-5 h-5 inline mr-2 animate-spin" />
+                      <Loader2 className="w-5 h-5 animate-spin" />
                       Mengirim...
                     </>
                   ) : (
                     <>
-                      <Send className="w-5 h-5 inline mr-2" />
+                      <Send className="w-5 h-5" />
                       Kirim Laporan
                     </>
                   )}
@@ -341,8 +343,8 @@ export default function ReportIssuePage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center mesh-gradient">
-          <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+        <div className="min-h-screen flex items-center justify-center bg-gray-950 blockchain-mesh">
+          <Loader2 className="w-12 h-12 text-white animate-spin" />
         </div>
       }
     >

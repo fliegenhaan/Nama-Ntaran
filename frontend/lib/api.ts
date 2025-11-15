@@ -105,6 +105,13 @@ export const authApi = {
     });
   },
 
+  async registerAdmin(email: string, password: string, name: string, inviteCode: string) {
+    return apiRequest('/api/auth/register-admin', {
+      method: 'POST',
+      body: { email, password, name, inviteCode },
+    });
+  },
+
   logout() {
     removeToken();
   },

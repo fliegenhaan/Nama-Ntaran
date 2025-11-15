@@ -441,6 +441,34 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
   }
 });
 
+// GET /api/verifications/:id/ai-analysis - Get AI analysis for verification
+router.get('/:id/ai-analysis', async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `SELECT ai.* FROM ai_food_analyses ai
+       JOIN verifications v ON ai.verification_id = v.id
+       WHERE v.id = $1`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'AI analysis not found for this verification' });
+    }
+
+    res.json({
+      analysis: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Get AI analysis error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch AI analysis',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 // GET /api/verifications/stats - Get verification statistics
 router.get('/stats/summary', async (req: AuthRequest, res: Response) => {
   try {

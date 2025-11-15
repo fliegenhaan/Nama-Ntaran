@@ -137,12 +137,12 @@ export default function VerifyQRPage() {
 
   return (
     <DashboardLayout role="school">
-      <div className="p-6">
+      <div className="p-6 min-h-screen bg-gray-950 blockchain-mesh">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-3 mb-4">
-              <div className="w-16 h-16 gradient-bg-3 rounded-2xl flex items-center justify-center">
+              <div className="w-16 h-16 gradient-bg-3 rounded-2xl flex items-center justify-center shadow-modern">
                 <Camera className="w-8 h-8 text-white" />
               </div>
             </div>
@@ -170,7 +170,7 @@ export default function VerifyQRPage() {
               ) : (
                 <button
                   onClick={stopScanning}
-                  className="w-full bg-red-500 hover:bg-red-600 text-white px-6 py-4 rounded-xl font-bold transition-smooth flex items-center justify-center gap-2"
+                  className="w-full gradient-bg-3 text-white px-6 py-4 rounded-xl font-bold hover:shadow-glow transition-smooth flex items-center justify-center gap-2"
                 >
                   <XCircle className="w-5 h-5" />
                   Stop Scanning
@@ -231,14 +231,14 @@ export default function VerifyQRPage() {
                       className={`flex-1 py-3 rounded-xl font-bold transition-smooth ${
                         qualityRating === rating
                           ? 'gradient-bg-4 text-white shadow-glow'
-                          : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                          : 'bg-white/10 text-white hover:bg-white/20'
                       }`}
                     >
                       {rating}
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-gray-300 mt-2 text-center">
+                <p className="text-xs text-gray-400 mt-2 text-center">
                   1 = Buruk, 5 = Sangat Baik
                 </p>
               </div>
@@ -291,7 +291,7 @@ export default function VerifyQRPage() {
           {/* Success Message */}
           {verified && (
             <div className="glass rounded-2xl p-8 text-center">
-              <div className="w-20 h-20 gradient-bg-4 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-20 h-20 gradient-bg-4 rounded-full flex items-center justify-center mx-auto mb-4 shadow-modern">
                 <CheckCircle className="w-10 h-10 text-white" />
               </div>
               <h2 className="text-3xl font-bold text-white mb-2">
@@ -310,12 +310,12 @@ export default function VerifyQRPage() {
           <div className="glass rounded-2xl p-6">
             <h3 className="font-bold text-white mb-3">Petunjuk:</h3>
             <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300">
-              <li>Klik tombol "Mulai Scan QR Code"</li>
+              <li>Klik tombol &quot;Mulai Scan QR Code&quot;</li>
               <li>Izinkan akses kamera jika diminta browser</li>
               <li>Arahkan kamera ke QR code di kotak makanan</li>
               <li>Tunggu hingga QR code terbaca otomatis</li>
               <li>Periksa detail delivery, beri penilaian kualitas</li>
-              <li>Klik "Verifikasi Penerimaan" untuk selesai</li>
+              <li>Klik &quot;Verifikasi Penerimaan&quot; untuk selesai</li>
             </ol>
           </div>
         </div>

@@ -8,7 +8,8 @@
  * Fallback to cached/simulated data if API unavailable
  */
 
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
+import type { AxiosInstance } from 'axios';
 import { pool } from '../config/database.js';
 
 // ============================================

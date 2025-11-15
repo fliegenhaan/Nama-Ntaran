@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc && npm run copy-contracts",
+    "copy-contracts": "mkdir -p dist/contracts && cp src/contracts/*.json dist/contracts/ || (if not exist dist\\contracts mkdir dist\\contracts && copy src\\contracts\\*.json dist\\contracts\\)",
     "start": "node dist/server.js"
   },
   "keywords": [],
@@ -17,7 +18,7 @@
     "@types/multer": "^2.0.0",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
-    "cohere-ai": "^7.15.0",
+    "cohere-ai": "^7.19.0",
     "cors": "^2.8.5",
     "csv-parse": "^6.1.0",
     "dotenv": "^17.2.3",

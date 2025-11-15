@@ -188,24 +188,32 @@ export async function findSimilarAnomalies(
       inputType: 'search_document',
     });
 
-    const embeddings = response.embeddings;
+    const embeddings = response.embeddings as number[][];
 
-    if (!embeddings || embeddings.length === 0) {
+    if (!embeddings || !Array.isArray(embeddings) || embeddings.length === 0) {
       return [];
     }
 
     const newEmbedding = embeddings[0];
+    if (!newEmbedding) {
+      return [];
+    }
+
     const matches: FraudPatternMatch[] = [];
 
     // Calculate cosine similarity dengan historical anomalies
     for (let i = 1; i < embeddings.length; i++) {
-      const similarity = cosineSimilarity(newEmbedding, embeddings[i]);
+      const embedding = embeddings[i];
+      if (!embedding) continue;
 
-      if (similarity > 0.7) { // Threshold untuk "similar"
+      const similarity = cosineSimilarity(newEmbedding, embedding);
+      const anomaly = historicalAnomalies[i - 1];
+
+      if (similarity > 0.7 && anomaly) { // Threshold untuk "similar"
         matches.push({
-          similarAnomalyId: historicalAnomalies[i - 1].id,
+          similarAnomalyId: anomaly.id,
           similarityScore: similarity,
-          description: historicalAnomalies[i - 1].description,
+          description: anomaly.description,
         });
       }
     }
@@ -234,9 +242,13 @@ function cosineSimilarity(vec1: number[], vec2: number[]): number {
   let mag2 = 0;
 
   for (let i = 0; i < vec1.length; i++) {
-    dotProduct += vec1[i] * vec2[i];
-    mag1 += vec1[i] * vec1[i];
-    mag2 += vec2[i] * vec2[i];
+    const v1 = vec1[i];
+    const v2 = vec2[i];
+    if (v1 !== undefined && v2 !== undefined) {
+      dotProduct += v1 * v2;
+      mag1 += v1 * v1;
+      mag2 += v2 * v2;
+    }
   }
 
   mag1 = Math.sqrt(mag1);

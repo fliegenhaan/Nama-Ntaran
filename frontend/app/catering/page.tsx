@@ -103,7 +103,7 @@ export default function CateringDashboard() {
   ];
 
   return (
-    <div className="flex min-h-screen mesh-gradient">
+    <div className="flex min-h-screen bg-gray-950 blockchain-mesh">
       <ModernSidebar
         navItems={navItems}
         userRole="Catering"
@@ -121,19 +121,19 @@ export default function CateringDashboard() {
           />
 
           {/* Catering Info */}
-          <GlassPanel className="mb-8 gradient-overlay">
+          <GlassPanel className="mb-8">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                <h2 className="text-2xl font-bold text-white mb-1">
                   {cateringInfo.name}
                 </h2>
-                <p className="text-gray-600">SIUP: {cateringInfo.license}</p>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-gray-300">SIUP: {cateringInfo.license}</p>
+                <p className="text-sm text-gray-400 mt-1">
                   Melayani {stats.schoolsServed} sekolah
                 </p>
               </div>
               <div className="text-right">
-                <div className="inline-flex items-center gap-2 px-4 py-2 gradient-bg-2 text-white rounded-xl shadow-modern">
+                <div className="inline-flex items-center gap-2 px-4 py-2 gradient-bg-4 text-white rounded-xl shadow-modern transition-smooth">
                   <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
                   <span className="text-sm font-semibold">Status: Aktif</span>
                 </div>
@@ -192,10 +192,10 @@ export default function CateringDashboard() {
           {/* Calendar Section */}
           <section className="mb-8">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">
+              <h2 className="text-2xl font-bold text-white mb-1">
                 Jadwal Pengiriman
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-300">
                 Kalender lengkap pengiriman makanan ke sekolah
               </p>
             </div>
@@ -205,10 +205,10 @@ export default function CateringDashboard() {
           {/* Payment Timeline */}
           <section className="mb-8">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">
+              <h2 className="text-2xl font-bold text-white mb-1">
                 Status Pembayaran
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-300">
                 Timeline pencairan dana dari blockchain escrow
               </p>
             </div>
@@ -217,8 +217,8 @@ export default function CateringDashboard() {
 
           {/* Performance Metrics */}
           <section>
-            <GlassPanel className="gradient-overlay">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">
+            <GlassPanel>
+              <h3 className="text-xl font-bold text-white mb-6">
                 Performance Metrics
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -226,29 +226,29 @@ export default function CateringDashboard() {
                   <div className="w-16 h-16 gradient-bg-1 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-modern">
                     <TrendingUp className="w-8 h-8 text-white" />
                   </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-1">98.5%</p>
-                  <p className="text-sm text-gray-600">On-Time Delivery</p>
+                  <p className="text-3xl font-bold text-white mb-1">98.5%</p>
+                  <p className="text-sm text-gray-300">On-Time Delivery</p>
                 </div>
                 <div className="text-center p-6">
                   <div className="w-16 h-16 gradient-bg-4 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-modern">
                     <CheckCircle className="w-8 h-8 text-white" />
                   </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-1">4.8/5</p>
-                  <p className="text-sm text-gray-600">Rating Kualitas</p>
+                  <p className="text-3xl font-bold text-white mb-1">4.8/5</p>
+                  <p className="text-sm text-gray-300">Rating Kualitas</p>
                 </div>
                 <div className="text-center p-6">
                   <div className="w-16 h-16 gradient-bg-2 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-modern">
                     <Clock className="w-8 h-8 text-white" />
                   </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-1">2.3 jam</p>
-                  <p className="text-sm text-gray-600">Avg. Payment Time</p>
+                  <p className="text-3xl font-bold text-white mb-1">2.3 jam</p>
+                  <p className="text-sm text-gray-300">Avg. Payment Time</p>
                 </div>
                 <div className="text-center p-6">
                   <div className="w-16 h-16 gradient-bg-5 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-modern">
                     <Package className="w-8 h-8 text-white" />
                   </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-1">15,420</p>
-                  <p className="text-sm text-gray-600">Total Porsi Bulan Ini</p>
+                  <p className="text-3xl font-bold text-white mb-1">15,420</p>
+                  <p className="text-sm text-gray-300">Total Porsi Bulan Ini</p>
                 </div>
               </div>
             </GlassPanel>

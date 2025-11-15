@@ -3,25 +3,25 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
-import useDeliveries from '../../hooks/useDeliveries';
 import ModernSidebar from '../../components/layout/ModernSidebar';
 import PageHeader from '../../components/layout/PageHeader';
 import GlassPanel from '../../components/ui/GlassPanel';
 import {
-  History,
+  LayoutDashboard,
+  DollarSign,
+  Calendar,
+  Receipt,
+  Loader2,
   CheckCircle,
   XCircle,
   Clock,
   Package,
-  Calendar,
   Filter,
   Download,
   Search,
-  Loader2,
   ChevronLeft,
   ChevronRight,
-  LayoutDashboard,
-  AlertTriangle,
+  Truck,
 } from 'lucide-react';
 
 export default function HistoryPage() {
@@ -36,28 +36,55 @@ export default function HistoryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
 
-  const { deliveries, isLoading, refetch } = useDeliveries({
-    school_id: user?.school_id,
-    status: statusFilter,
-    date_from: dateFrom,
-    date_to: dateTo,
-    page: currentPage,
-    limit: 10,
-  });
-
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login');
     }
-    if (!authLoading && isAuthenticated && user?.role !== 'school') {
+    if (!authLoading && isAuthenticated && user?.role !== 'catering') {
       router.push('/');
     }
   }, [authLoading, isAuthenticated, user, router]);
 
+  // Mock data - replace with actual API call
+  const deliveries = [
+    {
+      id: 1,
+      school_name: 'SDN 01 Bandung',
+      delivery_date: '2025-11-14T10:30:00',
+      portions: 250,
+      amount: 15000000,
+      status: 'verified',
+    },
+    {
+      id: 2,
+      school_name: 'SDN 05 Jakarta',
+      delivery_date: '2025-11-13T11:00:00',
+      portions: 180,
+      amount: 12500000,
+      status: 'verified',
+    },
+    {
+      id: 3,
+      school_name: 'SMP 12 Surabaya',
+      delivery_date: '2025-11-12T09:30:00',
+      portions: 200,
+      amount: 18000000,
+      status: 'verified',
+    },
+    {
+      id: 4,
+      school_name: 'SDN 02 Bandung',
+      delivery_date: '2025-11-11T10:00:00',
+      portions: 220,
+      amount: 16000000,
+      status: 'cancelled',
+    },
+  ];
+
   const handleApplyFilters = () => {
     setCurrentPage(1);
-    refetch();
+    // Implement filter logic
   };
 
   const handleResetFilters = () => {
@@ -66,28 +93,27 @@ export default function HistoryPage() {
     setDateTo('');
     setSearchQuery('');
     setCurrentPage(1);
-    refetch();
   };
 
   const handleExport = () => {
-    // TODO: Implement CSV export
     alert('Fitur export akan segera hadir!');
   };
 
-  // Filter deliveries by search query (client-side)
+  // Filter deliveries by search query
   const filteredDeliveries = deliveries.filter(d => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
-      d.catering_name?.toLowerCase().includes(query) ||
+      d.school_name?.toLowerCase().includes(query) ||
       d.id.toString().includes(query)
     );
   });
 
   const navItems = [
-    { label: 'Dashboard', path: '/school', icon: LayoutDashboard },
-    { label: 'Riwayat', path: '/school/history', icon: History },
-    { label: 'Laporan Masalah', path: '/school/issues', icon: AlertTriangle },
+    { label: 'Dashboard', path: '/catering', icon: LayoutDashboard },
+    { label: 'Jadwal', path: '/catering/schedule', icon: Calendar },
+    { label: 'Pembayaran', path: '/catering/payments', icon: DollarSign },
+    { label: 'Riwayat', path: '/catering/history', icon: Receipt },
   ];
 
   if (authLoading || !user) {
@@ -102,7 +128,7 @@ export default function HistoryPage() {
     const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
       pending: { label: 'Pending', color: 'bg-gray-500/20 text-gray-300', icon: Clock },
       scheduled: { label: 'Terjadwal', color: 'bg-blue-500/20 text-blue-400', icon: Calendar },
-      delivered: { label: 'Terkirim', color: 'bg-yellow-500/20 text-yellow-400', icon: Package },
+      delivered: { label: 'Terkirim', color: 'bg-yellow-500/20 text-yellow-400', icon: Truck },
       verified: { label: 'Terverifikasi', color: 'bg-green-500/20 text-green-400', icon: CheckCircle },
       cancelled: { label: 'Dibatalkan', color: 'bg-red-500/20 text-red-400', icon: XCircle },
     };
@@ -122,19 +148,19 @@ export default function HistoryPage() {
     <div className="flex min-h-screen bg-gray-950 blockchain-mesh">
       <ModernSidebar
         navItems={navItems}
-        userRole="School"
-        userName="Kepala Sekolah"
-        userEmail={user.school_name || 'Sekolah'}
+        userRole="Catering"
+        userName="Katering Manager"
+        userEmail={user.company_name || 'Katering'}
       />
 
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto p-8">
           <PageHeader
             title="Riwayat Pengiriman"
-            subtitle="Lihat semua riwayat pengiriman dan verifikasi"
-            icon={History}
+            subtitle="Lihat semua riwayat pengiriman dan pembayaran"
+            icon={Receipt}
             breadcrumbs={[
-              { label: 'Dashboard', href: '/school' },
+              { label: 'Dashboard', href: '/catering' },
               { label: 'Riwayat' },
             ]}
           />
@@ -157,7 +183,7 @@ export default function HistoryPage() {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Cari berdasarkan katering atau ID..."
+                placeholder="Cari berdasarkan sekolah atau ID..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-smooth outline-none"
@@ -247,14 +273,9 @@ export default function HistoryPage() {
 
           {/* Deliveries Table */}
           <GlassPanel>
-            {isLoading ? (
+            {filteredDeliveries.length === 0 ? (
               <div className="text-center py-12">
-                <Loader2 className="w-12 h-12 text-white animate-spin mx-auto mb-4" />
-                <p className="text-gray-300">Memuat data...</p>
-              </div>
-            ) : filteredDeliveries.length === 0 ? (
-              <div className="text-center py-12">
-                <History className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <Receipt className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-300">Tidak ada riwayat ditemukan</p>
               </div>
             ) : (
@@ -263,7 +284,7 @@ export default function HistoryPage() {
                   <thead>
                     <tr className="border-b border-white/20">
                       <th className="text-left p-4 font-semibold text-white">ID</th>
-                      <th className="text-left p-4 font-semibold text-white">Katering</th>
+                      <th className="text-left p-4 font-semibold text-white">Sekolah</th>
                       <th className="text-left p-4 font-semibold text-white">Tanggal</th>
                       <th className="text-left p-4 font-semibold text-white">Porsi</th>
                       <th className="text-left p-4 font-semibold text-white">Jumlah</th>
@@ -281,8 +302,7 @@ export default function HistoryPage() {
                           <span className="font-mono text-sm text-gray-300">#{delivery.id}</span>
                         </td>
                         <td className="p-4">
-                          <p className="font-semibold text-white">{delivery.catering_name}</p>
-                          <p className="text-sm text-gray-400">{delivery.catering_company}</p>
+                          <p className="font-semibold text-white">{delivery.school_name}</p>
                         </td>
                         <td className="p-4">
                           <p className="text-gray-300">
@@ -304,7 +324,7 @@ export default function HistoryPage() {
                         <td className="p-4">{getStatusBadge(delivery.status)}</td>
                         <td className="p-4">
                           <button
-                            onClick={() => router.push(`/school/deliveries/${delivery.id}`)}
+                            onClick={() => router.push(`/catering/deliveries/${delivery.id}`)}
                             className="text-blue-400 hover:text-blue-300 font-semibold text-sm transition-smooth"
                           >
                             Detail

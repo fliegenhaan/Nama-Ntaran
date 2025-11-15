@@ -198,6 +198,10 @@ router.get('/:escrowId', async (req: Request, res: Response) => {
   try {
     const { escrowId } = req.params;
 
+    if (!escrowId) {
+      return res.status(400).json({ error: 'Escrow ID is required' });
+    }
+
     // Get from blockchain
     const blockchainData = await blockchainService.getEscrowDetails(escrowId);
 

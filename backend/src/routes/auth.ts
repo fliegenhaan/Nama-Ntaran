@@ -96,6 +96,89 @@ router.post('/register', async (req: Request, res: Response) => {
   }
 });
 
+// POST /api/auth/register-admin (admin registration with invite code)
+router.post('/register-admin', async (req: Request, res: Response) => {
+  const { email, password, name, inviteCode } = req.body;
+
+  // Validation
+  if (!email || !password || !inviteCode) {
+    return res.status(400).json({
+      error: 'Email, password, and invite code are required'
+    });
+  }
+
+  // Validate invite code (hardcoded for now, can be stored in DB later)
+  const ADMIN_INVITE_CODE = process.env.ADMIN_INVITE_CODE || 'MBG-ADMIN-2025';
+  if (inviteCode !== ADMIN_INVITE_CODE) {
+    return res.status(403).json({
+      error: 'Invalid invite code'
+    });
+  }
+
+  if (password.length < 8) {
+    return res.status(400).json({
+      error: 'Password must be at least 8 characters for admin accounts'
+    });
+  }
+
+  try {
+    // Check if user already exists
+    const existingUser = await pool.query(
+      'SELECT id FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({
+        error: 'Email already registered'
+      });
+    }
+
+    // Hash password
+    const saltRounds = 12; // Higher for admin accounts
+    const password_hash = await bcrypt.hash(password, saltRounds);
+
+    // Insert admin user
+    const userResult = await pool.query(
+      `INSERT INTO users (email, password_hash, role, is_active)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, email, role, created_at`,
+      [email, password_hash, 'admin', true]
+    );
+
+    const user = userResult.rows[0];
+
+    // Generate JWT token
+    const secret = process.env.JWT_SECRET || 'nutrichain-secret-key';
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role
+      },
+      secret,
+      { expiresIn: '7d' }
+    );
+
+    res.status(201).json({
+      message: 'Admin registration successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        created_at: user.created_at
+      },
+      token
+    });
+  } catch (error) {
+    console.error('Admin registration error:', error);
+    res.status(500).json({
+      error: 'Admin registration failed',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 // POST /api/auth/login
 router.post('/login', async (req: Request, res: Response) => {
   const { email, password } = req.body;

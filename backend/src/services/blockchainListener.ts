@@ -264,18 +264,18 @@ export async function syncPastEvents(fromBlock: number = 0) {
     console.log(`  Current block: ${currentBlock}`);
 
     // Get past FundLocked events
-    const lockedFilter = contract.filters.FundLocked();
-    const lockedEvents = await contract.queryFilter(lockedFilter, fromBlock, currentBlock);
+    const lockedFilter = contract.filters.FundLocked?.();
+    const lockedEvents = lockedFilter ? await contract.queryFilter(lockedFilter, fromBlock, currentBlock) : [];
     console.log(`  Found ${lockedEvents.length} FundLocked events`);
 
     // Get past FundReleased events
-    const releasedFilter = contract.filters.FundReleased();
-    const releasedEvents = await contract.queryFilter(releasedFilter, fromBlock, currentBlock);
+    const releasedFilter = contract.filters.FundReleased?.();
+    const releasedEvents = releasedFilter ? await contract.queryFilter(releasedFilter, fromBlock, currentBlock) : [];
     console.log(`  Found ${releasedEvents.length} FundReleased events`);
 
     // Get past FundCancelled events
-    const cancelledFilter = contract.filters.FundCancelled();
-    const cancelledEvents = await contract.queryFilter(cancelledFilter, fromBlock, currentBlock);
+    const cancelledFilter = contract.filters.FundCancelled?.();
+    const cancelledEvents = cancelledFilter ? await contract.queryFilter(cancelledFilter, fromBlock, currentBlock) : [];
     console.log(`  Found ${cancelledEvents.length} FundCancelled events`);
 
     console.log('✅ Past events synced successfully!');

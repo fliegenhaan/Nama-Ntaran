@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 import ModernSidebar from '../components/layout/ModernSidebar';
 import PageHeader from '../components/layout/PageHeader';
 import GlassPanel from '../components/ui/GlassPanel';
@@ -24,10 +26,23 @@ import {
   Map,
   Download,
   BarChart3,
+  Loader2,
 } from 'lucide-react';
 
 export default function AdminDashboard() {
+  const router = useRouter();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const [activeSection, setActiveSection] = useState<'overview' | 'accounts' | 'escrow' | 'issues'>('overview');
+
+  // Redirect if not authenticated or not admin
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+    if (!authLoading && isAuthenticated && user?.role !== 'admin') {
+      router.push('/');
+    }
+  }, [authLoading, isAuthenticated, user, router]);
 
   const adminInfo = {
     name: 'Admin MBG',
@@ -59,13 +74,24 @@ export default function AdminDashboard() {
     // TODO: Implement report export functionality
   };
 
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 blockchain-mesh">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-white animate-spin mx-auto mb-4" />
+          <p className="text-gray-300">Memuat dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen mesh-gradient">
+    <div className="flex min-h-screen bg-gray-950 blockchain-mesh">
       <ModernSidebar
         navItems={navItems}
         userRole="Administrator"
-        userName={adminInfo.name}
-        userEmail={adminInfo.email}
+        userName={user.name || adminInfo.name}
+        userEmail={user.email || adminInfo.email}
       />
 
       <main className="flex-1 overflow-y-auto">

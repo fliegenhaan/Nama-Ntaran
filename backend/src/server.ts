@@ -19,6 +19,7 @@ import analyticsRoutes from './routes/analytics.js';
 import blockchainRoutes from './routes/blockchain.js';
 import escrowRoutes from './routes/escrow.js';
 import aiAnalyticsRoutes from './routes/aiAnalytics.js';
+import manualReviewRoutes from './routes/manualReview.js';
 
 dotenv.config();
 
@@ -56,6 +57,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/blockchain', blockchainRoutes);
 app.use('/api/escrow', escrowRoutes);
 app.use('/api/ai-analytics', aiAnalyticsRoutes); // 🤖 AI Analytics endpoints
+app.use('/api/manual-review', manualReviewRoutes); // 👨‍💼 Manual Review endpoints
 
 // Health check route
 app.get('/api/health', async (req, res) => {
