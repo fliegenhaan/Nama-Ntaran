@@ -30,6 +30,7 @@ import type {
 export interface EscrowSystemInterface extends utils.Interface {
   functions: {
     "admin()": FunctionFragment;
+    "cancelEscrow(bytes32,string)": FunctionFragment;
     "changeAdmin(address)": FunctionFragment;
     "escrows(bytes32)": FunctionFragment;
     "getEscrow(bytes32)": FunctionFragment;
@@ -40,6 +41,7 @@ export interface EscrowSystemInterface extends utils.Interface {
   getFunction(
     nameOrSignatureOrTopic:
       | "admin"
+      | "cancelEscrow"
       | "changeAdmin"
       | "escrows"
       | "getEscrow"
@@ -48,6 +50,10 @@ export interface EscrowSystemInterface extends utils.Interface {
   ): FunctionFragment;
 
   encodeFunctionData(functionFragment: "admin", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "cancelEscrow",
+    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+  ): string;
   encodeFunctionData(
     functionFragment: "changeAdmin",
     values: [PromiseOrValue<string>]
@@ -75,6 +81,10 @@ export interface EscrowSystemInterface extends utils.Interface {
 
   decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "cancelEscrow",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "changeAdmin",
     data: BytesLike
   ): Result;
@@ -87,13 +97,28 @@ export interface EscrowSystemInterface extends utils.Interface {
   ): Result;
 
   events: {
+    "FundCancelled(bytes32,address,uint256,string)": EventFragment;
     "FundLocked(bytes32,address,address,uint256,string)": EventFragment;
     "FundReleased(bytes32,address,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "FundCancelled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FundLocked"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FundReleased"): EventFragment;
 }
+
+export interface FundCancelledEventObject {
+  escrowId: string;
+  payer: string;
+  amount: BigNumber;
+  reason: string;
+}
+export type FundCancelledEvent = TypedEvent<
+  [string, string, BigNumber, string],
+  FundCancelledEventObject
+>;
+
+export type FundCancelledEventFilter = TypedEventFilter<FundCancelledEvent>;
 
 export interface FundLockedEventObject {
   escrowId: string;
@@ -149,6 +174,12 @@ export interface EscrowSystem extends BaseContract {
 
   functions: {
     admin(overrides?: CallOverrides): Promise<[string]>;
+
+    cancelEscrow(
+      escrowId: PromiseOrValue<BytesLike>,
+      reason: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     changeAdmin(
       newAdmin: PromiseOrValue<string>,
@@ -209,6 +240,12 @@ export interface EscrowSystem extends BaseContract {
 
   admin(overrides?: CallOverrides): Promise<string>;
 
+  cancelEscrow(
+    escrowId: PromiseOrValue<BytesLike>,
+    reason: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   changeAdmin(
     newAdmin: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -268,6 +305,12 @@ export interface EscrowSystem extends BaseContract {
   callStatic: {
     admin(overrides?: CallOverrides): Promise<string>;
 
+    cancelEscrow(
+      escrowId: PromiseOrValue<BytesLike>,
+      reason: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     changeAdmin(
       newAdmin: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -326,6 +369,19 @@ export interface EscrowSystem extends BaseContract {
   };
 
   filters: {
+    "FundCancelled(bytes32,address,uint256,string)"(
+      escrowId?: PromiseOrValue<BytesLike> | null,
+      payer?: PromiseOrValue<string> | null,
+      amount?: null,
+      reason?: null
+    ): FundCancelledEventFilter;
+    FundCancelled(
+      escrowId?: PromiseOrValue<BytesLike> | null,
+      payer?: PromiseOrValue<string> | null,
+      amount?: null,
+      reason?: null
+    ): FundCancelledEventFilter;
+
     "FundLocked(bytes32,address,address,uint256,string)"(
       escrowId?: PromiseOrValue<BytesLike> | null,
       payer?: PromiseOrValue<string> | null,
@@ -355,6 +411,12 @@ export interface EscrowSystem extends BaseContract {
 
   estimateGas: {
     admin(overrides?: CallOverrides): Promise<BigNumber>;
+
+    cancelEscrow(
+      escrowId: PromiseOrValue<BytesLike>,
+      reason: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     changeAdmin(
       newAdmin: PromiseOrValue<string>,
@@ -386,6 +448,12 @@ export interface EscrowSystem extends BaseContract {
 
   populateTransaction: {
     admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    cancelEscrow(
+      escrowId: PromiseOrValue<BytesLike>,
+      reason: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     changeAdmin(
       newAdmin: PromiseOrValue<string>,

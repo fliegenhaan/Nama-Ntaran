@@ -1,7 +1,48 @@
+# Dependencies
 **/node_modules
+**/package-lock.json
+
+# Build outputs
 **/dist
 **/build
+**/.next
+**/out
+
+# Environment Variables (CRITICAL - never commit!)
 **/.env
 **/.env.*
+!**/.env.example
+
+# Blockchain
 **/artifacts
 **/cache
+**/typechain-types
+**/deployments/*.json
+!**/deployments/.gitkeep
+
+# Uploads (user-generated files)
+**/uploads/**
+!**/uploads/.gitkeep
+
+# Logs
+**/*.log
+**/logs
+
+# OS Files
+.DS_Store
+Thumbs.db
+**/.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# TypeScript
+**/*.tsbuildinfo
+**/next-env.d.ts
+
+# Testing
+**/coverage
+**/.nyc_output

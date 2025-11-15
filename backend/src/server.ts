@@ -1,17 +1,54 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import { pool } from './config/database.js';
 import { testBlockchainConnection } from './config/blockchain.js';
+import { setSocketIO } from './config/socket.js';
+
+// Import routes
+import authRoutes from './routes/auth.js';
+import schoolsRoutes from './routes/schools.js';
+import deliveriesRoutes from './routes/deliveries.js';
+import verificationsRoutes from './routes/verifications.js';
+import cateringsRoutes from './routes/caterings.js';
+import issuesRoutes from './routes/issues.js';
+import analyticsRoutes from './routes/analytics.js';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const httpServer = createServer(app);
+const PORT = process.env.PORT || 3001;
+
+// Setup Socket.IO
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
+});
+
+// Set Socket.IO instance for use in other modules
+setSocketIO(io);
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static('uploads'));
+
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/schools', schoolsRoutes);
+app.use('/api/deliveries', deliveriesRoutes);
+app.use('/api/verifications', verificationsRoutes);
+app.use('/api/caterings', cateringsRoutes);
+app.use('/api/issues', issuesRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Health check route
 app.get('/api/health', async (req, res) => {
@@ -72,8 +109,38 @@ app.get('/api/blockchain-test', async (req, res) => {
   }
 });
 
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log(`✅ Client connected: ${socket.id}`);
+
+  // Join room based on user role and ID
+  socket.on('join', (data: { userId: number; role: string; schoolId?: number; cateringId?: number }) => {
+    const { userId, role, schoolId, cateringId } = data;
+
+    // Join user-specific room
+    socket.join(`user:${userId}`);
+
+    // Join role-specific rooms
+    if (role === 'school' && schoolId) {
+      socket.join(`school:${schoolId}`);
+      console.log(`📚 User ${userId} joined school room ${schoolId}`);
+    } else if (role === 'catering' && cateringId) {
+      socket.join(`catering:${cateringId}`);
+      console.log(`🍽️  User ${userId} joined catering room ${cateringId}`);
+    } else if (role === 'admin') {
+      socket.join('admin');
+      console.log(`👑 Admin ${userId} joined admin room`);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`❌ Client disconnected: ${socket.id}`);
+  });
+});
+
 // Start server
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🔌 WebSocket server ready`);
 });

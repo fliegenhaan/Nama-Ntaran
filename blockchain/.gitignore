@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+
+# Hardhat
+artifacts/
+cache/
+coverage/
+
+# TypeChain generated files
+typechain-types/
+typechain/
+
+# Environment Variables
+.env
+.env.local
+.env.production
+
+# Deployment files (contains sensitive info)
+deployments/localhost.json
+deployments/mumbai.json
+deployments/polygon.json
+# Keep deployments directory structure
+!deployments/.gitkeep
+
+# Hardhat network files
+.openzeppelin/
+
+# Coverage reports
+coverage.json
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
