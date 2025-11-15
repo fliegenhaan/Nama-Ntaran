@@ -9,7 +9,7 @@
  */
 
 import axios, { AxiosInstance } from 'axios';
-import pool from '../config/database.js';
+import { pool } from '../config/database.js';
 
 // ============================================
 // TYPE DEFINITIONS

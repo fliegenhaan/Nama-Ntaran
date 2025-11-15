@@ -13,7 +13,7 @@
  * - Fallback mechanism: Cohere → Claude → Rule-based
  */
 
-import pool from '../config/database.js';
+import { pool } from '../config/database.js';
 import Anthropic from '@anthropic-ai/sdk';
 import {
   classifyAnomalySeverity,

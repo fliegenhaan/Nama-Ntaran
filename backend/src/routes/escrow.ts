@@ -1,7 +1,7 @@
-import express, { Request, Response } from 'express';
-import pool from '../config/database';
-import blockchainService from '../services/blockchainService';
-import { authenticateToken } from '../middleware/auth';
+import express, { type Request, type Response } from 'express';
+import { pool } from '../config/database.js';
+import blockchainService from '../services/blockchainService.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
