@@ -1,274 +1,547 @@
 'use client';
 
-import Navbar from '../components/layout/Navbar';
-import GlassPanel from '../components/ui/GlassPanel';
-import { Shield, ExternalLink, CheckCircle, Clock, DollarSign, FileText, TrendingUp, Activity } from 'lucide-react';
+import { useState } from 'react';
+import Link from 'next/link';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin
+} from 'lucide-react';
 
 export default function TransparansiPage() {
-  // Mock blockchain transactions
-  const transactions = [
-    {
-      id: 1,
-      type: 'escrow_locked',
-      from: 'Pemerintah Daerah',
-      to: 'Smart Contract',
-      amount: 'Rp 50.000.000',
-      timestamp: '2025-01-15 10:30:45',
-      txHash: '0x7f9fa3b2c8d1e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9',
-      status: 'confirmed',
-    },
-    {
-      id: 2,
-      type: 'fund_released',
-      from: 'Smart Contract',
-      to: 'Katering Sehat Mandiri',
-      amount: 'Rp 15.000.000',
-      timestamp: '2025-01-15 14:20:12',
-      txHash: '0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2',
-      status: 'confirmed',
-    },
-    {
-      id: 3,
-      type: 'verification',
-      from: 'SDN 01 Bandung',
-      to: 'Smart Contract',
-      amount: '450 Porsi',
-      timestamp: '2025-01-15 14:15:30',
-      txHash: '0x9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9c8b7a6f5e4d3c2b1a0f9e8',
-      status: 'confirmed',
-    },
-    {
-      id: 4,
-      type: 'escrow_locked',
-      from: 'Pemerintah Daerah',
-      to: 'Smart Contract',
-      amount: 'Rp 30.000.000',
-      timestamp: '2025-01-15 09:00:00',
-      txHash: '0x5f4e3d2c1b0a9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4',
-      status: 'confirmed',
-    },
-    {
-      id: 5,
-      type: 'fund_released',
-      from: 'Smart Contract',
-      to: 'Boga Rasa Catering',
-      amount: 'Rp 12.500.000',
-      timestamp: '2025-01-14 16:45:22',
-      txHash: '0x3c2b1a0f9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9c8b7a6f5e4d3c2',
-      status: 'confirmed',
-    },
+  const [activeTab, setActiveTab] = useState('transparansi');
+  const heroRef = useRef(null);
+  const dashboardRef = useRef(null);
+  const heroInView = useInView(heroRef, { once: true, margin: "-100px" });
+  const dashboardInView = useInView(dashboardRef, { once: true, margin: "-100px" });
+
+  // data untuk line chart tren alokasi
+  const trendData = [
+    { month: 'Okt', alokasi: 11000000, distribusi: 13000000 },
+    { month: 'Nov', alokasi: 21000000, distribusi: 19000000 },
+    { month: 'Des', alokasi: 5000000, distribusi: 6000000 },
+    { month: 'Jan', alokasi: 18000000, distribusi: 17000000 },
+    { month: 'Feb', alokasi: 23000000, distribusi: 21000000 },
+    { month: 'Mar', alokasi: 24000000, distribusi: 22000000 },
+    { month: 'Apr', alokasi: 27000000, distribusi: 25000000 },
+    { month: 'Mei', alokasi: 25000000, distribusi: 24000000 },
+    { month: 'Jun', alokasi: 28000000, distribusi: 26000000 },
+    { month: 'Jul', alokasi: 29000000, distribusi: 27000000 },
+    { month: 'Agt', alokasi: 30000000, distribusi: 28000000 },
   ];
 
-  const stats = {
-    totalTransactions: '15,432',
-    totalValue: 'Rp 280 M',
-    avgBlockTime: '2.3s',
-    gasUsed: '0.0021 ETH',
+  // data untuk distribusi regional (donut chart)
+  const regionalData = [
+    { region: 'Jawa', value: 40, color: '#8b5cf6' },
+    { region: 'Sumatera', value: 25, color: '#f59e0b' },
+    { region: 'Kalimantan', value: 20, color: '#3b82f6' },
+    { region: 'Sulawesi', value: 10, color: '#ec4899' },
+    { region: 'Lainnya', value: 5, color: '#10b981' },
+  ];
+
+  // TODO: implementasi API untuk mendapatkan data transaksi real-time dari blockchain
+  const transactions = [
+    { time: '10 menit lalu', amount: 'Rp 150 Juta', receiver: 'SMP Harapan Bangsa', status: 'Selesai' },
+    { time: '30 menit lalu', amount: 'Rp 200 Juta', receiver: 'SMP Cerdas Mandiri', status: 'Selesai' },
+    { time: '1 jam lalu', amount: 'Rp 75 Juta', receiver: 'SMA Prestasi Unggul', status: 'Tertunda' },
+  ];
+
+  // data untuk bar chart distribusi skor
+  const scoreData = [
+    { category: 'Tinggi', value: 40, color: '#6366f1' },
+    { category: 'Sedang', value: 110, color: '#6366f1' },
+    { category: 'Rendah', value: 65, color: '#6366f1' },
+  ];
+
+  // variasi animasi
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 100,
+        damping: 15,
+        duration: 0.6,
+      },
+    },
+  };
+
+  const cardHover = {
+    scale: 1.02,
+    transition: {
+      type: 'spring',
+      stiffness: 300,
+      damping: 20,
+    },
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 blockchain-mesh">
-      <Navbar role="public" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="text-center mb-12 fade-in">
-          <div className="inline-block mb-4 px-4 py-2 glass-subtle rounded-full">
-            <span className="text-sm font-semibold text-white">
-              Blockchain-Powered Transparency
-            </span>
-          </div>
-          <h1 className="text-5xl font-bold mb-4 text-white">
-            Transparansi Blockchain
-          </h1>
-          <p className="text-white/80 max-w-2xl mx-auto text-lg">
-            Setiap transaksi tercatat permanen di blockchain. Tidak ada yang bisa dihapus, diubah, atau disembunyikan.
-          </p>
-        </div>
-
-        {/* Blockchain Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <GlassPanel hover>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Activity className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Total Transaksi</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalTransactions}</p>
-              </div>
-            </div>
-          </GlassPanel>
-
-          <GlassPanel hover>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <DollarSign className="w-6 h-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Total Nilai</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalValue}</p>
-              </div>
-            </div>
-          </GlassPanel>
-
-          <GlassPanel hover>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <Clock className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Avg Block Time</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.avgBlockTime}</p>
-              </div>
-            </div>
-          </GlassPanel>
-
-          <GlassPanel hover>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-orange-100 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Total Gas</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.gasUsed}</p>
-              </div>
-            </div>
-          </GlassPanel>
-        </div>
-
-        {/* How Blockchain Ensures Transparency */}
-        <GlassPanel className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Bagaimana Blockchain Menjamin Transparansi
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="font-bold text-gray-900 mb-2">Immutable</h3>
-              <p className="text-sm text-gray-600">
-                Data tidak dapat diubah atau dihapus setelah tercatat di blockchain
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <FileText className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="font-bold text-gray-900 mb-2">Auditable</h3>
-              <p className="text-sm text-gray-600">
-                Setiap transaksi dapat dilacak dan diaudit oleh siapa saja
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="font-bold text-gray-900 mb-2">Trustless</h3>
-              <p className="text-sm text-gray-600">
-                Tidak perlu percaya pada pihak ketiga, smart contract otomatis bekerja
-              </p>
-            </div>
-          </div>
-        </GlassPanel>
-
-        {/* Recent Transactions */}
-        <GlassPanel>
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                Transaksi Terbaru
-              </h2>
-              <p className="text-gray-600">Real-time blockchain transactions</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-              <span className="text-sm text-green-600 font-semibold">LIVE</span>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            {transactions.map((tx) => (
-              <div
-                key={tx.id}
-                className="glass-subtle rounded-xl p-5 hover:shadow-modern transition-smooth"
+    <div className="min-h-screen bg-white">
+      {/* navbar */}
+      <motion.nav
+        className="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100"
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* logo */}
+            <Link href="/" className="flex items-center gap-2 group">
+              <motion.div
+                className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center shadow-md"
+                whileHover={{ scale: 1.05, rotate: 5 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`p-2 rounded-lg ${
-                        tx.type === 'escrow_locked'
-                          ? 'bg-yellow-100'
-                          : tx.type === 'fund_released'
-                          ? 'bg-green-100'
-                          : 'bg-blue-100'
-                      }`}
-                    >
-                      {tx.type === 'escrow_locked' ? (
-                        <Clock className="w-5 h-5 text-yellow-600" />
-                      ) : tx.type === 'fund_released' ? (
-                        <DollarSign className="w-5 h-5 text-green-600" />
-                      ) : (
-                        <CheckCircle className="w-5 h-5 text-blue-600" />
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-gray-900">
-                        {tx.type === 'escrow_locked'
-                          ? 'Dana Dikunci di Escrow'
-                          : tx.type === 'fund_released'
-                          ? 'Dana Dicairkan'
-                          : 'Verifikasi Pengiriman'}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {tx.from} → {tx.to}
-                      </p>
-                    </div>
+                <span className="text-white font-bold text-lg">M</span>
+              </motion.div>
+              <motion.span
+                className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
+                whileHover={{ scale: 1.02 }}
+              >
+                MBG
+              </motion.span>
+            </Link>
+
+            {/* menu navigasi */}
+            <div className="flex items-center gap-6">
+              <Link
+                href="/priority-map"
+                className="text-gray-700 hover:text-purple-600 transition-colors font-medium relative group"
+              >
+                Priority Map
+                <motion.span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 group-hover:w-full transition-all duration-300" />
+              </Link>
+              <Link
+                href="/school-list"
+                className="text-gray-700 hover:text-purple-600 transition-colors font-medium relative group"
+              >
+                School List
+                <motion.span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 group-hover:w-full transition-all duration-300" />
+              </Link>
+              <Link
+                href="/transparansi"
+                className="text-gray-700 hover:text-purple-600 transition-colors font-medium relative group"
+              >
+                Transparency Dashboard
+                <motion.span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-600 to-blue-600" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </motion.nav>
+
+      {/* hero section */}
+      <motion.section
+        ref={heroRef}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20"
+        initial="hidden"
+        animate={heroInView ? "visible" : "hidden"}
+        variants={containerVariants}
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* content kiri */}
+          <motion.div variants={itemVariants}>
+            <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              Wujudkan Akuntabilitas Dana Pendidikan
+            </h1>
+            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+              Platform Transparansi MBG menyediakan akses publik ke data prioritas sekolah dan alokasi dana.
+              Visualisasikan skor sekolah berbasis AI dan alokasi dana yang terverifikasi blockchain untuk
+              meningkatkan akuntabilitas.
+            </p>
+            <div className="flex gap-4">
+              <motion.button
+                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 gpu-accelerate"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Jelajahi Data
+              </motion.button>
+              <motion.button
+                className="bg-white text-gray-700 px-8 py-3 rounded-lg font-semibold border-2 border-gray-200 hover:border-blue-600 hover:text-blue-600 transition-all duration-300 gpu-accelerate"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Pelajari Lebih Lanjut
+              </motion.button>
+            </div>
+          </motion.div>
+
+          {/* ilustrasi kanan */}
+          <motion.div
+            variants={itemVariants}
+            className="relative"
+          >
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-12 shadow-xl">
+              {/* TODO: ganti dengan ilustrasi custom atau gunakan gambar dari public folder */}
+              <div className="space-y-6">
+                {/* ilustrasi dashboard sederhana */}
+                <div className="bg-white rounded-xl p-6 shadow-md">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-orange-500"></div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-bold text-gray-900">{tx.amount}</p>
-                    <p className="text-xs text-gray-500">{tx.timestamp}</p>
+                  {/* grafik bar sederhana */}
+                  <div className="flex items-end gap-2 h-32">
+                    <div className="flex-1 bg-blue-200 rounded-t" style={{ height: '60%' }}></div>
+                    <div className="flex-1 bg-blue-400 rounded-t" style={{ height: '85%' }}></div>
+                    <div className="flex-1 bg-blue-300 rounded-t" style={{ height: '70%' }}></div>
+                    <div className="flex-1 bg-blue-500 rounded-t" style={{ height: '95%' }}></div>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-3">
-                  <Shield className="w-4 h-4 text-gray-500" />
-                  <code className="text-xs text-gray-700 flex-1 truncate">
-                    {tx.txHash}
-                  </code>
-                  <button className="text-blue-600 hover:text-blue-700">
-                    <ExternalLink className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <div className="mt-3 flex items-center gap-2">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      tx.status === 'confirmed'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-yellow-100 text-yellow-700'
-                    }`}
-                  >
-                    {tx.status === 'confirmed' ? '✓ Confirmed' : '⏳ Pending'}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    12 block confirmations
-                  </span>
+                {/* statistik cards */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white rounded-xl p-4 shadow-md">
+                    <div className="text-2xl font-bold text-blue-600">Rp 123M</div>
+                    <div className="text-sm text-gray-600">Total Dana</div>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 shadow-md">
+                    <div className="text-2xl font-bold text-purple-600">578</div>
+                    <div className="text-sm text-gray-600">Sekolah</div>
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* dashboard section */}
+      <motion.section
+        ref={dashboardRef}
+        className="bg-gray-50 py-20"
+        initial="hidden"
+        animate={dashboardInView ? "visible" : "hidden"}
+        variants={containerVariants}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.h2
+            variants={itemVariants}
+            className="text-4xl font-bold text-center text-gray-900 mb-12"
+          >
+            Dasbor Transparansi Utama
+          </motion.h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* card 1: tren alokasi dana bulanan */}
+            <motion.div
+              variants={itemVariants}
+              whileHover={cardHover}
+              className="bg-white rounded-xl shadow-lg p-6 gpu-accelerate"
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Tren Alokasi Dana Bulanan</h3>
+              {/* TODO: implementasi chart library seperti recharts atau chart.js untuk visualisasi yang lebih baik */}
+              <div className="h-64 relative">
+                {/* line chart sederhana dengan SVG */}
+                <svg className="w-full h-full" viewBox="0 0 300 200">
+                  {/* grid lines */}
+                  <line x1="0" y1="180" x2="300" y2="180" stroke="#e5e7eb" strokeWidth="1" />
+                  <line x1="0" y1="135" x2="300" y2="135" stroke="#e5e7eb" strokeWidth="1" />
+                  <line x1="0" y1="90" x2="300" y2="90" stroke="#e5e7eb" strokeWidth="1" />
+                  <line x1="0" y1="45" x2="300" y2="45" stroke="#e5e7eb" strokeWidth="1" />
+
+                  {/* line path - representasi sederhana */}
+                  <polyline
+                    points="0,160 30,140 60,165 90,150 120,130 150,125 180,115 210,120 240,110 270,105 300,100"
+                    fill="none"
+                    stroke="#3b82f6"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+
+                  {/* labels */}
+                  <text x="15" y="195" fontSize="10" fill="#6b7280">Des</text>
+                  <text x="135" y="195" fontSize="10" fill="#6b7280">Apr</text>
+                  <text x="270" y="195" fontSize="10" fill="#6b7280">Agt</text>
+                </svg>
+                {/* legend */}
+                <div className="absolute top-2 right-2 text-xs space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded"></div>
+                    <span className="text-gray-600">Rp 0.5 M</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-purple-500 rounded"></div>
+                    <span className="text-gray-600">Rp 0.5 M</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* card 2: distribusi dana regional */}
+            <motion.div
+              variants={itemVariants}
+              whileHover={cardHover}
+              className="bg-white rounded-xl shadow-lg p-6 gpu-accelerate"
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Distribusi Dana Regional</h3>
+              {/* TODO: implementasi donut chart dengan library chart */}
+              <div className="h-64 flex items-center justify-center relative">
+                {/* donut chart dengan SVG */}
+                <svg className="w-48 h-48 transform -rotate-90">
+                  <circle
+                    cx="96"
+                    cy="96"
+                    r="80"
+                    fill="none"
+                    stroke="#8b5cf6"
+                    strokeWidth="30"
+                    strokeDasharray="200 314"
+                    strokeDashoffset="0"
+                  />
+                  <circle
+                    cx="96"
+                    cy="96"
+                    r="80"
+                    fill="none"
+                    stroke="#f59e0b"
+                    strokeWidth="30"
+                    strokeDasharray="125 314"
+                    strokeDashoffset="-200"
+                  />
+                  <circle
+                    cx="96"
+                    cy="96"
+                    r="80"
+                    fill="none"
+                    stroke="#3b82f6"
+                    strokeWidth="30"
+                    strokeDasharray="100 314"
+                    strokeDashoffset="-325"
+                  />
+                  <circle
+                    cx="96"
+                    cy="96"
+                    r="80"
+                    fill="none"
+                    stroke="#ec4899"
+                    strokeWidth="30"
+                    strokeDasharray="50 314"
+                    strokeDashoffset="-425"
+                  />
+                  <circle
+                    cx="96"
+                    cy="96"
+                    r="80"
+                    fill="none"
+                    stroke="#10b981"
+                    strokeWidth="30"
+                    strokeDasharray="25 314"
+                    strokeDashoffset="-475"
+                  />
+                </svg>
+
+                {/* legend */}
+                <div className="absolute bottom-0 left-0 right-0 grid grid-cols-2 gap-2 text-xs">
+                  {regionalData.map((item) => (
+                    <div key={item.region} className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                      <span className="text-gray-600">{item.region}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* card 3: umpan transaksi blockchain */}
+            <motion.div
+              variants={itemVariants}
+              whileHover={cardHover}
+              className="bg-white rounded-xl shadow-lg p-6 gpu-accelerate"
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Umpan Transaksi Blockchain Langsung</h3>
+              {/* TODO: implementasi websocket untuk real-time updates dari blockchain */}
+              <div className="space-y-3 h-64 overflow-y-auto">
+                {transactions.map((tx, index) => (
+                  <div key={index} className="border-b border-gray-100 pb-3">
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="text-xs text-gray-500">{tx.time}</span>
+                      <span className={`text-xs px-2 py-1 rounded ${tx.status === 'Selesai' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                        {tx.status}
+                      </span>
+                    </div>
+                    <div className="font-semibold text-sm text-gray-900">{tx.amount}</div>
+                    <div className="text-xs text-gray-600">{tx.receiver}</div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* card 4: distribusi skor prioritas sekolah */}
+            <motion.div
+              variants={itemVariants}
+              whileHover={cardHover}
+              className="bg-white rounded-xl shadow-lg p-6 gpu-accelerate"
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Distribusi Skor Prioritas Sekolah</h3>
+              {/* TODO: implementasi bar chart dengan library chart */}
+              <div className="h-64 flex items-end justify-around gap-4 p-4">
+                {scoreData.map((item) => (
+                  <div key={item.category} className="flex-1 flex flex-col items-center">
+                    <div className="w-full relative">
+                      <motion.div
+                        className="w-full rounded-t-lg"
+                        style={{
+                          backgroundColor: item.color,
+                          height: `${item.value}px`,
+                        }}
+                        initial={{ height: 0 }}
+                        animate={{ height: `${item.value}px` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-600 mt-2">{item.category}</div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* card 5: total dana dialokasikan */}
+            <motion.div
+              variants={itemVariants}
+              whileHover={cardHover}
+              className="bg-white rounded-xl shadow-lg p-6 gpu-accelerate flex flex-col items-center justify-center"
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Total Dana Dialokasikan</h3>
+              <div className="text-5xl font-bold text-blue-600 mb-2">Rp 123,45</div>
+              <div className="text-2xl font-semibold text-blue-600 mb-4">Miliar</div>
+              <p className="text-sm text-gray-600 text-center">
+                Dana terverifikasi blockchain sejak awal platform.
+              </p>
+            </motion.div>
+
+            {/* card 6: jumlah sekolah terdampak */}
+            <motion.div
+              variants={itemVariants}
+              whileHover={cardHover}
+              className="bg-white rounded-xl shadow-lg p-6 gpu-accelerate flex flex-col items-center justify-center"
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Jumlah Sekolah Terdampak</h3>
+              <div className="text-6xl font-bold text-blue-600 mb-2">578</div>
+              <div className="text-xl font-semibold text-blue-600 mb-4">Sekolah</div>
+              <p className="text-sm text-gray-600 text-center">
+                Total sekolah yang menerima dukungan dana.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            {/* tentang kami */}
+            <div>
+              <h3 className="text-lg font-bold mb-4">Tentang Kami</h3>
+              <p className="text-sm text-gray-400 mb-4">
+                Enhancing accountability and transparency in education.
+              </p>
+              <div className="flex gap-4">
+                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <Facebook className="w-5 h-5" />
+                </Link>
+                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <Twitter className="w-5 h-5" />
+                </Link>
+                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <Instagram className="w-5 h-5" />
+                </Link>
+                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <Linkedin className="w-5 h-5" />
+                </Link>
+              </div>
+            </div>
+
+            {/* sumber daya */}
+            <div>
+              <h3 className="text-lg font-bold mb-4">Sumber Daya</h3>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li>
+                  <Link href="#" className="hover:text-white transition-colors">
+                    Misi Kami
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition-colors">
+                    Tim
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition-colors">
+                    Kontak
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* sumber daya 2 */}
+            <div>
+              <h3 className="text-lg font-bold mb-4">Sumber Daya</h3>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li>
+                  <Link href="#" className="hover:text-white transition-colors">
+                    Dokumentasi
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition-colors">
+                    FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition-colors">
+                    Dukungan
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* hukum */}
+            <div>
+              <h3 className="text-lg font-bold mb-4">Hukum</h3>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li>
+                  <Link href="#" className="hover:text-white transition-colors">
+                    Kebijakan Privasi
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition-colors">
+                    Ketentuan Layanan
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
 
-          <div className="mt-6 text-center">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-              Lihat Semua Transaksi
-            </button>
+          <div className="border-t border-gray-800 pt-8">
+            <p className="text-center text-gray-400 text-sm">
+              © 2025 MBG Transparency Platform. All rights reserved.
+            </p>
           </div>
-        </GlassPanel>
-      </div>
+        </div>
+      </footer>
     </div>
   );
 }
