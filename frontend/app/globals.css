@@ -39,6 +39,8 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 body {
@@ -547,6 +549,52 @@ body {
 img, video {
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
+}
+
+/* optimisasi untuk scrolling yang sangat smooth */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* optimisasi untuk elements yang akan di-animate */
+.will-animate {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* optimisasi untuk container scrollable */
+.scroll-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* hapus lag pada hover states */
+button, a {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* optimisasi untuk table */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* preload untuk transisi */
+.transition-preload {
+  transition: none !important;
+}
+
+/* optimisasi rendering untuk animasi kompleks */
+@media (prefers-reduced-motion: no-preference) {
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    scroll-snap-type: y proximity;
+  }
 }
 
 .focus-ring {

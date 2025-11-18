@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react';
 interface GlassPanelProps {
   children: ReactNode;
   className?: string;
-  variant?: 'default' | 'dark' | 'subtle';
+  variant?: 'default' | 'dark' | 'subtle' | 'light';
   hover?: boolean;
   noPadding?: boolean;
 }
@@ -11,7 +11,7 @@ interface GlassPanelProps {
 const GlassPanel: React.FC<GlassPanelProps> = ({
   children,
   className = '',
-  variant = 'default',
+  variant = 'light',
   hover = false,
   noPadding = false,
 }) => {
@@ -19,10 +19,11 @@ const GlassPanel: React.FC<GlassPanelProps> = ({
     default: 'glass',
     dark: 'glass-dark',
     subtle: 'glass-subtle',
+    light: 'bg-white border border-gray-200 shadow-sm',
   };
 
   const hoverClasses = hover
-    ? 'hover:shadow-glow-lg transition-smooth hover:-translate-y-1'
+    ? 'hover:shadow-xl transition-smooth hover:-translate-y-1'
     : '';
 
   const paddingClasses = noPadding ? '' : 'p-6';

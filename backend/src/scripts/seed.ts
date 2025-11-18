@@ -17,6 +17,7 @@ const pool = new Pool({
  *
  * Data yang akan dibuat:
  * - 1 Admin
+ * - 1 Pemerintah (Government)
  * - 10 Schools (dengan user account)
  * - 5 Caterings (dengan user account)
  * - 30 Deliveries (berbagai status)
@@ -60,7 +61,14 @@ async function seedUsers() {
     `, [password]);
     console.log('  ✅ Admin created: admin@nutrichain.id');
 
-    // 2. School users (10 schools)
+    // 2. Government user
+    await client.query(`
+      INSERT INTO users (email, password_hash, role) VALUES
+      ('pemerintah@mbg.go.id', $1, 'government')
+    `, [password]);
+    console.log('  ✅ Government user created: pemerintah@mbg.go.id');
+
+    // 3. School users (10 schools)
     const schoolEmails = [
       'sdn01.jakarta@sekolah.id',
       'sdn15.bandung@sekolah.id',
@@ -81,7 +89,7 @@ async function seedUsers() {
     }
     console.log(`  ✅ ${schoolEmails.length} school users created`);
 
-    // 3. Catering users (5 caterings)
+    // 4. Catering users (5 caterings)
     const cateringEmails = [
       'sehat.jaya@katering.id',
       'nutrisi.prima@katering.id',
@@ -495,10 +503,11 @@ async function printSummary() {
 
     console.log('\n' + '═'.repeat(50));
     console.log('\n🎉 SEEDING COMPLETED SUCCESSFULLY!\n');
-    console.log('📝 Login credentials:');
-    console.log('   Admin    : admin@nutrichain.id / password123');
-    console.log('   School   : sdn01.jakarta@sekolah.id / password123');
-    console.log('   Catering : sehat.jaya@katering.id / password123');
+    console.log('📝 Login credentials (semua password: password123):');
+    console.log('   Admin      : admin@nutrichain.id');
+    console.log('   Pemerintah : pemerintah@mbg.go.id');
+    console.log('   School     : sdn01.jakarta@sekolah.id');
+    console.log('   Catering   : sehat.jaya@katering.id');
     console.log('\n');
 
   } finally {
