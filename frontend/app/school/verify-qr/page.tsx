@@ -50,6 +50,7 @@ export default function VerifyQRPage() {
     { label: 'Verifikasi QR', path: '/school/verify-qr', icon: QrCode },
     { label: 'Riwayat Verifikasi', path: '/school/history', icon: History },
     { label: 'Masalah', path: '/school/issues', icon: AlertTriangle },
+    { label: 'Laporan Masalah Baru', path: '/school/issues/new', icon: AlertCircle },
   ];
 
   const handleLogout = () => {

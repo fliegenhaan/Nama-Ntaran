@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { LucideIcon, Settings, LogOut } from 'lucide-react';
 
@@ -52,14 +53,15 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({
     <aside className="w-72 h-screen bg-white border-r border-gray-200 flex flex-col shadow-sm fixed left-0 top-0">
       {/* logo dan brand */}
       <div className="p-6 border-b border-gray-200 flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-md">
-            <span className="text-2xl font-bold text-white">MBG</span>
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">MBG</h1>
-            <p className="text-xs text-gray-600">Makan Bergizi Gabocor</p>
-          </div>
+        <div className="flex items-center justify-center">
+          <Image
+            src="/MBG-removebg-preview.png"
+            alt="MBG Logo"
+            width={180}
+            height={60}
+            className="object-contain"
+            priority
+          />
         </div>
       </div>
 
