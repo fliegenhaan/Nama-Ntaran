@@ -562,6 +562,8 @@ img, video {
 .will-animate {
   will-change: transform, opacity;
   backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 /* optimisasi untuk container scrollable */
@@ -570,12 +572,38 @@ img, video {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
+  scrollbar-width: thin;
 }
 
 /* hapus lag pada hover states */
 button, a {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  user-select: none;
+}
+
+/* optimisasi performa untuk card dan panel */
+.card-optimized {
+  contain: layout style paint;
+  content-visibility: auto;
+}
+
+/* preload transitions untuk menghindari jank */
+.preload-transitions {
+  transition: none !important;
+}
+
+/* optimisasi untuk animasi yang smooth dengan cubic bezier */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* optimisasi untuk hover yang lebih responsive */
+@media (hover: hover) {
+  .hover-lift:hover {
+    transform: translateY(-2px) translateZ(0);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 /* optimisasi untuk table */
@@ -652,5 +680,68 @@ table {
   .glass, .glass-dark, .glass-subtle {
     background: white;
     border: 1px solid #e5e7eb;
+  }
+}
+
+/* ========================================
+   ADMIN DASHBOARD OPTIMIZATIONS
+   ======================================== */
+
+/* optimisasi khusus untuk sidebar yang sticky */
+.admin-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  transform: translateZ(0);
+  will-change: scroll-position;
+}
+
+/* optimisasi untuk stat cards dengan hover yang smooth */
+.stat-card-hover {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+}
+
+.stat-card-hover:hover {
+  transform: translateY(-2px) translateZ(0);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* optimisasi untuk map container */
+.map-container {
+  contain: layout style paint;
+  content-visibility: auto;
+  transform: translateZ(0);
+}
+
+/* optimisasi untuk activity log items */
+.activity-log-item {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* optimisasi untuk chart animations */
+.chart-bar {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* prevent layout shift pada stat numbers */
+.stat-number {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* optimisasi untuk badge notifications */
+.notification-badge {
+  animation: pulse-badge 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
   }
 }
