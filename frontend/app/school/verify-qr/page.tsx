@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/app/context/AuthContext';
 import ModernSidebar from '@/app/components/layout/ModernSidebar';
-import TopHeader from '@/app/components/layout/TopHeader';
 import {
   LayoutDashboard,
   CheckCircle,
@@ -50,6 +49,7 @@ export default function VerifyQRPage() {
     { label: 'Verifikasi QR', path: '/school/verify-qr', icon: QrCode },
     { label: 'Riwayat Verifikasi', path: '/school/history', icon: History },
     { label: 'Masalah', path: '/school/issues', icon: AlertTriangle },
+    { label: 'Laporan Masalah Baru', path: '/school/issues/new', icon: AlertCircle },
   ];
 
   const handleLogout = () => {
@@ -287,22 +287,14 @@ export default function VerifyQRPage() {
       <ModernSidebar
         navItems={navItems}
         userRole="School"
-        userName="Kepala Sekolah"
-        userEmail={schoolInfo.name}
+        userName={user?.name || 'Kepala Sekolah'}
+        userEmail={user?.email || 'sekolah@mbg.id'}
+        schoolName={schoolInfo.name}
         onLogout={handleLogout}
       />
 
       {/* main content */}
       <main className="ml-72 min-h-screen bg-gray-50">
-        {/* top header */}
-        <TopHeader
-          userName="Kepala Sekolah"
-          userEmail={schoolInfo.name}
-          notificationCount={0}
-          messageCount={0}
-          onLogout={handleLogout}
-        />
-
         <div className="max-w-4xl mx-auto p-8 gpu-accelerate">
           {/* page header */}
           <motion.div

@@ -20,7 +20,7 @@
 
 import { pool } from '../config/database.js';
 import blockchainPaymentService from './blockchainPaymentService.js';
-import io, { Socket } from 'socket.io';
+import { Server as SocketIOServer } from 'socket.io';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -48,14 +48,14 @@ interface ListenerConfig {
 
 class BlockchainEventListener {
   private isRunning: boolean = false;
-  private socketIO: Socket | null = null;
+  private socketIO: SocketIOServer | null = null;
   private eventQueue: BlockchainEvent[] = [];
   private isProcessingQueue: boolean = false;
 
   constructor(config?: ListenerConfig) {
     if (config?.enableSocketIO && config?.httpServer) {
       // Setup Socket.IO untuk real-time updates ke frontend
-      this.socketIO = io(config.httpServer, {
+      this.socketIO = new SocketIOServer(config.httpServer, {
         cors: {
           origin: process.env.FRONTEND_URL || 'http://localhost:3000',
           methods: ['GET', 'POST'],

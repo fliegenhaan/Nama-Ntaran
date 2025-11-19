@@ -20,6 +20,10 @@ import blockchainRoutes from './routes/blockchain.js';
 import escrowRoutes from './routes/escrow.js';
 import aiAnalyticsRoutes from './routes/aiAnalytics.js';
 import manualReviewRoutes from './routes/manualReview.js';
+import cateringPaymentRoutes from './routes/cateringPaymentRoutes.js';
+import cateringHistoryRoutes from './routes/cateringHistoryRoutes.js';
+import cateringMenuRoutes from './routes/cateringMenuRoutes.js';
+import cateringIssuesRoutes from './routes/cateringIssuesRoutes.js';
 
 dotenv.config();
 
@@ -58,6 +62,10 @@ app.use('/api/blockchain', blockchainRoutes);
 app.use('/api/escrow', escrowRoutes);
 app.use('/api/ai-analytics', aiAnalyticsRoutes); // 🤖 AI Analytics endpoints
 app.use('/api/manual-review', manualReviewRoutes); // 👨‍💼 Manual Review endpoints
+app.use('/api/catering/payments', cateringPaymentRoutes);
+app.use('/api/catering/history', cateringHistoryRoutes);
+app.use('/api/catering/menu', cateringMenuRoutes);
+app.use('/api/catering/issues', cateringIssuesRoutes);
 
 // Health check route
 app.get('/api/health', async (req, res) => {

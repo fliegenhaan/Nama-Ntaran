@@ -233,13 +233,53 @@ router.post('/login', async (req: Request, res: Response) => {
       { expiresIn: '7d' }
     );
 
+    // siapkan response user
+    let userResponse: any = {
+      id: user.id,
+      email: user.email,
+      role: user.role
+    };
+
+    // jika role adalah school, ambil data sekolah
+    if (user.role === 'school') {
+      const schoolResult = await pool.query(
+        `SELECT id, name, npsn, address, province, city, district, jenjang, contact_name
+         FROM schools WHERE user_id = $1`,
+        [user.id]
+      );
+
+      if (schoolResult.rows.length > 0) {
+        const school = schoolResult.rows[0];
+        userResponse.school_id = school.id;
+        userResponse.school_name = school.name;
+        userResponse.school_npsn = school.npsn;
+        userResponse.school_address = school.address;
+        // gunakan contact_name sebagai nama user jika tersedia
+        if (school.contact_name) {
+          userResponse.name = school.contact_name;
+        }
+      }
+    }
+
+    // jika role adalah catering, ambil data catering
+    if (user.role === 'catering') {
+      const cateringResult = await pool.query(
+        `SELECT id, name, company_name
+         FROM caterings WHERE user_id = $1`,
+        [user.id]
+      );
+
+      if (cateringResult.rows.length > 0) {
+        const catering = cateringResult.rows[0];
+        userResponse.catering_id = catering.id;
+        userResponse.catering_name = catering.company_name || catering.name;
+        userResponse.name = catering.name;
+      }
+    }
+
     res.json({
       message: 'Login successful',
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role
-      },
+      user: userResponse,
       token
     });
   } catch (error) {

@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   LayoutDashboard,
   School,
@@ -59,10 +60,16 @@ export default function DashboardLayout({ children, role, userName = 'User' }: D
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 h-full w-64 glass-card bg-white/10 border-r border-white/20 z-50">
         <div className="p-6">
-          {/* Logo */}
-          <Link href="/">
-            <h1 className="text-3xl font-bold gradient-text mb-1">MBG</h1>
-            <p className="text-white text-xs font-semibold">Makan Bergizi Gabocor</p>
+          {/* logo */}
+          <Link href="/" className="flex justify-center">
+            <Image
+              src="/MBG-removebg-preview.png"
+              alt="MBG Logo"
+              width={160}
+              height={50}
+              className="object-contain"
+              priority
+            />
           </Link>
         </div>
 

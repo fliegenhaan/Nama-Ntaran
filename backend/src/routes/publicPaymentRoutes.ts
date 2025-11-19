@@ -16,7 +16,8 @@
  * Author: NutriChain Dev Team
  */
 
-import express, { Request, Response, Router } from 'express';
+import express, { Router } from 'express';
+import type { Request, Response } from 'express';
 import { pool } from '../config/database.js';
 
 const router: Router = express.Router();

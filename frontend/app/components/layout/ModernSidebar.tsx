@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { LucideIcon, Settings, LogOut } from 'lucide-react';
 
@@ -16,6 +17,7 @@ interface ModernSidebarProps {
   userRole: string;
   userName: string;
   userEmail: string;
+  schoolName?: string;
   onLogout?: () => void;
 }
 
@@ -24,6 +26,7 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({
   userRole,
   userName,
   userEmail,
+  schoolName,
   onLogout,
 }) => {
   const pathname = usePathname();
@@ -52,14 +55,15 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({
     <aside className="w-72 h-screen bg-white border-r border-gray-200 flex flex-col shadow-sm fixed left-0 top-0">
       {/* logo dan brand */}
       <div className="p-6 border-b border-gray-200 flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-md">
-            <span className="text-2xl font-bold text-white">MBG</span>
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">MBG</h1>
-            <p className="text-xs text-gray-600">Makan Bergizi Gabocor</p>
-          </div>
+        <div className="flex items-center justify-center">
+          <Image
+            src="/MBG-removebg-preview.png"
+            alt="MBG Logo"
+            width={180}
+            height={60}
+            className="object-contain"
+            priority
+          />
         </div>
       </div>
 
@@ -71,10 +75,10 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-gray-900 truncate">{userName}</p>
-            <p className="text-xs text-gray-600 truncate">{userEmail}</p>
-            <span className="inline-block mt-1 px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-              {userRole}
-            </span>
+            {schoolName && (
+              <p className="text-xs text-gray-600 truncate">{schoolName}</p>
+            )}
+            <p className="text-xs text-gray-500 truncate">{userEmail}</p>
           </div>
         </div>
       </div>
@@ -141,9 +145,9 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({
 
       {/* footer */}
       <div className="p-4 border-t border-gray-200 flex-shrink-0">
-        <div className="p-3 rounded-xl bg-blue-600 text-white text-sm shadow-md">
-          <p className="font-semibold mb-1">Powered By AI & Blockchain</p>
-          <p className="text-xs text-white/90">
+        <div className="text-center text-sm">
+          <p className="font-semibold text-gray-700 mb-1">Powered By AI & Blockchain</p>
+          <p className="text-xs text-gray-500">
             Transparansi Penuh Untuk Generasi Lebih Sehat
           </p>
         </div>

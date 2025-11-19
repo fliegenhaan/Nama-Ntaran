@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import Navbar from './components/layout/Navbar';
 import {
@@ -409,14 +410,17 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             {/* logo dan copyright */}
             <div className="col-span-1">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-lg">M</span>
-                </div>
-                <span className="text-xl font-bold">MBG</span>
+              <div className="mb-4">
+                <Image
+                  src="/MBG-removebg-preview.png"
+                  alt="MBG Logo"
+                  width={120}
+                  height={40}
+                  className="object-contain brightness-0 invert"
+                />
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                © 2025 MBG. Semua hak dilindungi undang-undang.
+                2025 MBG. Semua Hak Dilindungi Undang-Undang.
               </p>
             </div>
 

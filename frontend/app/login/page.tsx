@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
@@ -127,17 +128,19 @@ export default function LoginPage() {
         >
           {/* logo dan heading */}
           <motion.div className="mb-8" variants={itemVariants}>
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-xl">M</span>
-              </div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                MBG Platform
-              </h1>
+            <div className="flex justify-center mb-8">
+              <Image
+                src="/MBG-removebg-preview.png"
+                alt="MBG Logo"
+                width={200}
+                height={65}
+                className="object-contain"
+                priority
+              />
             </div>
 
             <h2 className="text-3xl font-bold text-gray-900 mb-3">
-              Masuk Ke MBG Platform
+              Masuk Ke Platform
             </h2>
             <p className="text-gray-600">
               Masukkan Kredensial Anda Untuk Mengakses Platform.

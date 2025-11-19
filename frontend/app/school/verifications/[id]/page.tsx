@@ -18,6 +18,8 @@ import {
   Store,
   LayoutDashboard,
   History,
+  QrCode,
+  AlertCircle,
 } from 'lucide-react';
 import Link from 'next/link';
 import api from '../../../lib/api';
@@ -116,9 +118,11 @@ export default function VerificationDetailPage() {
 
   const navItems = [
     { label: 'Dashboard', path: '/school', icon: LayoutDashboard },
-    { label: 'Verifikasi', path: '/school/verify', icon: CheckCircle },
-    { label: 'Riwayat', path: '/school/history', icon: History },
-    { label: 'Laporan Masalah', path: '/school/issues', icon: AlertTriangle },
+    { label: 'Verifikasi Pengiriman', path: '/school/verify', icon: CheckCircle },
+    { label: 'Verifikasi QR', path: '/school/verify-qr', icon: QrCode },
+    { label: 'Riwayat Verifikasi', path: '/school/history', icon: History },
+    { label: 'Masalah', path: '/school/issues', icon: AlertTriangle },
+    { label: 'Laporan Masalah Baru', path: '/school/issues/new', icon: AlertCircle },
   ];
 
   return (

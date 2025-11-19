@@ -53,3 +53,8 @@ export const requireRole = (...allowedRoles: string[]) => {
     next();
   };
 };
+
+// alias untuk backward compatibility
+export const authorizeRole = (allowedRoles: string[]) => {
+  return requireRole(...allowedRoles);
+};

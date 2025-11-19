@@ -22,9 +22,11 @@
  * Author: NutriChain Dev Team
  */
 
-import express, { Request, Response, Router } from 'express';
+import express, { Router } from 'express';
+import type { Request, Response } from 'express';
 import { pool } from '../config/database.js';
 import { authenticateToken, authorizeRole } from '../middleware/auth.js';
+import type { AuthRequest } from '../middleware/auth.js';
 import blockchainPaymentService from '../services/blockchainPaymentService.js';
 import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
@@ -89,7 +91,7 @@ router.get(
   requireSchool,
   async (req: Request, res: Response) => {
     try {
-      const schoolId = (req.user as any).linkedSchoolId;
+      const schoolId = ((req as AuthRequest).user as any)?.linkedSchoolId;
 
       if (!schoolId) {
         return res.status(400).json({
@@ -144,7 +146,7 @@ router.get(
   async (req: Request, res: Response) => {
     try {
       const { deliveryId } = req.params;
-      const schoolId = (req.user as any).linkedSchoolId;
+      const schoolId = ((req as AuthRequest).user as any)?.linkedSchoolId;
 
       const result = await pool.query(
         `
@@ -232,15 +234,16 @@ router.post(
   '/deliveries/:deliveryId/confirm',
   requireSchool,
   upload.single('photo'),
-  async (req: ConfirmDeliveryRequest, res: Response) => {
+  async (req: Request, res: Response) => {
     const client = await pool.connect();
 
     try {
       console.log('\n📬 [School API] Delivery confirmation received');
 
       const { deliveryId } = req.params;
-      const schoolId = (req.user as any).linkedSchoolId;
-      const userId = (req.user as any).id;
+      const authReq = req as AuthRequest;
+      const schoolId = (authReq.user as any)?.linkedSchoolId;
+      const userId = (authReq.user as any)?.id;
 
       const {
         isOk,
@@ -538,7 +541,7 @@ router.get(
   requireSchool,
   async (req: Request, res: Response) => {
     try {
-      const schoolId = (req.user as any).linkedSchoolId;
+      const schoolId = ((req as AuthRequest).user as any)?.linkedSchoolId;
 
       if (!schoolId) {
         return res.status(400).json({
