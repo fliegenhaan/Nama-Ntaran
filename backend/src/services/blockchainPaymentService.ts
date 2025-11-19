@@ -13,7 +13,7 @@
  * Author: NutriChain Dev Team
  */
 
-import { ethers, Contract, ContractEventPayload, EventLog } from 'ethers';
+import { ethers, Contract } from 'ethers';
 import { pool } from '../config/database.js';
 import dotenv from 'dotenv';
 
@@ -130,7 +130,7 @@ const ESCROW_ABI = [
 // ============================================
 
 class BlockchainPaymentService {
-  private provider: ethers.Provider;
+  private provider: ethers.providers.Provider;
   private signer: ethers.Signer;
   private contract: Contract;
   private escrowContractAddress: string;
@@ -150,7 +150,7 @@ class BlockchainPaymentService {
     this.escrowContractAddress = contractAddress;
 
     // Initialize provider (RPC connection)
-    this.provider = new ethers.JsonRpcProvider(rpcUrl);
+    this.provider = new ethers.providers.JsonRpcProvider(rpcUrl);
 
     // Initialize signer (wallet untuk send transactions)
     this.signer = new ethers.Wallet(privateKey, this.provider);
@@ -164,7 +164,7 @@ class BlockchainPaymentService {
 
     console.log('✅ Blockchain Payment Service initialized');
     console.log(`   Contract Address: ${contractAddress}`);
-    console.log(`   Signer Address: ${this.signer.address}`);
+    console.log(`   Signer Address: ${(this.signer as ethers.Wallet).address}`);
   }
 
   /**
@@ -181,7 +181,7 @@ class BlockchainPaymentService {
       console.log('\n📌 [Blockchain] Locking fund...');
       console.log(`   Allocation ID: ${allocationData.allocationId}`);
       console.log(
-        `   Amount: ${ethers.formatEther(allocationData.amount)} ETH`
+        `   Amount: ${ethers.utils.formatEther(allocationData.amount)} ETH`
       );
       console.log(`   Payee: ${allocationData.payeeAddress}`);
 
@@ -192,7 +192,7 @@ class BlockchainPaymentService {
       const metadata = allocationData.metadata;
 
       // Convert string allocation ID to bytes32
-      const allocationIdBytes32 = ethers.id(allocationId); // Convert ke bytes32
+      const allocationIdBytes32 = ethers.utils.id(allocationId); // Convert ke bytes32
 
       // Send transaction
       const tx = await this.contract.lockFund(
@@ -247,7 +247,7 @@ class BlockchainPaymentService {
       console.log(`   Allocation ID: ${allocationId}`);
 
       // Convert string allocation ID to bytes32
-      const allocationIdBytes32 = ethers.id(allocationId);
+      const allocationIdBytes32 = ethers.utils.id(allocationId);
 
       // Send transaction
       const tx = await this.contract.releaseEscrow(allocationIdBytes32);
@@ -288,7 +288,7 @@ class BlockchainPaymentService {
    */
   async getAllocationData(allocationId: string) {
     try {
-      const allocationIdBytes32 = ethers.id(allocationId);
+      const allocationIdBytes32 = ethers.utils.id(allocationId);
       const allocation = await this.contract.getAllocation(
         allocationIdBytes32
       );
@@ -332,13 +332,13 @@ class BlockchainPaymentService {
           amount: bigint,
           timestamp: bigint,
           metadata: string,
-          event: EventLog
+          event: any
         ) => {
           console.log('📢 FundLocked Event received:');
           console.log(`   Allocation ID: ${allocationId}`);
           console.log(`   Payer: ${payer}`);
           console.log(`   Payee: ${payee}`);
-          console.log(`   Amount: ${ethers.formatEther(amount)} ETH`);
+          console.log(`   Amount: ${ethers.utils.formatEther(amount)} ETH`);
 
           callback({
             event: 'FundLocked',
@@ -387,12 +387,12 @@ class BlockchainPaymentService {
           amount: bigint,
           timestamp: bigint,
           txHash: string,
-          event: EventLog
+          event: any
         ) => {
           console.log('📢 PaymentReleased Event received:');
           console.log(`   Allocation ID: ${allocationId}`);
           console.log(`   Payee: ${payee}`);
-          console.log(`   Amount: ${ethers.formatEther(amount)} ETH`);
+          console.log(`   Amount: ${ethers.utils.formatEther(amount)} ETH`);
 
           callback({
             event: 'PaymentReleased',
@@ -431,7 +431,7 @@ class BlockchainPaymentService {
     deliveryDate: string
   ): string {
     const combined = `${schoolId}-${cateringId}-${deliveryDate}`;
-    return ethers.id(combined); // Keccak256 hash
+    return ethers.utils.id(combined); // Keccak256 hash
   }
 
   /**

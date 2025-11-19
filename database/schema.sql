@@ -37,6 +37,7 @@ CREATE TABLE schools (
     priority_score DECIMAL(5,2) DEFAULT 0,
     latitude DECIMAL(10,8),
     longitude DECIMAL(11,8),
+    contact_name VARCHAR(255), -- nama kepala sekolah atau kontak utama
     user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

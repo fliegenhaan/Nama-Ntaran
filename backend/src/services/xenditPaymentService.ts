@@ -14,7 +14,8 @@
  * Author: NutriChain Dev Team
  */
 
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
+import type { AxiosInstance } from 'axios';
 import { pool } from '../config/database.js';
 import dotenv from 'dotenv';
 import crypto from 'crypto';

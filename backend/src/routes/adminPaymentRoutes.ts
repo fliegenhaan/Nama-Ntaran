@@ -14,7 +14,8 @@
  * Author: NutriChain Dev Team
  */
 
-import express, { Request, Response, Router } from 'express';
+import express, { Router } from 'express';
+import type { Request, Response } from 'express';
 import { pool } from '../config/database.js';
 import { authenticateToken, authorizeRole } from '../middleware/auth.js';
 import blockchainPaymentService from '../services/blockchainPaymentService.js';

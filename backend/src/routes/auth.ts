@@ -243,7 +243,7 @@ router.post('/login', async (req: Request, res: Response) => {
     // jika role adalah school, ambil data sekolah
     if (user.role === 'school') {
       const schoolResult = await pool.query(
-        `SELECT id, name, npsn, address, province, city, district, jenjang
+        `SELECT id, name, npsn, address, province, city, district, jenjang, contact_name
          FROM schools WHERE user_id = $1`,
         [user.id]
       );
@@ -254,8 +254,10 @@ router.post('/login', async (req: Request, res: Response) => {
         userResponse.school_name = school.name;
         userResponse.school_npsn = school.npsn;
         userResponse.school_address = school.address;
-        // gunakan nama sekolah sebagai nama default
-        userResponse.name = school.name;
+        // gunakan contact_name sebagai nama user jika tersedia
+        if (school.contact_name) {
+          userResponse.name = school.contact_name;
+        }
       }
     }
 
