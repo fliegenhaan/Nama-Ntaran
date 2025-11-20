@@ -290,14 +290,118 @@ Actual performance tergantung:
    - Caterings: 80% verified, 20% pending
    - Admins: `is_verified = true`
 
+## 📊 Script 09: Payment Events
+
+**File:** `09-seed-payment-events.ts`
+
+**Purpose:** Seed payment_events table dengan comprehensive audit trail untuk payment lifecycle
+
+**Dependencies:**
+- 06-seed-payments.ts (payments must exist)
+- 03-seed-allocations.ts (allocations must exist)
+
+**Run:**
+```bash
+npm run seed:payment-events
+```
+
+atau
+
+```bash
+npx ts-node 09-seed-payment-events.ts
+```
+
+**Data yang di-generate:**
+
+| Event Type | Description | When Generated |
+|------------|-------------|----------------|
+| ALLOCATION_CREATED | Allocation dibuat | Semua payments |
+| FUND_LOCKED | Dana di-lock ke smart contract | Semua payments dengan status >= LOCKED |
+| DELIVERY_CONFIRMED | Sekolah konfirmasi penerimaan | Payments dengan status >= CONFIRMED |
+| PAYMENT_RELEASING | Mulai release dana | Payments dengan status >= RELEASING |
+| PAYMENT_RELEASED | Dana berhasil di-release | Payments dengan status COMPLETED |
+| PAYMENT_FAILED | Gagal memproses payment | Payments dengan status FAILED |
+| REFUND_INITIATED | Refund dimulai | Payments dengan status REFUNDED |
+
+**Expected Output:**
+- Total Events: ~3,500-4,000 events (3-4 events per payment)
+- Processing Status: ~95% PROCESSED, ~5% PENDING
+- Success Rate: 100%
+
+**Event Data Structure:**
+```json
+{
+  "payment_id": 123,
+  "allocation_id": 456,
+  "event_type": "FUND_LOCKED",
+  "blockchain_event_signature": "0x1234...",
+  "blockchain_tx_hash": "0xabcd...",
+  "blockchain_block_number": 15234567,
+  "event_data": {
+    "allocationId": "abc123...",
+    "payer": "0x742d35...",
+    "payee": "0x9a8b7c...",
+    "amount": 150000,
+    "timestamp": "2025-11-20T10:30:00Z",
+    "metadata": {
+      "schoolId": 789,
+      "cateringId": 12,
+      "deliveryId": 345,
+      "portions": 100,
+      "notes": "Dana Rp 150,000 di-lock ke smart contract..."
+    }
+  },
+  "processed": true,
+  "processed_at": "2025-11-20T10:35:00Z"
+}
+```
+
+**Features:**
+- ✅ Realistic event sequencing (events happen in chronological order)
+- ✅ Blockchain transaction hashing (Ethereum format)
+- ✅ Event signatures (keccak256 hash simulation)
+- ✅ Processing status tracking (95% processed rate)
+- ✅ Comprehensive event metadata
+- ✅ Multiple events per payment based on status
+
+**Verification:**
+```sql
+-- Count events by type
+SELECT event_type, COUNT(*) as count
+FROM payment_events
+GROUP BY event_type
+ORDER BY count DESC;
+
+-- Check processing status
+SELECT processed, COUNT(*) as count
+FROM payment_events
+GROUP BY processed;
+
+-- Verify event sequencing for a payment
+SELECT pe.event_type, pe.created_at, pe.blockchain_block_number
+FROM payment_events pe
+WHERE pe.payment_id = 1
+ORDER BY pe.created_at;
+```
+
+**Performance:**
+- Expected time: ~15-20 seconds for 1,000 payments
+- Batch size: 100 events per batch
+- Memory efficient: Events generated on-the-fly
+
 ## 📝 Next Steps
 
 Setelah users berhasil di-seed, lanjut ke:
 
-1. **Script 02:** `seed-schools.ts` - Seed schools table
-2. **Script 03:** `seed-caterings.ts` - Seed caterings table
-3. **Script 04:** `seed-menu-items.ts` - Seed menu items
-4. Dan seterusnya...
+1. **Script 02:** `seed-menu-items.ts` - Seed menu items
+2. **Script 04:** `seed-deliveries.ts` - Seed deliveries
+3. **Script 05:** `seed-verifications.ts` - Seed verifications
+4. **Script 03:** `seed-allocations.ts` - Seed allocations
+5. **Script 06:** `seed-payments.ts` - Seed payments
+6. **Script 07:** `seed-issues.ts` - Seed issues
+7. **Script 08:** `seed-escrow-transactions.ts` - Seed escrow transactions
+8. **Script 09:** `seed-payment-events.ts` - Seed payment events ✅
+9. **Script 10+:** Coming soon (delivery-confirmations, public-feed, refunds, etc.)
 
 ## 🆘 Support
 

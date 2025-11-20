@@ -11,7 +11,18 @@
     "seed:payments": "ts-node 06-seed-payments.ts",
     "seed:issues": "ts-node 07-seed-issues.ts",
     "seed:escrow-transactions": "ts-node 08-seed-escrow-transactions.ts",
-    "seed:all": "npm run seed:users && npm run seed:menu-items && npm run seed:deliveries && npm run seed:allocations && npm run seed:verifications && npm run seed:payments && npm run seed:issues && npm run seed:escrow-transactions"
+    "seed:payment-events": "ts-node 09-seed-payment-events.ts",
+    "seed:delivery-confirmations": "ts-node 10-seed-delivery-confirmations.ts",
+    "seed:public-payment-feed": "ts-node 11-seed-public-payment-feed.ts",
+    "seed:refunds": "ts-node 12-seed-refunds.ts",
+    "seed:payment-methods": "ts-node 13-seed-payment-methods.ts",
+    "seed:blockchain-sync-log": "ts-node 14-seed-blockchain-sync-log.ts",
+    "seed:poverty-data-cache": "ts-node 15-seed-poverty-data-cache.ts",
+    "seed:ai-food-analyses": "ts-node 16-seed-ai-food-analyses.ts",
+    "seed:anomaly-alerts": "ts-node 17-seed-anomaly-alerts.ts",
+    "seed:vendor-risk-assessments": "ts-node 18-seed-vendor-risk-assessments.ts",
+    "seed:all": "npm run seed:users && npm run seed:menu-items && npm run seed:deliveries && npm run seed:allocations && npm run seed:verifications && npm run seed:payments && npm run seed:issues && npm run seed:escrow-transactions && npm run seed:payment-events && npm run seed:delivery-confirmations && npm run seed:public-payment-feed && npm run seed:refunds && npm run seed:payment-methods && npm run seed:blockchain-sync-log && npm run seed:poverty-data-cache && npm run seed:ai-food-analyses && npm run seed:anomaly-alerts && npm run seed:vendor-risk-assessments",
+    "seed:ai-features": "npm run seed:poverty-data-cache && npm run seed:ai-food-analyses && npm run seed:anomaly-alerts && npm run seed:vendor-risk-assessments"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
