@@ -3315,3 +3315,76 @@ For questions or clarifications, refer to:
 - API endpoints: /backend/src/
 
 READY FOR IMPLEMENTATION!
+
+================================================================================
+                    SEEDER NICE-TO-HAVE (25-40) - ADDED 2025-11-21
+================================================================================
+
+DESKRIPSI: 16 seeder tambahan untuk fitur advanced dan analytics
+MIGRATION: database/migrations/025_create_nice_to_have_tables.sql
+NPM SCRIPTS: Sudah ditambahkan ke package.json
+
+TABEL BARU (13 tables):
+1. system_config              - App configuration settings
+2. user_activity_logs         - Security audit logs
+3. notifications              - In-app notifications
+4. regional_statistics        - Province/city aggregate stats
+5. catering_contracts         - Formal vendor contracts
+6. menu_plans                 - Weekly menu planning
+7. performance_metrics        - KPI tracking
+8. public_feedback            - Community feedback
+9. budget_allocations         - Fiscal budget tracking
+10. audit_trails              - Immutable financial audit log
+11. school_student_counts     - Historical enrollment data
+12. catering_menu_catalog     - Menu item master catalog
+13. delivery_routes           - Optimized delivery routes
+
+================================================================================
+NICE-TO-HAVE SEEDING EXECUTION GUIDE
+================================================================================
+
+PREREQUISITE:
+1. Run migration first:
+   Via Supabase SQL Editor: Copy paste 025_create_nice_to_have_tables.sql
+
+2. Ensure .env configured in database/seeders/.env
+
+EXECUTION BY PRIORITY (RECOMMENDED):
+  cd database/seeders
+  npm run seed:nice-to-have:critical   # System config + historical data
+  npm run seed:nice-to-have:high       # Activity logs + regional stats
+  npm run seed:nice-to-have:medium     # Notifications + metrics + menus
+  npm run seed:nice-to-have:low        # Photos + feedback + audit trails
+
+VERIFICATION QUERY:
+SELECT 'system_config', COUNT(*) FROM system_config
+UNION ALL SELECT 'user_activity_logs', COUNT(*) FROM user_activity_logs
+UNION ALL SELECT 'notifications', COUNT(*) FROM notifications
+UNION ALL SELECT 'regional_statistics', COUNT(*) FROM regional_statistics
+UNION ALL SELECT 'catering_contracts', COUNT(*) FROM catering_contracts
+UNION ALL SELECT 'menu_plans', COUNT(*) FROM menu_plans
+UNION ALL SELECT 'performance_metrics', COUNT(*) FROM performance_metrics
+UNION ALL SELECT 'public_feedback', COUNT(*) FROM public_feedback
+UNION ALL SELECT 'budget_allocations', COUNT(*) FROM budget_allocations
+UNION ALL SELECT 'audit_trails', COUNT(*) FROM audit_trails
+UNION ALL SELECT 'school_student_counts', COUNT(*) FROM school_student_counts
+UNION ALL SELECT 'catering_menu_catalog', COUNT(*) FROM catering_menu_catalog
+UNION ALL SELECT 'delivery_routes', COUNT(*) FROM delivery_routes;
+
+ESTIMATED TOTAL NEW RECORDS: ~11,200-29,500
+
+================================================================================
+                    UPDATED TOTAL SUMMARY (2025-11-21)
+================================================================================
+
+CORE SEEDERS (01-24):
+  Records: ~70,000-120,000
+  Status: ✅ COMPLETED & SEEDED
+
+NICE-TO-HAVE SEEDERS (25-40):
+  Records: ~11,200-29,500
+  Status: 🆕 READY TO RUN
+
+GRAND TOTAL: ~81,200-149,500 records across 37 tables
+
+ALL SEEDERS AVAILABLE AS NPM SCRIPTS! 🚀
