@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { supabase } from '../config/database.js';
-import { getPovertyData, calculatePovertyIndex } from './bpsDataService.js';
+import { getPovertyData, calculatePovertyIndex, getStuntingData } from './bpsDataService.js';
 
 /**
  * AI Scoring Service untuk menentukan prioritas sekolah
@@ -55,26 +55,28 @@ async function getPovertyIndexByProvince(province: string): Promise<number> {
 }
 
 /**
- * Get stunting data from database cache
- * (Kemenkes API not available, using pre-populated data from migration)
+ * Get stunting data with BPS API priority, fallback to database seeder
+ *
+ * DATA SOURCE PRIORITY (as per user requirement):
+ * 1. BPS API (if available) ← PRIORITY
+ * 2. Database seeder (fallback) ← FALLBACK
+ *
+ * Note: "Untuk data stunting prioritas pada BPS API. Apabila ada dari BPS API
+ * gunakan BPS API, apabila tidak ada maka gunakan seeder!"
  */
 async function getStuntingRateByProvince(province: string): Promise<number> {
   try {
-    // Fetch from database cache (populated by migration)
-    const { data, error } = await supabase
-      .from('latest_stunting_data')
-      .select('stunting_rate')
-      .eq('province', province)
-      .single();
+    // Fetch using priority system: BPS API → Database seeder
+    const stuntingData = await getStuntingData(province, true);
 
-    if (error || !data) {
-      // Fallback to national average if not found
+    if (!stuntingData) {
+      // Fallback to national average if not found in any source
       console.warn(`[AI Scoring] Stunting data not found for ${province}, using national average`);
       return 21.6; // National average
     }
 
-    const stuntingRate = parseFloat(data.stunting_rate);
-    console.log(`[AI Scoring] ${province} - Stunting: ${stuntingRate.toFixed(2)}%`);
+    const stuntingRate = stuntingData.stuntingRate;
+    console.log(`[AI Scoring] ${province} - Stunting: ${stuntingRate.toFixed(2)}% (Source: ${stuntingData.source})`);
     return stuntingRate;
   } catch (error) {
     console.error('Error fetching stunting data:', error);

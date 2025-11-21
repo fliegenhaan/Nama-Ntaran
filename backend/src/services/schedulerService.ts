@@ -16,7 +16,7 @@
 import cron from 'node-cron';
 import { createClient } from '@supabase/supabase-js';
 import { batchCalculatePriorityScores } from './priorityScoringService.js';
-import { getAllProvincePovertyData } from './bpsDataService.js';
+import { getAllProvincePovertyData, getAllProvinceStuntingData } from './bpsDataService.js';
 
 // ============================================================================
 // CONFIGURATION
@@ -32,8 +32,11 @@ const SCHEDULES = {
   // Priority scoring: Every Sunday at 2:00 AM
   PRIORITY_SCORING: process.env.PRIORITY_SCORING_SCHEDULE || '0 2 * * 0',
 
-  // BPS data refresh: 1st day of every month at 3:00 AM
+  // BPS poverty data refresh: 1st day of every month at 3:00 AM
   BPS_DATA_REFRESH: process.env.BPS_DATA_REFRESH_SCHEDULE || '0 3 1 * *',
+
+  // Stunting data refresh: 1st day of every month at 4:00 AM
+  STUNTING_DATA_REFRESH: process.env.STUNTING_DATA_REFRESH_SCHEDULE || '0 4 1 * *',
 
   // Health check: Every day at 1:00 AM
   HEALTH_CHECK: process.env.HEALTH_CHECK_SCHEDULE || '0 1 * * *',
@@ -63,6 +66,13 @@ const jobStatuses: Record<string, JobStatus> = {
     runCount: 0,
   },
   bpsDataRefresh: {
+    lastRun: null,
+    lastSuccess: null,
+    lastError: null,
+    isRunning: false,
+    runCount: 0,
+  },
+  stuntingDataRefresh: {
     lastRun: null,
     lastSuccess: null,
     lastError: null,
@@ -204,6 +214,64 @@ async function bpsDataRefreshJob() {
 }
 
 /**
+ * Stunting Data Refresh Job
+ * Fetches latest stunting data with BPS API priority, fallback to seeder
+ *
+ * PRIORITY ORDER (as per user requirement):
+ * 1. BPS API (if available)
+ * 2. Database seeder (fallback)
+ */
+async function stuntingDataRefreshJob() {
+  const jobName = 'stuntingDataRefresh';
+
+  if (jobStatuses[jobName].isRunning) {
+    console.log('[Scheduler] Stunting data refresh job already running, skipping...');
+    return;
+  }
+
+  console.log('\n' + '='.repeat(80));
+  console.log('[Scheduler] Starting STUNTING DATA REFRESH JOB');
+  console.log('[Scheduler] Priority: BPS API → Database Seeder');
+  console.log('='.repeat(80));
+
+  jobStatuses[jobName].isRunning = true;
+  jobStatuses[jobName].lastRun = new Date();
+  jobStatuses[jobName].runCount++;
+
+  try {
+    // Fetch data for all provinces (with BPS API priority)
+    const stuntingData = await getAllProvinceStuntingData();
+
+    console.log(`[Scheduler] Fetched stunting data for ${stuntingData.length} provinces`);
+
+    // Count data sources
+    const bpsApiCount = stuntingData.filter(d => d.source === 'bps_api').length;
+    const kemenkesApiCount = stuntingData.filter(d => d.source === 'kemenkes_api').length;
+    const seederCount = stuntingData.filter(d => d.source === 'seeder').length;
+
+    console.log(`[Scheduler] Data sources: ${bpsApiCount} BPS API, ${kemenkesApiCount} Kemenkes API, ${seederCount} seeder`);
+
+    if (seederCount === stuntingData.length) {
+      console.log('[Scheduler] ⚠️ All data from seeder - BPS API not available for stunting data');
+    } else if (bpsApiCount > 0) {
+      console.log(`[Scheduler] ✅ Using BPS API for ${bpsApiCount} provinces`);
+    }
+
+    console.log('\n' + '='.repeat(80));
+    console.log('[Scheduler] STUNTING DATA REFRESH JOB COMPLETED');
+    console.log('='.repeat(80) + '\n');
+
+    jobStatuses[jobName].lastSuccess = new Date();
+    jobStatuses[jobName].lastError = null;
+  } catch (error: any) {
+    console.error('[Scheduler] Stunting data refresh job failed:', error.message);
+    jobStatuses[jobName].lastError = error.message;
+  } finally {
+    jobStatuses[jobName].isRunning = false;
+  }
+}
+
+/**
  * Health Check Job
  * Verifies system health and logs status
  */
@@ -239,6 +307,7 @@ async function healthCheckJob() {
 
 let priorityScoringTask: cron.ScheduledTask | null = null;
 let bpsDataRefreshTask: cron.ScheduledTask | null = null;
+let stuntingDataRefreshTask: cron.ScheduledTask | null = null;
 let healthCheckTask: cron.ScheduledTask | null = null;
 
 /**
@@ -250,6 +319,7 @@ export function startScheduler() {
   console.log('='.repeat(80));
   console.log(`[Scheduler] Priority Scoring: ${SCHEDULES.PRIORITY_SCORING} (Every Sunday 2:00 AM)`);
   console.log(`[Scheduler] BPS Data Refresh: ${SCHEDULES.BPS_DATA_REFRESH} (1st of month 3:00 AM)`);
+  console.log(`[Scheduler] Stunting Data Refresh: ${SCHEDULES.STUNTING_DATA_REFRESH} (1st of month 4:00 AM)`);
   console.log(`[Scheduler] Health Check: ${SCHEDULES.HEALTH_CHECK} (Every day 1:00 AM)`);
   console.log('='.repeat(80) + '\n');
 
@@ -260,6 +330,11 @@ export function startScheduler() {
 
   // BPS Data Refresh: 1st day of every month at 3:00 AM
   bpsDataRefreshTask = cron.schedule(SCHEDULES.BPS_DATA_REFRESH, bpsDataRefreshJob, {
+    timezone: 'Asia/Jakarta',
+  });
+
+  // Stunting Data Refresh: 1st day of every month at 4:00 AM
+  stuntingDataRefreshTask = cron.schedule(SCHEDULES.STUNTING_DATA_REFRESH, stuntingDataRefreshJob, {
     timezone: 'Asia/Jakarta',
   });
 
@@ -285,6 +360,11 @@ export function stopScheduler() {
   if (bpsDataRefreshTask) {
     bpsDataRefreshTask.stop();
     bpsDataRefreshTask = null;
+  }
+
+  if (stuntingDataRefreshTask) {
+    stuntingDataRefreshTask.stop();
+    stuntingDataRefreshTask = null;
   }
 
   if (healthCheckTask) {
@@ -323,6 +403,14 @@ export async function triggerBpsDataRefresh() {
   await bpsDataRefreshJob();
 }
 
+/**
+ * Manually trigger stunting data refresh job
+ */
+export async function triggerStuntingDataRefresh() {
+  console.log('[Scheduler] Manual trigger: Stunting Data Refresh');
+  await stuntingDataRefreshJob();
+}
+
 // ============================================================================
 // EXPORT
 // ============================================================================
@@ -333,4 +421,5 @@ export default {
   getStatus: getSchedulerStatus,
   triggerPriorityScoring,
   triggerBpsDataRefresh,
+  triggerStuntingDataRefresh,
 };

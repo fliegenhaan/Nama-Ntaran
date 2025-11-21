@@ -1,58 +1,53 @@
 /**
  * ============================================================================
- * DATABASE CONFIGURATION - SUPABASE CLIENT (RECOMMENDED)
+ * DATABASE CONFIGURATION - SUPABASE CLIENT ONLY
  * ============================================================================
  *
- * IMPORTANT: Semua kode baru HARUS menggunakan Supabase client!
+ * IMPORTANT: ALL code MUST use Supabase client!
  *
- * ✅ GUNAKAN: import { supabase } from '../config/database.js';
- * ❌ JANGAN:  import { pool } from '../config/database.js';
+ * ✅ CORRECT: import { supabase } from '../config/database.js';
+ * ❌ REMOVED: Legacy PostgreSQL pool has been removed
  *
- * Pool hanya disediakan untuk backward compatibility dan akan di-deprecate.
+ * For database operations, use Supabase client methods:
+ * - supabase.from('table').select()
+ * - supabase.from('table').insert()
+ * - supabase.from('table').update()
+ * - supabase.from('table').delete()
+ * - supabase.rpc('function_name')
+ *
+ * For seeders/migrations, use scripts in database/seeders/
  * ============================================================================
  */
 
-import { Pool } from 'pg';
 import dotenv from 'dotenv';
 import { supabase, testSupabaseConnection } from './supabase.js';
 
 dotenv.config();
 
 // ============================================================================
-// SUPABASE CLIENT (RECOMMENDED) ✅
+// SUPABASE CLIENT (PRIMARY DATABASE INTERFACE) ✅
 // ============================================================================
 
 /**
- * @deprecated Use Supabase client for all new code
- * Export Supabase client sebagai primary database interface
+ * Supabase client - the ONLY database interface
+ * All database operations must use this client
  */
 export { supabase };
 
 // ============================================================================
-// LEGACY PG POOL (DEPRECATED) ⚠️
+// LEGACY POOL REMOVED ✅
 // ============================================================================
 
 /**
- * @deprecated Legacy PostgreSQL pool - akan dihapus di versi future
- * Hanya untuk backward compatibility dengan kode lama
+ * IMPORTANT: Legacy PostgreSQL pool has been REMOVED!
+ *
+ * If you're using old scripts in src/scripts/:
+ * - migrate.ts → Use database/migrations/ instead
+ * - seed.ts → Use database/seeders/ instead
+ * - importSchools.ts → Use database/seeders/02-seed-schools.ts instead
+ *
+ * All new seeders/migrations use Supabase client.
  */
-export const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-});
-
-// Test connection untuk pool (legacy)
-pool.on('connect', () => {
-  console.log('⚠️  Connected to PostgreSQL via legacy pool (deprecated)');
-});
-
-pool.on('error', (err) => {
-  console.error('❌ Unexpected database error:', err);
-  process.exit(-1);
-});
 
 // ============================================================================
 // INITIALIZATION & HEALTH CHECK
@@ -63,6 +58,7 @@ testSupabaseConnection().then((success) => {
   if (success) {
     console.log('✅ Database ready: Using Supabase client');
   } else {
-    console.warn('⚠️  Supabase connection test failed, falling back to legacy pool');
+    console.error('❌ Supabase connection failed! Check your credentials.');
+    process.exit(-1);
   }
 });
