@@ -40,11 +40,13 @@ export default function AccountsPage() {
   const fetchAccounts = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get('/api/users');
-      setAllAccounts(response.users || []);
+      const response = await api.get('/api/admin/users');
+      const usersData = response.success ? response.users : (response.users || []);
+      setAllAccounts(usersData);
     } catch (error: any) {
       console.error('Error fetching accounts:', error);
-      alert(error.response?.data?.error || 'Gagal memuat data akun');
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || 'Gagal memuat data akun';
+      alert(errorMessage);
     } finally {
       setIsLoading(false);
     }
