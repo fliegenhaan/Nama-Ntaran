@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import useIssues from '../../hooks/useIssues';
 import ModernSidebar from '../../components/layout/ModernSidebar';
+import { useSchoolLogo } from '../../hooks/useSchoolLogo';
 import {
   LayoutDashboard,
   AlertTriangle,
@@ -29,6 +30,7 @@ import {
 export default function IssuesPage() {
   const router = useRouter();
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { logoUrl } = useSchoolLogo();
 
   const { issues, isLoading } = useIssues({
     autoFetch: true,
@@ -176,6 +178,7 @@ export default function IssuesPage() {
         userName={user.name || 'Kepala Sekolah'}
         userEmail={user.email || 'sekolah@mbg.id'}
         schoolName={user.school_name || 'Sekolah'}
+        schoolLogoUrl={logoUrl}
       />
 
       {/* main content dengan margin left untuk sidebar */}
