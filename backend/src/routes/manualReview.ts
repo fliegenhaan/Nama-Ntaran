@@ -23,104 +23,120 @@ router.use(requireRole('admin'));
 // ============================================
 router.get('/pending', async (req: AuthRequest, res: Response) => {
   try {
-    const { data, error } = await supabase
+    // First, get verifications with pending review status
+    const { data: verifications, error: verificationError } = await supabase
       .from('verifications')
-      .select(`
-        id,
-        delivery_id,
-        verified_at,
-        portions_received,
-        quality_rating,
-        notes,
-        photo_url,
-        status,
-        deliveries!inner (
-          delivery_date,
-          portions,
-          amount,
-          school_id,
-          catering_id,
-          schools!inner (
-            id,
-            name,
-            npsn
-          ),
-          caterings!inner (
-            id,
-            name
-          )
-        ),
-        ai_food_analyses (
-          id,
-          quality_score,
-          freshness_score,
-          presentation_score,
-          hygiene_score,
-          detected_items,
-          portion_estimate,
-          portion_confidence,
-          meets_bgn_standards,
-          confidence,
-          reasoning,
-          issues,
-          warnings,
-          recommendations,
-          needs_manual_review
-        )
-      `)
-      .eq('ai_food_analyses.needs_manual_review', true)
+      .select('*')
       .eq('status', 'pending_review')
       .order('verified_at', { ascending: false });
 
-    if (error) {
-      throw error;
+    if (verificationError) {
+      throw verificationError;
     }
 
-    // Flatten the nested structure for backwards compatibility
-    const reviews = (data || []).map(v => ({
-      verification_id: v.id,
-      delivery_id: v.delivery_id,
-      verified_at: v.verified_at,
-      portions_received: v.portions_received,
-      quality_rating: v.quality_rating,
-      notes: v.notes,
-      photo_url: v.photo_url,
-      verification_status: v.status,
-      delivery_date: v.deliveries.delivery_date,
-      expected_portions: v.deliveries.portions,
-      amount: v.deliveries.amount,
-      school_id: v.deliveries.schools.id,
-      school_name: v.deliveries.schools.name,
-      npsn: v.deliveries.schools.npsn,
-      catering_id: v.deliveries.caterings.id,
-      catering_name: v.deliveries.caterings.name,
-      ai_analysis_id: v.ai_food_analyses?.[0]?.id,
-      quality_score: v.ai_food_analyses?.[0]?.quality_score,
-      freshness_score: v.ai_food_analyses?.[0]?.freshness_score,
-      presentation_score: v.ai_food_analyses?.[0]?.presentation_score,
-      hygiene_score: v.ai_food_analyses?.[0]?.hygiene_score,
-      detected_items: v.ai_food_analyses?.[0]?.detected_items,
-      portion_estimate: v.ai_food_analyses?.[0]?.portion_estimate,
-      portion_confidence: v.ai_food_analyses?.[0]?.portion_confidence,
-      meets_bgn_standards: v.ai_food_analyses?.[0]?.meets_bgn_standards,
-      confidence: v.ai_food_analyses?.[0]?.confidence,
-      reasoning: v.ai_food_analyses?.[0]?.reasoning,
-      issues: v.ai_food_analyses?.[0]?.issues,
-      warnings: v.ai_food_analyses?.[0]?.warnings,
-      recommendations: v.ai_food_analyses?.[0]?.recommendations,
-      needs_manual_review: v.ai_food_analyses?.[0]?.needs_manual_review
-    }));
+    if (!verifications || verifications.length === 0) {
+      return res.json({
+        success: true,
+        count: 0,
+        data: {
+          reviews: []
+        }
+      });
+    }
+
+    const verificationIds = verifications.map((v: any) => v.id);
+    const deliveryIds = verifications.map((v: any) => v.delivery_id);
+
+    // Get AI analyses that need manual review
+    const { data: aiAnalyses } = await supabase
+      .from('ai_food_analyses')
+      .select('*')
+      .in('verification_id', verificationIds)
+      .eq('needs_manual_review', true);
+
+    // Filter verifications that have AI analysis needing review
+    const verificationsNeedingReview = verifications.filter((v: any) =>
+      aiAnalyses?.some((ai: any) => ai.verification_id === v.id)
+    );
+
+    const relevantDeliveryIds = verificationsNeedingReview.map((v: any) => v.delivery_id);
+
+    // Get deliveries
+    const { data: deliveries } = await supabase
+      .from('deliveries')
+      .select('id, delivery_date, portions, amount, school_id, catering_id')
+      .in('id', relevantDeliveryIds);
+
+    const schoolIds = [...new Set(deliveries?.map((d: any) => d.school_id).filter(Boolean))];
+    const cateringIds = [...new Set(deliveries?.map((d: any) => d.catering_id).filter(Boolean))];
+
+    // Get schools and caterings
+    const [{ data: schools }, { data: caterings }] = await Promise.all([
+      supabase.from('schools').select('id, name, npsn').in('id', schoolIds),
+      supabase.from('caterings').select('id, name').in('id', cateringIds)
+    ]);
+
+    // Create lookup maps
+    const deliveriesMap = new Map(deliveries?.map((d: any) => [d.id, d]));
+    const schoolsMap = new Map(schools?.map((s: any) => [s.id, s]));
+    const cateringsMap = new Map(caterings?.map((c: any) => [c.id, c]));
+    const aiAnalysesMap = new Map(aiAnalyses?.map((ai: any) => [ai.verification_id, ai]));
+
+    // Flatten the data
+    const reviews = verificationsNeedingReview.map((v: any) => {
+      const delivery = deliveriesMap.get(v.delivery_id);
+      const school = delivery ? schoolsMap.get(delivery.school_id) : null;
+      const catering = delivery ? cateringsMap.get(delivery.catering_id) : null;
+      const aiAnalysis = aiAnalysesMap.get(v.id);
+
+      return {
+        verification_id: v.id,
+        delivery_id: v.delivery_id,
+        verified_at: v.verified_at,
+        portions_received: v.portions_received,
+        quality_rating: v.quality_rating,
+        notes: v.notes,
+        photo_url: v.photo_url,
+        verification_status: v.status,
+        delivery_date: delivery?.delivery_date,
+        expected_portions: delivery?.portions,
+        amount: delivery?.amount,
+        school_id: school?.id,
+        school_name: school?.name,
+        npsn: school?.npsn,
+        catering_id: catering?.id,
+        catering_name: catering?.name,
+        ai_analysis_id: aiAnalysis?.id,
+        quality_score: aiAnalysis?.quality_score,
+        freshness_score: aiAnalysis?.freshness_score,
+        presentation_score: aiAnalysis?.presentation_score,
+        hygiene_score: aiAnalysis?.hygiene_score,
+        detected_items: aiAnalysis?.detected_items,
+        portion_estimate: aiAnalysis?.portion_estimate,
+        portion_confidence: aiAnalysis?.portion_confidence,
+        meets_bgn_standards: aiAnalysis?.meets_bgn_standards,
+        confidence: aiAnalysis?.confidence,
+        reasoning: aiAnalysis?.reasoning,
+        issues: aiAnalysis?.issues,
+        warnings: aiAnalysis?.warnings,
+        recommendations: aiAnalysis?.recommendations,
+        needs_manual_review: aiAnalysis?.needs_manual_review
+      };
+    });
 
     res.json({
       success: true,
       count: reviews.length,
-      reviews,
+      data: {
+        reviews
+      }
     });
   } catch (error: any) {
     console.error('[Manual Review] Get pending error:', error);
     res.status(500).json({
+      success: false,
       error: 'Failed to fetch pending reviews',
-      details: error.message,
+      message: error.message || 'Unknown error',
     });
   }
 });

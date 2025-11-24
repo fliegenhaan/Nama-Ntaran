@@ -70,10 +70,15 @@ export default function ManualReviewPage() {
     setIsLoading(true);
     try {
       const response = await api.get('/api/manual-review/pending');
-      setPendingReviews(response.data.reviews || []);
+      // Handle response based on structure
+      const reviewsData = response.success
+        ? (response.data?.reviews || [])
+        : (response.reviews || response.data?.reviews || []);
+      setPendingReviews(reviewsData);
     } catch (error: any) {
       console.error('Fetch pending reviews error:', error);
-      alert(error.response?.data?.error || 'Gagal Memuat Data Pending Reviews');
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || 'Gagal Memuat Data Pending Reviews';
+      alert(errorMessage);
     } finally {
       setIsLoading(false);
     }
