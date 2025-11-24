@@ -59,19 +59,19 @@ router.get('/dashboard', authenticateToken, async (req: Request, res: Response) 
 
     const cateringId = (cateringData as any).id;
 
-    // TO DO: query ke database untuk mendapatkan riwayat pengiriman
-    // contoh query (sesuaikan dengan schema database)
+    // query ke database untuk mendapatkan riwayat pengiriman dari tabel deliveries
     const { data: deliveriesData, error: deliveriesError } = await supabase
-      .from('allocations')
+      .from('deliveries')
       .select(`
         id,
-        allocation_date,
-        quantity,
+        delivery_date,
+        portions,
+        amount,
         status,
         schools!inner(id, name)
       `)
       .eq('catering_id', cateringId)
-      .order('allocation_date', { ascending: false })
+      .order('delivery_date', { ascending: false })
       .limit(50);
 
     if (deliveriesError) {
@@ -82,10 +82,9 @@ router.get('/dashboard', authenticateToken, async (req: Request, res: Response) 
     const deliveries: DeliveryHistoryItem[] = (deliveriesData || []).map((row: any, index: number) => ({
       id: row.id.toString(),
       schoolName: row.schools?.name || `Sekolah ${index + 1}`,
-      date: (row.allocation_date ? new Date(row.allocation_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]) as string,
-      portions: row.quantity || 0,
+      date: (row.delivery_date ? new Date(row.delivery_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]) as string,
+      portions: row.portions || 0,
       status: mapStatus(row.status),
-      // TO DO: implementasi image URL dari database atau gunakan placeholder
       imageUrl: getImageUrl(index),
     }));
 
@@ -130,11 +129,12 @@ router.get('/deliveries', authenticateToken, async (req: Request, res: Response)
 
     // build query dengan filter
     let query = supabase
-      .from('allocations')
+      .from('deliveries')
       .select(`
         id,
-        allocation_date,
-        quantity,
+        delivery_date,
+        portions,
+        amount,
         status,
         schools!inner(id, name)
       `, { count: 'exact' })
@@ -159,7 +159,7 @@ router.get('/deliveries', authenticateToken, async (req: Request, res: Response)
     }
 
     const { data: deliveriesData, error: deliveriesError, count } = await query
-      .order('allocation_date', { ascending: false })
+      .order('delivery_date', { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (deliveriesError) {
@@ -177,7 +177,7 @@ router.get('/deliveries', authenticateToken, async (req: Request, res: Response)
       const monthNum = monthMap[month.toLowerCase()];
       if (monthNum) {
         filteredData = filteredData.filter((row: any) => {
-          const date = new Date(row.allocation_date);
+          const date = new Date(row.delivery_date);
           return date.getMonth() + 1 === monthNum;
         });
       }
@@ -190,8 +190,8 @@ router.get('/deliveries', authenticateToken, async (req: Request, res: Response)
     const deliveries: DeliveryHistoryItem[] = filteredData.map((row: any, index: number) => ({
       id: row.id.toString(),
       schoolName: row.schools?.name || `Sekolah ${index + 1}`,
-      date: (row.allocation_date ? new Date(row.allocation_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]) as string,
-      portions: row.quantity || 0,
+      date: (row.delivery_date ? new Date(row.delivery_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]) as string,
+      portions: row.portions || 0,
       status: mapStatus(row.status),
       imageUrl: getImageUrl(index),
     }));
@@ -218,14 +218,13 @@ router.get('/:id', authenticateToken, async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // TO DO: implementasi query untuk detail delivery
-    // contoh query (sesuaikan dengan schema database)
-    const { data: allocation, error: allocationError } = await supabase
-      .from('allocations')
+    // query untuk detail delivery
+    const { data: delivery, error: deliveryError } = await supabase
+      .from('deliveries')
       .select(`
         id,
-        allocation_date,
-        quantity,
+        delivery_date,
+        portions,
         status,
         amount,
         schools!inner(name, address),
@@ -235,30 +234,30 @@ router.get('/:id', authenticateToken, async (req: Request, res: Response) => {
       .eq('id', deliveryId)
       .single();
 
-    if (allocationError || !allocation) {
+    if (deliveryError || !delivery) {
       return res.status(404).json({ error: 'Data pengiriman tidak ditemukan' });
     }
 
-    const allocData = allocation as any;
+    const deliveryData = delivery as any;
 
-    // Check if this allocation belongs to the user's catering
-    if (allocData.caterings?.user_id !== userId) {
+    // Check if this delivery belongs to the user's catering
+    if (deliveryData.caterings?.user_id !== userId) {
       return res.status(403).json({ error: 'Tidak memiliki akses ke data ini' });
     }
 
     // Extract verification data (could be array or single object)
-    const verification = Array.isArray(allocData.verifications)
-      ? allocData.verifications[0]
-      : allocData.verifications;
+    const verification = Array.isArray(deliveryData.verifications)
+      ? deliveryData.verifications[0]
+      : deliveryData.verifications;
 
     res.json({
-      id: allocData.id.toString(),
-      schoolName: allocData.schools?.name || '',
-      schoolAddress: allocData.schools?.address || '',
-      date: allocData.allocation_date,
-      portions: allocData.quantity,
-      amount: allocData.amount,
-      status: mapStatus(allocData.status),
+      id: deliveryData.id.toString(),
+      schoolName: deliveryData.schools?.name || '',
+      schoolAddress: deliveryData.schools?.address || '',
+      date: deliveryData.delivery_date,
+      portions: deliveryData.portions,
+      amount: deliveryData.amount,
+      status: mapStatus(deliveryData.status),
       verifiedAt: verification?.verified_at || null,
       verificationNotes: verification?.notes || null,
     });
@@ -269,7 +268,6 @@ router.get('/:id', authenticateToken, async (req: Request, res: Response) => {
 });
 
 // helper function untuk mendapatkan image URL
-// TO DO: implementasi logic untuk mendapatkan gambar dari database atau storage
 function getImageUrl(index: number): string {
   const images = [
     '/aesthetic view.jpg',
