@@ -24,6 +24,8 @@ import cateringPaymentRoutes from './routes/cateringPaymentRoutes.js';
 import cateringHistoryRoutes from './routes/cateringHistoryRoutes.js';
 import cateringMenuRoutes from './routes/cateringMenuRoutes.js';
 import cateringIssuesRoutes from './routes/cateringIssuesRoutes.js';
+import cateringDashboardRoutes from './routes/cateringDashboardRoutes.js';
+import cateringScheduleRoutes from './routes/cateringScheduleRoutes.js';
 import schedulerRoutes from './routes/schedulerRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 
@@ -68,6 +70,8 @@ app.use('/api/blockchain', blockchainRoutes);
 app.use('/api/escrow', escrowRoutes);
 app.use('/api/ai-analytics', aiAnalyticsRoutes); // 🤖 AI Analytics endpoints
 app.use('/api/manual-review', manualReviewRoutes); // 👨‍💼 Manual Review endpoints
+app.use('/api/catering/dashboard', cateringDashboardRoutes);
+app.use('/api/catering/schedules', cateringScheduleRoutes);
 app.use('/api/catering/payments', cateringPaymentRoutes);
 app.use('/api/catering/history', cateringHistoryRoutes);
 app.use('/api/catering/menu', cateringMenuRoutes);
