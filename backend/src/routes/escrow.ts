@@ -203,6 +203,118 @@ router.post('/cancel', authenticateToken, async (req: Request, res: Response) =>
 });
 
 /**
+ * GET /api/escrow
+ * Get all escrow transactions (Admin only)
+ */
+router.get('/', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    // Validate role
+    if ((req as any).user.role !== 'admin') {
+      return res.status(403).json({ error: 'Only admin can view all escrows' });
+    }
+
+    // Get all escrow transactions from database with allocations join
+    const { data: escrows, error } = await supabase
+      .from('escrow_transactions')
+      .select(`
+        *,
+        allocations!inner(
+          id,
+          school_id,
+          catering_id,
+          schools!inner(name),
+          caterings!inner(name)
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching escrows:', error);
+      return res.status(500).json({ error: 'Failed to fetch escrow transactions' });
+    }
+
+    // Format the data for frontend
+    const formattedEscrows = escrows.map((escrow: any) => ({
+      id: escrow.id,
+      school: escrow.allocations?.schools?.name || 'Unknown School',
+      catering: escrow.allocations?.caterings?.name || 'Unknown Catering',
+      amount: escrow.amount,
+      status: escrow.transaction_type === 'LOCK' && escrow.status === 'CONFIRMED' ? 'Terkunci' :
+              escrow.transaction_type === 'RELEASE' && escrow.status === 'CONFIRMED' ? 'Tercairkan' :
+              escrow.status === 'FAILED' ? 'Gagal' :
+              escrow.status === 'PENDING' ? 'Menunggu Rilis' : 'Tertunda',
+      lockedAt: escrow.executed_at || escrow.created_at,
+      releaseDate: escrow.confirmed_at || escrow.executed_at || escrow.created_at,
+      releasedAt: escrow.transaction_type === 'RELEASE' ? escrow.confirmed_at : null,
+      txHash: escrow.blockchain_tx_hash || '0x0000000000000000000000000000000000000000'
+    }));
+
+    res.json({
+      success: true,
+      escrows: formattedEscrows
+    });
+  } catch (error: any) {
+    console.error('Error getting escrows:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/escrow/stats
+ * Get escrow statistics (Admin only)
+ */
+router.get('/stats', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    // Validate role
+    if ((req as any).user.role !== 'admin') {
+      return res.status(403).json({ error: 'Only admin can view escrow stats' });
+    }
+
+    // Get statistics from database
+    const { data: escrows, error } = await supabase
+      .from('escrow_transactions')
+      .select('amount, status, transaction_type');
+
+    if (error) {
+      console.error('Error fetching escrow stats:', error);
+      return res.status(500).json({ error: 'Failed to fetch escrow statistics' });
+    }
+
+    // Calculate statistics based on real schema
+    const stats = {
+      totalTerkunci: 0,
+      totalTercair: 0,
+      pendingRelease: 0
+    };
+
+    escrows.forEach((escrow: any) => {
+      const amount = parseFloat(escrow.amount);
+
+      // Locked funds: LOCK transaction that is CONFIRMED
+      if (escrow.transaction_type === 'LOCK' && escrow.status === 'CONFIRMED') {
+        stats.totalTerkunci += amount;
+      }
+      // Released funds: RELEASE transaction that is CONFIRMED
+      else if (escrow.transaction_type === 'RELEASE' && escrow.status === 'CONFIRMED') {
+        stats.totalTercair += amount;
+      }
+      // Pending: PENDING status or FAILED
+      else if (escrow.status === 'PENDING' || escrow.status === 'FAILED') {
+        stats.pendingRelease += amount;
+      }
+    });
+
+    res.json({
+      success: true,
+      stats
+    });
+  } catch (error: any) {
+    console.error('Error getting escrow stats:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * GET /api/escrow/:escrowId
  * Get escrow details from blockchain
  */
