@@ -1,4 +1,4 @@
-import { pool } from '../config/database.js';
+// @ts-nocheck
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';

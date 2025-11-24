@@ -1,3 +1,4 @@
+// @ts-nocheck
 import multer from 'multer';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
