@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-type FilterType = 'today' | 'week' | 'month';
+type FilterType = 'today' | 'week' | 'month' | 'all';
 
 interface FilterTab {
   id: FilterType;
@@ -23,6 +23,7 @@ const ScheduleFilterTabs: React.FC<ScheduleFilterTabsProps> = ({
     { id: 'today', label: 'Hari Ini' },
     { id: 'week', label: 'Minggu Ini' },
     { id: 'month', label: 'Bulan Ini' },
+    { id: 'all', label: 'Semua' },
   ];
 
   return (
