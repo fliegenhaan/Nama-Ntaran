@@ -17,8 +17,8 @@ export default function TransparansiPage() {
   const [activeTab, setActiveTab] = useState('transparansi');
   const heroRef = useRef(null);
   const dashboardRef = useRef(null);
-  const heroInView = useInView(heroRef, { once: true, margin: "-100px" });
-  const dashboardInView = useInView(dashboardRef, { once: true, margin: "-100px" });
+  const heroInView = useInView(heroRef, { once: true, amount: 0.1 });
+  const dashboardInView = useInView(dashboardRef, { once: true, amount: 0.1 });
 
   // state management
   const [trendData, setTrendData] = useState<any[]>([]);
@@ -158,6 +158,7 @@ export default function TransparansiPage() {
                   width={120}
                   height={40}
                   className="object-contain"
+                  style={{ height: 'auto' }}
                   priority
                 />
               </motion.div>

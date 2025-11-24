@@ -437,6 +437,7 @@ export default function Home() {
                   width={120}
                   height={40}
                   className="object-contain brightness-0 invert"
+                  style={{ height: 'auto' }}
                 />
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">

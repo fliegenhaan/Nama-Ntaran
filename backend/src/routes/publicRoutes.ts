@@ -172,4 +172,201 @@ router.get('/priority-schools', async (req: Request, res: Response) => {
   }
 });
 
+// GET /api/public/statistics - Get summary statistics for transparency dashboard
+router.get('/statistics', async (req: Request, res: Response) => {
+  try {
+    // Get total amount distributed
+    const { data: deliveries, error: deliveriesError } = await supabase
+      .from('deliveries')
+      .select('amount, status, school_id')
+      .in('status', ['delivered', 'verified']);
+
+    if (deliveriesError) throw deliveriesError;
+
+    const totalAmountDistributed = (deliveries || []).reduce(
+      (sum, delivery) => sum + (delivery.amount || 0),
+      0
+    );
+
+    // Get total schools served
+    const { data: schools, error: schoolsError, count } = await supabase
+      .from('schools')
+      .select('*', { count: 'exact', head: true });
+
+    if (schoolsError) throw schoolsError;
+
+    // Get schools with province information
+    const { data: schoolsData, error: regionError } = await supabase
+      .from('schools')
+      .select('id, province');
+
+    if (regionError) throw regionError;
+
+    // Create a map of school_id to province
+    const schoolProvinceMap = new Map<number, string>();
+    (schoolsData || []).forEach(school => {
+      schoolProvinceMap.set(school.id, school.province || 'Unknown');
+    });
+
+    // Calculate deliveries by province using the deliveries we already fetched
+    const provinceMap = new Map<string, number>();
+
+    (deliveries || []).forEach(delivery => {
+      const province = schoolProvinceMap.get(delivery.school_id) || 'Unknown';
+      provinceMap.set(province, (provinceMap.get(province) || 0) + (delivery.amount || 0));
+    });
+
+    // Get top 5 regions
+    const topRegions = Array.from(provinceMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([region, amount], index) => {
+        const colors = ['#8b5cf6', '#f59e0b', '#3b82f6', '#ec4899', '#10b981'];
+        return {
+          region,
+          amount,
+          color: colors[index % colors.length]
+        };
+      });
+
+    res.json({
+      success: true,
+      data: {
+        summary: {
+          totalAmountDistributed,
+          schoolsServed: count || 0
+        },
+        topRegions
+      }
+    });
+  } catch (error) {
+    console.error('Get statistics error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch statistics',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// GET /api/public/blockchain-transactions - Get recent blockchain transactions
+router.get('/blockchain-transactions', async (req: Request, res: Response) => {
+  try {
+    const { limit = '10' } = req.query;
+    const limitNum = parseInt(limit as string);
+
+    // Fetch recent deliveries
+    const { data: deliveries, error } = await supabase
+      .from('deliveries')
+      .select('id, amount, delivery_date, status, school_id')
+      .order('delivery_date', { ascending: false })
+      .limit(limitNum);
+
+    if (error) throw error;
+
+    // Get school IDs from deliveries
+    const schoolIds = [...new Set((deliveries || []).map(d => d.school_id))];
+
+    // Fetch school names
+    const { data: schools, error: schoolsError } = await supabase
+      .from('schools')
+      .select('id, name')
+      .in('id', schoolIds);
+
+    if (schoolsError) throw schoolsError;
+
+    // Create school map
+    const schoolMap = new Map<number, string>();
+    (schools || []).forEach(school => {
+      schoolMap.set(school.id, school.name);
+    });
+
+    // Format transactions for display
+    const transactions = (deliveries || []).map(delivery => {
+      const date = new Date(delivery.delivery_date);
+      const timeStr = date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      const amountInMillions = delivery.amount / 1_000_000;
+      const formattedAmount = amountInMillions >= 1
+        ? `Rp ${amountInMillions.toFixed(1)} Juta`
+        : `Rp ${(delivery.amount / 1_000).toFixed(0)} Ribu`;
+
+      return {
+        time: timeStr,
+        amount: formattedAmount,
+        receiver: schoolMap.get(delivery.school_id) || 'Unknown School',
+        status: delivery.status === 'verified' || delivery.status === 'delivered'
+          ? 'Selesai'
+          : 'Pending',
+        txHash: `tx-${delivery.id}`
+      };
+    });
+
+    res.json({
+      success: true,
+      data: transactions
+    });
+  } catch (error) {
+    console.error('Get blockchain transactions error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch blockchain transactions',
+      details: error instanceof Error ? error.message : JSON.stringify(error)
+    });
+  }
+});
+
+// GET /api/public/regions - Get school priority score distribution by region
+router.get('/regions', async (req: Request, res: Response) => {
+  try {
+    // Fetch all schools with priority scores
+    const { data: schools, error } = await supabase
+      .from('schools')
+      .select('priority_score');
+
+    if (error) throw error;
+
+    // Categorize schools by priority score ranges
+    const categories = [
+      { category: 'Sangat Tinggi', min: 80, max: 100, count: 0, color: '#ef4444' },
+      { category: 'Tinggi', min: 60, max: 79, count: 0, color: '#f59e0b' },
+      { category: 'Sedang', min: 40, max: 59, count: 0, color: '#eab308' },
+      { category: 'Rendah', min: 20, max: 39, count: 0, color: '#3b82f6' },
+      { category: 'Sangat Rendah', min: 0, max: 19, count: 0, color: '#10b981' }
+    ];
+
+    (schools || []).forEach(school => {
+      const score = school.priority_score || 0;
+      const category = categories.find(cat => score >= cat.min && score <= cat.max);
+      if (category) {
+        category.count++;
+      }
+    });
+
+    // Convert counts to visual heights (max 200px)
+    const maxCount = Math.max(...categories.map(cat => cat.count), 1);
+    const scoreData = categories.map(cat => ({
+      category: cat.category,
+      value: Math.round((cat.count / maxCount) * 200),
+      count: cat.count,
+      color: cat.color
+    }));
+
+    res.json({
+      success: true,
+      data: scoreData
+    });
+  } catch (error) {
+    console.error('Get regions error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch regions data',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 export default router;
