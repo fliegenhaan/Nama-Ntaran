@@ -11,7 +11,10 @@ interface DeliveryHistoryItem {
   portions: number;
   status: DeliveryStatus;
   imageUrl: string;
-  // TO DO: tambahkan field lain dari API seperti amount, verificationId, dll
+  amount?: number;
+  schoolAddress?: string;
+  verifiedAt?: string | null;
+  verificationNotes?: string | null;
 }
 
 // interface untuk response API
@@ -99,9 +102,8 @@ export function useHistoryData(): UseHistoryDataReturn {
       // get auth token
       const token = localStorage.getItem('token');
 
-      // TO DO: ganti dengan endpoint API yang sebenarnya
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/catering/history/dashboard`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/api/catering/history/dashboard`,
         {
           headers: {
             'Content-Type': 'application/json',

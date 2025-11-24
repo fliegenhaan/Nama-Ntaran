@@ -108,7 +108,7 @@ export function usePaymentsData() {
       const token = getAuthToken();
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
-      const response = await fetch(`${apiUrl}/catering/payments/dashboard`, {
+      const response = await fetch(`${apiUrl}/api/catering/payments/dashboard`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

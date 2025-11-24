@@ -99,7 +99,7 @@ export function useMenuData(): UseMenuDataReturn {
 
       // TO DO: ganti dengan endpoint API yang sebenarnya
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/catering/menu`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/api/catering/menu`,
         {
           headers: {
             'Content-Type': 'application/json',

@@ -110,7 +110,7 @@ export function useCateringDashboard(): UseCateringDashboardReturn {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
-      const response = await fetch(`${apiUrl}/catering/dashboard`, {
+      const response = await fetch(`${apiUrl}/api/catering/dashboard`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
