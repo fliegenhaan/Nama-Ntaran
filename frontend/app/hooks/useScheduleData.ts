@@ -14,7 +14,7 @@ interface ScheduleItem {
   iconVariant: 'primary' | 'secondary';
 }
 
-type FilterType = 'today' | 'week' | 'month';
+type FilterType = 'today' | 'week' | 'month' | 'all';
 
 interface UseScheduleDataReturn {
   schedules: ScheduleItem[];
@@ -88,9 +88,9 @@ export function useScheduleData(filter: FilterType): UseScheduleDataReturn {
 
       // actual API call
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-      const response = await fetch(`${apiUrl}/catering/schedules`, {
+      const response = await fetch(`${apiUrl}/api/catering/schedules`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -150,6 +150,8 @@ export function useScheduleData(filter: FilterType): UseScheduleDataReturn {
             scheduleDate.getFullYear() === today.getFullYear()
           );
         }
+        case 'all':
+          return true;
         default:
           return true;
       }
