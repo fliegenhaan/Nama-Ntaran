@@ -106,7 +106,11 @@ function ReportIssueContent() {
       await createIssue(issueData);
 
       alert('Laporan Masalah Berhasil Dikirim!');
-      router.push('/school/issues');
+
+      // Small delay to ensure data is committed before redirect
+      setTimeout(() => {
+        router.push('/school/issues');
+      }, 500);
     } catch (error: any) {
       alert(`Error: ${error.message || 'Gagal Mengirim Laporan'}`);
     } finally {

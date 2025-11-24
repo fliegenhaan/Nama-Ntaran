@@ -93,7 +93,7 @@ router.get('/', async (req: AuthRequest, res: Response) => {
       .from('issues')
       .select(`
         *,
-        deliveries!inner(
+        deliveries(
           delivery_date,
           portions,
           amount,
@@ -108,15 +108,8 @@ router.get('/', async (req: AuthRequest, res: Response) => {
 
     // Filter by user role
     if (req.user?.role === 'school') {
-      const { data: schoolData } = await supabase
-        .from('schools')
-        .select('id')
-        .eq('user_id', req.user.id)
-        .single();
-
-      if (schoolData) {
-        query = query.eq('deliveries.school_id', schoolData.id);
-      }
+      // Filter by reported_by to include issues without delivery_id
+      query = query.eq('reported_by', req.user.id);
     } else if (req.user?.role === 'catering') {
       const { data: cateringData } = await supabase
         .from('caterings')
