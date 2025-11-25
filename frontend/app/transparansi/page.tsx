@@ -93,10 +93,9 @@ export default function TransparansiPage() {
       opacity: 1,
       y: 0,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 100,
         damping: 15,
-        duration: 0.6,
       },
     },
   };
@@ -104,7 +103,7 @@ export default function TransparansiPage() {
   const cardHover = {
     scale: 1.02,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 300,
       damping: 20,
     },
@@ -141,7 +140,7 @@ export default function TransparansiPage() {
         className="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+        transition={{ type: 'spring' as const, stiffness: 100, damping: 20 }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -150,7 +149,7 @@ export default function TransparansiPage() {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                transition={{ type: 'spring' as const, stiffness: 400, damping: 17 }}
               >
                 <Image
                   src="/MBG-removebg-preview.png"
@@ -171,21 +170,21 @@ export default function TransparansiPage() {
                 className="text-gray-700 hover:text-purple-600 transition-colors font-medium relative group"
               >
                 Priority Map
-                <motion.span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 group-hover:w-full transition-all duration-300" />
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 group-hover:w-full transition-all duration-300" />
               </Link>
               <Link
                 href="/school-list"
                 className="text-gray-700 hover:text-purple-600 transition-colors font-medium relative group"
               >
                 School List
-                <motion.span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 group-hover:w-full transition-all duration-300" />
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 group-hover:w-full transition-all duration-300" />
               </Link>
               <Link
                 href="/transparansi"
                 className="text-gray-700 hover:text-purple-600 transition-colors font-medium relative group"
               >
                 Transparency Dashboard
-                <motion.span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-600 to-blue-600" />
+                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-600 to-blue-600" />
               </Link>
             </div>
           </div>
@@ -213,14 +212,14 @@ export default function TransparansiPage() {
             </p>
             <div className="flex gap-4">
               <motion.button
-                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 gpu-accelerate"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Jelajahi Data
               </motion.button>
               <motion.button
-                className="bg-white text-gray-700 px-8 py-3 rounded-lg font-semibold border-2 border-gray-200 hover:border-blue-600 hover:text-blue-600 transition-all duration-300 gpu-accelerate"
+                className="bg-white text-gray-700 px-8 py-3 rounded-lg font-semibold border-2 border-gray-200 hover:border-blue-600 hover:text-blue-600 transition-all duration-300"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -294,7 +293,7 @@ export default function TransparansiPage() {
             <motion.div
               variants={itemVariants}
               whileHover={cardHover}
-              className="bg-white rounded-xl shadow-lg p-6 gpu-accelerate"
+              className="bg-white rounded-xl shadow-lg p-6"
             >
               <h3 className="text-lg font-bold text-gray-900 mb-4">Tren Alokasi Dana Bulanan</h3>
               {/* TODO: implementasi chart library seperti recharts atau chart.js untuk visualisasi yang lebih baik */}
@@ -340,7 +339,7 @@ export default function TransparansiPage() {
             <motion.div
               variants={itemVariants}
               whileHover={cardHover}
-              className="bg-white rounded-xl shadow-lg p-6 gpu-accelerate"
+              className="bg-white rounded-xl shadow-lg p-6"
             >
               <h3 className="text-lg font-bold text-gray-900 mb-4">Distribusi Dana Regional</h3>
               {/* TODO: implementasi donut chart dengan library chart */}
@@ -415,7 +414,7 @@ export default function TransparansiPage() {
             <motion.div
               variants={itemVariants}
               whileHover={cardHover}
-              className="bg-white rounded-xl shadow-lg p-6 gpu-accelerate"
+              className="bg-white rounded-xl shadow-lg p-6"
             >
               <h3 className="text-lg font-bold text-gray-900 mb-4">Umpan Transaksi Blockchain Langsung</h3>
               {/* TODO: implementasi websocket untuk real-time updates dari blockchain */}
@@ -439,7 +438,7 @@ export default function TransparansiPage() {
             <motion.div
               variants={itemVariants}
               whileHover={cardHover}
-              className="bg-white rounded-xl shadow-lg p-6 gpu-accelerate"
+              className="bg-white rounded-xl shadow-lg p-6"
             >
               <h3 className="text-lg font-bold text-gray-900 mb-4">Distribusi Skor Prioritas Sekolah</h3>
               {/* TODO: implementasi bar chart dengan library chart */}
@@ -468,7 +467,7 @@ export default function TransparansiPage() {
             <motion.div
               variants={itemVariants}
               whileHover={cardHover}
-              className="bg-white rounded-xl shadow-lg p-6 gpu-accelerate flex flex-col items-center justify-center"
+              className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center"
             >
               <h3 className="text-lg font-bold text-gray-900 mb-4">Total Dana Dialokasikan</h3>
               <div className="text-5xl font-bold text-blue-600 mb-2">Rp 123,45</div>
@@ -482,7 +481,7 @@ export default function TransparansiPage() {
             <motion.div
               variants={itemVariants}
               whileHover={cardHover}
-              className="bg-white rounded-xl shadow-lg p-6 gpu-accelerate flex flex-col items-center justify-center"
+              className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center"
             >
               <h3 className="text-lg font-bold text-gray-900 mb-4">Jumlah Sekolah Terdampak</h3>
               <div className="text-6xl font-bold text-blue-600 mb-2">578</div>

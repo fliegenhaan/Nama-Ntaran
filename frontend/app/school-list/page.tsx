@@ -52,10 +52,16 @@ export default function SchoolListPage() {
     const fetchSchools = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/schools`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/schools`, {
+          params: {
+            limit: 1000, // Fetch up to 1000 schools
+            sort_by: 'priority_score',
+            order: 'DESC'
+          }
+        });
 
         // Transform API data to match School interface
-        const transformedSchools = response.data.map((school: any) => ({
+        const transformedSchools = response.data.schools.map((school: any) => ({
           id: school.id,
           name: school.name,
           location: school.city || school.province || 'Unknown',
@@ -430,11 +436,12 @@ export default function SchoolListPage() {
                   </div>
 
                   {/* button */}
-                  <button
-                    className="w-full py-2 px-4 bg-white border-2 border-gray-200 text-gray-700 font-semibold rounded-lg hover:border-purple-600 hover:text-purple-600 transition-all duration-200"
+                  <Link
+                    href={`/school-list/${school.id}`}
+                    className="block w-full py-2 px-4 bg-white border-2 border-gray-200 text-gray-700 font-semibold rounded-lg hover:border-purple-600 hover:text-purple-600 transition-all duration-200 text-center"
                   >
                     Lihat Detail
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}
