@@ -15,9 +15,12 @@ import { batchCalculateHybridScores } from '../services/hybridPriorityScoring.js
 
 const AI_SCHOOL_LIMIT = 10000; // First 10k schools get AI analysis
 const BATCH_SIZE = 1000;
+const RESUME_FROM_OFFSET = 6000; // Set to 0 to start fresh, or offset to resume
+const ENABLE_AI = process.env.ENABLE_AI_SCORING === 'true'; // Read from .env
 
 async function recalculatePriorityScoresOptimized() {
   console.log('🚀 Starting OPTIMIZED priority score recalculation...');
+  console.log(`   AI Scoring: ${ENABLE_AI ? '✅ ENABLED' : '❌ DISABLED (using base formula only)'}`);
   console.log(`   Strategy: First ${AI_SCHOOL_LIMIT} schools with AI, rest without AI\n`);
 
   try {
@@ -34,7 +37,11 @@ async function recalculatePriorityScoresOptimized() {
     console.log(`   - With AI: ${Math.min(AI_SCHOOL_LIMIT, totalSchools || 0)}`);
     console.log(`   - Without AI: ${Math.max(0, (totalSchools || 0) - AI_SCHOOL_LIMIT)}\n`);
 
-    let offset = 0;
+    if (RESUME_FROM_OFFSET > 0) {
+      console.log(`⏭️  RESUMING from offset ${RESUME_FROM_OFFSET} (skipping first ${RESUME_FROM_OFFSET} schools)\n`);
+    }
+
+    let offset = RESUME_FROM_OFFSET;
     let totalProcessed = 0;
     let totalUpdated = 0;
     let totalFailed = 0;
@@ -57,7 +64,7 @@ async function recalculatePriorityScoresOptimized() {
         supabase,
         BATCH_SIZE,
         offset,
-        isAIBatch // Use AI for first 10k schools
+        ENABLE_AI && isAIBatch // Use AI only if enabled in .env AND within first 10k schools
       );
 
       const batchDuration = ((Date.now() - batchStartTime) / 1000).toFixed(1);
