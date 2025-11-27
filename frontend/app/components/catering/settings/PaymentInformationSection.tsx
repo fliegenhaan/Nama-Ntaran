@@ -10,6 +10,7 @@ import { DollarSign, CreditCard, FileText, CheckCircle, Eye, EyeOff } from 'luci
 
 interface PaymentInformationData {
   bankAccount: string;
+  walletAddress: string;
   xenditGateway: string;
   taxRegistration: string;
 }
@@ -75,10 +76,35 @@ const PaymentInformationSection: React.FC<PaymentInformationSectionProps> = ({
         </p>
       </div>
 
+      {/* crypto wallet address */}
+      <div className="mb-6">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          Crypto Wallet Address (For Escrow Payments)
+        </label>
+        <input
+          type="text"
+          value={data.walletAddress}
+          onChange={(e) => handleFieldChange('walletAddress', e.target.value)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-smooth text-gray-900 font-mono text-sm placeholder:text-gray-500 placeholder:font-normal"
+          placeholder="0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0"
+        />
+        <p className="text-xs text-gray-600 mt-2 font-medium">
+          🔐 Your Ethereum wallet address to receive payments from blockchain escrow.
+          <a
+            href="https://metamask.io/download/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline ml-1"
+          >
+            Get MetaMask wallet →
+          </a>
+        </p>
+      </div>
+
       {/* xendit payment gateway */}
       <div className="mb-6">
         <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Xendit Payment Gateway
+          Xendit Payment Gateway (Optional - For IDR Conversion)
         </label>
         <div className="flex items-center gap-3">
           <div className="flex-1 px-4 py-3 border border-gray-300 rounded-xl bg-gray-50">
@@ -103,7 +129,7 @@ const PaymentInformationSection: React.FC<PaymentInformationSectionProps> = ({
           </button>
         </div>
         <p className="text-xs text-gray-600 mt-2 font-medium">
-          Manage Your Payment Gateway Integration Settings
+          Optional: Auto-convert crypto payments to Rupiah via Xendit
         </p>
       </div>
 

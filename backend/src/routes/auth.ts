@@ -24,6 +24,13 @@ router.post('/register', async (req: Request, res: Response) => {
     });
   }
 
+  // Additional validation for catering
+  if (role === 'catering' && !company_name) {
+    return res.status(400).json({
+      error: 'Company name is required for catering registration'
+    });
+  }
+
   if (password.length < 6) {
     return res.status(400).json({
       error: 'Password must be at least 6 characters'
@@ -72,7 +79,7 @@ router.post('/register', async (req: Request, res: Response) => {
 
     // If catering, create catering profile
     if (role === 'catering' && company_name) {
-      const { data: catering } = await supabase
+      const { data: catering, error: cateringError } = await supabase
         .from('caterings')
         .insert({
           name: name || company_name,
@@ -82,6 +89,12 @@ router.post('/register', async (req: Request, res: Response) => {
         })
         .select('id')
         .single();
+
+      // Check for errors creating catering profile
+      if (cateringError) {
+        console.error('Catering profile creation error:', cateringError);
+        throw new Error(`Failed to create catering profile: ${cateringError.message}`);
+      }
 
       // Add catering_id to JWT token
       if (catering) {

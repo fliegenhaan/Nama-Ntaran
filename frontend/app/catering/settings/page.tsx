@@ -41,6 +41,7 @@ interface VendorSettings {
   };
   paymentInformation: {
     bankAccount: string;
+    walletAddress: string;
     xenditGateway: string;
     taxRegistration: string;
   };
@@ -92,8 +93,9 @@ export default function VendorSettingsPage() {
     },
     paymentInformation: {
       bankAccount: '**** **** **** 1234',
-      xenditGateway: 'Active',
-      taxRegistration: 'TXID-987654321',
+      walletAddress: '',
+      xenditGateway: 'Inactive',
+      taxRegistration: '',
     },
   });
 
@@ -120,21 +122,106 @@ export default function VendorSettingsPage() {
   const handleSaveChanges = useCallback(async () => {
     setIsSaving(true);
     try {
-      // simulasi API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // await fetch('/api/vendor/settings', {
-      //   method: 'PUT',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(settings),
-      // });
+      const token = localStorage.getItem('token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+      // Get catering_id from localStorage
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      const cateringId = user?.catering_id;
+
+      if (!cateringId) {
+        alert('Error: Catering ID not found. Please login again.');
+        return;
+      }
+
+      // Validate wallet address format (if provided)
+      const walletAddress = settings.paymentInformation.walletAddress.trim();
+      if (walletAddress && !walletAddress.match(/^0x[a-fA-F0-9]{40}$/)) {
+        alert('Invalid wallet address format. Must start with 0x and be 42 characters long.');
+        return;
+      }
+
+      // Call API to update catering profile
+      const response = await fetch(`${apiUrl}/api/caterings/${cateringId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: settings.companyProfile.businessName,
+          company_name: settings.companyProfile.businessName,
+          phone: settings.companyProfile.phoneNumber,
+          email: settings.companyProfile.email,
+          address: settings.companyProfile.officialAddress,
+          wallet_address: walletAddress || null,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save settings');
+      }
+
+      const result = await response.json();
+      console.log('Settings saved successfully:', result);
+
       setHasUnsavedChanges(false);
-      console.log('Settings saved:', settings);
+      alert('✅ Settings saved successfully!');
     } catch (error) {
       console.error('Error saving settings:', error);
+      alert(`❌ Failed to save settings: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSaving(false);
     }
   }, [settings]);
+
+  // Load existing catering data on mount
+  useEffect(() => {
+    const loadCateringData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : null;
+        const cateringId = user?.catering_id;
+
+        if (!cateringId) return;
+
+        const response = await fetch(`${apiUrl}/api/caterings/${cateringId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const catering = data.catering;
+
+          // Update settings with existing data
+          setSettings(prev => ({
+            ...prev,
+            companyProfile: {
+              ...prev.companyProfile,
+              businessName: catering.company_name || catering.name || prev.companyProfile.businessName,
+              officialAddress: catering.address || prev.companyProfile.officialAddress,
+              phoneNumber: catering.phone || prev.companyProfile.phoneNumber,
+              email: catering.email || prev.companyProfile.email,
+            },
+            paymentInformation: {
+              ...prev.paymentInformation,
+              walletAddress: catering.wallet_address || '',
+            }
+          }));
+        }
+      } catch (error) {
+        console.error('Error loading catering data:', error);
+      }
+    };
+
+    loadCateringData();
+  }, []);
 
   // preload images untuk performa
   useEffect(() => {
@@ -159,7 +246,7 @@ export default function VendorSettingsPage() {
         scale: 1,
         transition: {
           duration: 0.5,
-          ease: smoothEasing,
+          ease: smoothEasing as any,
         },
       },
     }),
@@ -259,7 +346,7 @@ export default function VendorSettingsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.3, ease: smoothEasing }}
+                transition={{ duration: 0.3, ease: smoothEasing as any }}
                 className="fixed bottom-8 right-8 z-50"
               >
                 <button
