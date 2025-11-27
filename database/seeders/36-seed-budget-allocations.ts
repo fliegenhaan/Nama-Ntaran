@@ -250,15 +250,15 @@ async function seedBudgetAllocations() {
 
   try {
     // STEP 1: GET APPROVER
-    logger.log('\nSTEP 1: Fetching government users...')
+    logger.log('\nSTEP 1: Fetching admin users...')
 
-    const { data: govUsers } = await supabase
+    const { data: adminUsers } = await supabase
       .from('users')
       .select('id')
-      .eq('role', 'GOVERNMENT')
+      .eq('role', 'admin')
       .limit(1)
 
-    const approvedBy = govUsers && govUsers.length > 0 ? govUsers[0].id : null
+    const approvedBy = adminUsers && adminUsers.length > 0 ? adminUsers[0].id : null
     logger.success(`Approver: ${approvedBy || 'None'}`)
 
     // STEP 2: GENERATE ALLOCATIONS

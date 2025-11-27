@@ -48,7 +48,7 @@ interface SchoolCSVRow {
 interface UserInsert {
   email: string
   password_hash: string
-  role: 'admin' | 'government' | 'school' | 'catering'
+  role: 'admin' | 'school' | 'catering'
   is_active: boolean
 }
 

@@ -1,0 +1,13 @@
+{
+  "totalAdmins": 100,
+  "totalSchools": 1000,
+  "totalCaterings": 104,
+  "budgetAllocationsCreated": 2,
+  "allocationsCreated": 1000,
+  "deliveriesCreated": 807,
+  "anomaliesCreated": 0,
+  "escrowTransactionsCreated": 0,
+  "aiAnalysesCreated": 0,
+  "verificationsCreated": 0,
+  "errors": []
+}

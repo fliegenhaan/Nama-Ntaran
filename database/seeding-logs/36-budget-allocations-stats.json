@@ -1,0 +1,13 @@
+{
+  "totalAllocations": 55,
+  "successCount": 55,
+  "failedCount": 0,
+  "byStatus": {
+    "active": 55
+  },
+  "byYear": {
+    "2024": 30,
+    "2025": 25
+  },
+  "errors": []
+}

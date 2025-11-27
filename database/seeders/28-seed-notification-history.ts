@@ -72,7 +72,7 @@ const CONFIG = {
   READ_RATE: 0.70,
 
   NOTIFICATION_TEMPLATES_BY_ROLE: {
-    SCHOOL: [
+    school: [
       {
         type: 'delivery_reminder',
         title: 'Pengiriman Akan Tiba',
@@ -95,7 +95,7 @@ const CONFIG = {
         action_url: '/payments',
       },
     ],
-    CATERING: [
+    catering: [
       {
         type: 'payment_pending',
         title: 'Pembayaran Menunggu',
@@ -118,7 +118,7 @@ const CONFIG = {
         action_url: '/issues',
       },
     ],
-    ADMIN: [
+    admin: [
       {
         type: 'system_announcement',
         title: 'Pembaruan Sistem',
@@ -133,8 +133,6 @@ const CONFIG = {
         priority: 'high',
         action_url: '/admin/issues',
       },
-    ],
-    GOVERNMENT: [
       {
         type: 'system_announcement',
         title: 'Laporan Bulanan Tersedia',

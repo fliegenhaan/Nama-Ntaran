@@ -71,19 +71,16 @@ const CONFIG = {
 
   // Action types by role
   ACTION_TYPES_BY_ROLE: {
-    ADMIN: [
+    admin: [
       'login', 'logout', 'view_dashboard', 'view_report', 'export_data',
-      'approve_catering', 'suspend_user', 'system_config_update'
+      'approve_catering', 'suspend_user', 'system_config_update',
+      'allocate_budget', 'approve_contract', 'view_analytics'
     ],
-    GOVERNMENT: [
-      'login', 'logout', 'view_dashboard', 'view_report', 'allocate_budget',
-      'approve_contract', 'view_analytics'
-    ],
-    SCHOOL: [
+    school: [
       'login', 'logout', 'verify_delivery', 'report_issue', 'view_deliveries',
       'confirm_payment', 'update_profile'
     ],
-    CATERING: [
+    catering: [
       'login', 'logout', 'create_delivery', 'update_delivery', 'view_payments',
       'upload_menu', 'view_orders'
     ],
@@ -235,7 +232,7 @@ async function seedUserActivityLogs() {
     const logsToInsert: ActivityLogInsert[] = []
 
     for (const user of users) {
-      const actionTypes = CONFIG.ACTION_TYPES_BY_ROLE[user.role] || CONFIG.ACTION_TYPES_BY_ROLE.ADMIN
+      const actionTypes = CONFIG.ACTION_TYPES_BY_ROLE[user.role] || CONFIG.ACTION_TYPES_BY_ROLE.admin
       const numLogs = randomInt(CONFIG.LOGS_PER_USER_MIN, CONFIG.LOGS_PER_USER_MAX)
 
       for (let i = 0; i < numLogs; i++) {

@@ -1,0 +1,12 @@
+{
+  "totalUsers": 1000,
+  "totalNotifications": 12419,
+  "successCount": 12419,
+  "failedCount": 0,
+  "byType": {
+    "verification_required": 4098,
+    "delivery_reminder": 4169,
+    "payment_received": 4152
+  },
+  "errors": []
+}

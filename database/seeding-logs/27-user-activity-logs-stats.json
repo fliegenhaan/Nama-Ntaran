@@ -1,0 +1,16 @@
+{
+  "totalUsers": 1000,
+  "totalLogs": 29830,
+  "successCount": 29830,
+  "failedCount": 0,
+  "byActionType": {
+    "logout": 4294,
+    "update_profile": 4279,
+    "report_issue": 4269,
+    "login": 4248,
+    "confirm_payment": 4283,
+    "verify_delivery": 4164,
+    "view_deliveries": 4293
+  },
+  "errors": []
+}
