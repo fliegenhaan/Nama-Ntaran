@@ -4,6 +4,7 @@ import type { Response } from 'express';
 import { supabase } from '../config/database.js';
 import { authenticateToken, requireRole } from '../middleware/auth.js';
 import type { AuthRequest } from '../middleware/auth.js';
+import { lockEscrowForDelivery } from '../services/blockchain.js';
 
 const router = express.Router();
 
@@ -14,14 +15,22 @@ router.use(authenticateToken);
 router.post('/', async (req: AuthRequest, res: Response) => {
   const { school_id, catering_id, delivery_date, portions, amount, notes } = req.body;
 
+  console.log('\n========================================');
+  console.log('📦 [STEP 1] CREATE DELIVERY REQUEST');
+  console.log('========================================');
+  console.log('Request Body:', { school_id, catering_id, delivery_date, portions, amount, notes });
+  console.log('User:', req.user?.email, '| Role:', req.user?.role);
+
   // Validation
   if (!school_id || !catering_id || !delivery_date || !portions || !amount) {
+    console.log('❌ Validation failed: Missing required fields');
     return res.status(400).json({
       error: 'school_id, catering_id, delivery_date, portions, and amount are required'
     });
   }
 
   try {
+    console.log('\n📝 Inserting delivery to database...');
     const { data: delivery, error } = await supabase
       .from('deliveries')
       .insert({
@@ -31,21 +40,58 @@ router.post('/', async (req: AuthRequest, res: Response) => {
         portions,
         amount,
         notes: notes || null,
-        status: 'pending'
+        status: 'scheduled' // Changed from 'pending' to 'scheduled' to auto-lock escrow
       })
       .select()
       .single();
 
     if (error || !delivery) {
+      console.log('❌ Database insert failed:', error);
       throw error || new Error('Failed to create delivery');
     }
 
+    console.log('✅ Delivery created:', {
+      id: delivery.id,
+      status: delivery.status,
+      amount: delivery.amount,
+      delivery_date: delivery.delivery_date
+    });
+
+    // Auto-lock escrow for new delivery
+    console.log('\n========================================');
+    console.log('🔐 [STEP 2] AUTO-LOCK ESCROW');
+    console.log('========================================');
+    try {
+      console.log(`🔐 Attempting to lock escrow for delivery ${delivery.id}...`);
+      console.log('Escrow params:', { delivery_id: delivery.id, catering_id, school_id, amount });
+
+      await lockEscrowForDelivery(
+        delivery.id,
+        catering_id,
+        school_id,
+        amount
+      );
+
+      console.log(`✅ Escrow locked successfully for delivery ${delivery.id}`);
+      console.log('========================================\n');
+    } catch (escrowError) {
+      console.log('========================================');
+      console.error('⚠️  ESCROW LOCK FAILED (delivery still created)');
+      console.error('Error details:', escrowError);
+      console.log('========================================\n');
+      // Don't fail the delivery creation if escrow lock fails
+      // Just log the error - admin can manually lock escrow later
+    }
+
+    console.log('✅ [STEP 1 COMPLETE] Delivery created successfully\n');
     res.status(201).json({
       message: 'Delivery created successfully',
       delivery
     });
   } catch (error) {
-    console.error('Create delivery error:', error);
+    console.log('========================================');
+    console.error('❌ [STEP 1 FAILED] Create delivery error:', error);
+    console.log('========================================\n');
     res.status(500).json({
       error: 'Failed to create delivery',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -218,16 +264,38 @@ router.patch('/:id/status', async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
   const { status } = req.body;
 
+  console.log('\n========================================');
+  console.log('🔄 [STEP 3] UPDATE DELIVERY STATUS');
+  console.log('========================================');
+  console.log('Delivery ID:', id);
+  console.log('New Status:', status);
+  console.log('User:', req.user?.email, '| Role:', req.user?.role);
+
   const validStatuses = ['pending', 'scheduled', 'delivered', 'verified', 'cancelled'];
 
   if (!validStatuses.includes(status)) {
+    console.log('❌ Invalid status provided');
+    console.log('   Valid statuses:', validStatuses);
     return res.status(400).json({
       error: 'Invalid status',
       valid_statuses: validStatuses
     });
   }
 
+  // SECURITY: Prevent catering from marking delivery as "verified"
+  // Only school can verify deliveries
+  if (status === 'verified' && req.user?.role !== 'school' && req.user?.role !== 'admin') {
+    console.log('🚫 AUTHORIZATION FAILED: Only schools can verify deliveries');
+    console.log('   User role:', req.user?.role);
+    console.log('   Attempted status:', status);
+    return res.status(403).json({
+      error: 'Forbidden: Only schools can verify deliveries',
+      message: 'Catering cannot mark deliveries as verified. Please wait for school verification.'
+    });
+  }
+
   try {
+    console.log('\n📝 Updating delivery status in database...');
     const { data: delivery, error } = await supabase
       .from('deliveries')
       .update({
@@ -239,15 +307,29 @@ router.patch('/:id/status', async (req: AuthRequest, res: Response) => {
       .single();
 
     if (error || !delivery) {
+      console.log('❌ Delivery not found:', error);
       return res.status(404).json({ error: 'Delivery not found' });
     }
+
+    console.log('✅ Status updated successfully');
+    console.log('   Old status → New status:', delivery.status);
+    console.log('   Delivery:', {
+      id: delivery.id,
+      status: delivery.status,
+      school_id: delivery.school_id,
+      catering_id: delivery.catering_id
+    });
+
+    console.log('========================================\n');
 
     res.json({
       message: 'Delivery status updated',
       delivery
     });
   } catch (error) {
-    console.error('Update delivery status error:', error);
+    console.log('========================================');
+    console.error('❌ Update delivery status error:', error);
+    console.log('========================================\n');
     res.status(500).json({
       error: 'Failed to update delivery status',
       details: error instanceof Error ? error.message : 'Unknown error'

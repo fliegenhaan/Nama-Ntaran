@@ -49,11 +49,67 @@ export default function SchedulePage() {
 
   // handler untuk update status pengiriman
   const handleUpdateStatus = useCallback(async (id: string, newStatus: 'in_progress' | 'scheduled' | 'delivered') => {
-    // simulasi API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    // setelah berhasil, refetch data
-    await refetch();
-  }, [refetch]);
+    console.log('\n🎯 [CATERING] UPDATE STATUS REQUEST');
+    console.log('Schedule ID:', id);
+    console.log('New UI Status:', newStatus);
+
+    try {
+      const token = localStorage.getItem('token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+      // Map UI status to database status
+      // IMPORTANT: Catering can ONLY update status up to 'delivered'
+      // School must verify to change status to 'verified'
+      // UI: 'scheduled' -> 'in_progress' -> 'delivered' (STOPPED HERE)
+      // DB: 'pending/scheduled' -> 'delivered' -> (wait for school verification)
+      let dbStatus: string;
+      if (newStatus === 'in_progress') {
+        dbStatus = 'delivered'; // Mulai pengiriman = delivered di database
+      } else if (newStatus === 'delivered') {
+        // FIXED: Catering marks as delivered, NOT verified
+        // School will verify later via verifications endpoint
+        dbStatus = 'delivered'; // Already delivered, waiting for school verification
+      } else {
+        dbStatus = 'scheduled'; // Fallback
+      }
+
+      console.log('Mapped DB Status:', dbStatus);
+
+      // Update status via API
+      const response = await fetch(`${apiUrl}/api/deliveries/${id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: dbStatus }),
+      });
+
+      console.log('Response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error(errorData.message || errorData.error || 'Failed to update status');
+      }
+
+      console.log('✅ Status updated successfully');
+
+      // Clear cache untuk force fresh data
+      localStorage.removeItem('schedule_data_cache');
+
+      // Refetch data setelah berhasil update
+      await refetch();
+
+      // Update selectedSchedule jika modal masih terbuka
+      if (selectedSchedule && selectedSchedule.id === id) {
+        setSelectedSchedule(prev => prev ? { ...prev, status: newStatus } : null);
+      }
+    } catch (error) {
+      console.error('❌ Error updating delivery status:', error);
+      throw error; // Re-throw untuk handling di modal
+    }
+  }, [refetch, selectedSchedule]);
 
   // animasi untuk list
   const listVariants = {

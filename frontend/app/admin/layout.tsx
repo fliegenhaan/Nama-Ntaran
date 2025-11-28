@@ -22,6 +22,7 @@ import {
   ChevronRight,
   Menu,
   X,
+  Truck,
 } from 'lucide-react';
 
 // TODO: Implementasi theme switcher (light/dark mode)
@@ -57,6 +58,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const sidebarMenus = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
     { id: 'akun', label: 'Manajemen Akun', icon: Users, path: '/admin/accounts' },
+    { id: 'deliveries', label: 'Buat Delivery', icon: Truck, path: '/admin/deliveries' },
     { id: 'escrow', label: 'Kontrol Escrow', icon: Shield, path: '/admin/escrow', badge: 2 },
     { id: 'masalah', label: 'Manajemen Masalah', icon: ClipboardList, path: '/admin/issues' },
     { id: 'review', label: 'Manual Review', icon: Eye, path: '/admin/manual-review' },

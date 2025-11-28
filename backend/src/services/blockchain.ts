@@ -9,12 +9,26 @@ import { supabase } from '../config/database.js';
  * @returns Transaction hash atau error
  */
 export async function releaseEscrowForDelivery(deliveryId: number) {
+  console.log('\n📤 ====== RELEASE ESCROW FUNCTION START ======');
+  console.log('Input params:', { deliveryId });
+
   try {
+    // Check blockchain configuration
+    console.log('\n📡 Checking blockchain configuration...');
     if (!escrowContract || !wallet) {
+      console.error('❌ Blockchain not configured!');
+      console.log('   escrowContract:', !!escrowContract);
+      console.log('   wallet:', !!wallet);
       throw new Error('Blockchain not configured. Check BLOCKCHAIN_RPC_URL and SERVICE_WALLET_PRIVATE_KEY in .env');
     }
+    console.log('✅ Blockchain configured');
+    console.log('   Wallet address:', wallet.address);
 
     // Get escrow transaction for this delivery
+    console.log('\n🔍 Searching for locked escrow...');
+    console.log('   delivery_id:', deliveryId);
+    console.log('   escrow_status: locked');
+
     const { data: escrow, error: escrowError } = await supabase
       .from('escrow_transactions')
       .select(`
@@ -23,48 +37,69 @@ export async function releaseEscrowForDelivery(deliveryId: number) {
         caterings!inner(wallet_address)
       `)
       .eq('delivery_id', deliveryId)
-      .eq('status', 'locked')
+      .eq('escrow_status', 'locked')
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
 
     if (escrowError || !escrow) {
+      console.error('❌ No locked escrow found!');
+      console.log('   Query error:', escrowError);
+      console.log('   Query result:', escrow);
       throw new Error('No locked escrow found for this delivery');
     }
 
-    // Generate escrow ID (same format as when locking)
-    const escrowId = ethers.utils.id(`delivery-${deliveryId}-${escrow.id}`);
+    console.log('✅ Locked escrow found:');
+    console.log('   Escrow ID (DB):', escrow.id);
+    console.log('   Amount:', escrow.amount);
+    console.log('   Catering wallet:', escrow.caterings.wallet_address);
+    console.log('   Locked at:', escrow.locked_at);
 
-    console.log(`📤 Releasing escrow for delivery ${deliveryId}...`);
-    console.log(`   Escrow ID: ${escrowId}`);
-    console.log(`   Amount: ${escrow.amount}`);
-    console.log(`   Payee: ${escrow.caterings.wallet_address}`);
+    // Generate escrow ID (same format as when locking)
+    console.log('\n🔑 Generating escrow ID hash...');
+    const escrowId = ethers.utils.id(`delivery-${deliveryId}-${escrow.id}`);
+    console.log('   Escrow ID (hash):', escrowId);
+
+    console.log('\n📤 ====== BLOCKCHAIN TRANSACTION ======');
+    console.log('   Escrow ID:', escrowId);
+    console.log('   Amount:', escrow.amount, 'IDR');
+    console.log('   Payee (Catering Wallet):', escrow.caterings.wallet_address);
 
     // Call releaseFund on smart contract
+    console.log('\n📤 Sending release transaction to blockchain...');
     const tx = await escrowContract.releaseFund(escrowId);
-    console.log(`   Transaction sent: ${tx.hash}`);
+    console.log('✅ Transaction sent!');
+    console.log('   Transaction Hash:', tx.hash);
+    console.log('   Waiting for confirmation...');
 
     // Wait for confirmation
     const receipt = await tx.wait();
-    console.log(`✅ Escrow released! Block: ${receipt.blockNumber}`);
+    console.log('✅ Transaction confirmed!');
+    console.log('   Block Number:', receipt.blockNumber);
+    console.log('   Gas Used:', receipt.gasUsed?.toString());
 
     // Update escrow transaction in database
+    console.log('\n💾 Updating escrow record...');
+    const updateData = {
+      escrow_status: 'released',
+      released_at: new Date().toISOString(),
+      tx_hash: receipt.transactionHash,
+      blockchain_block_number: receipt.blockNumber
+    };
+    console.log('   Update data:', updateData);
+
     const { error: updateError } = await supabase
       .from('escrow_transactions')
-      .update({
-        status: 'released',
-        released_at: new Date().toISOString(),
-        tx_hash: receipt.transactionHash,
-        block_number: receipt.blockNumber,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', escrow.id);
 
     if (updateError) {
+      console.error('❌ Failed to update escrow record:', updateError);
       throw updateError;
     }
+    console.log('✅ Escrow record updated');
 
-    return {
+    const result = {
       success: true,
       transactionHash: receipt.transactionHash,
       blockNumber: receipt.blockNumber,
@@ -72,22 +107,35 @@ export async function releaseEscrowForDelivery(deliveryId: number) {
       amount: escrow.amount
     };
 
+    console.log('\n✅ ====== RELEASE ESCROW COMPLETE ======');
+    console.log('Result:', result);
+    console.log('💰 Funds released to catering wallet!');
+    console.log('========================================\n');
+
+    return result;
+
   } catch (error) {
-    console.error('❌ Release escrow error:', error);
+    console.log('\n❌ ====== RELEASE ESCROW FAILED ======');
+    console.error('Error details:', error);
 
     // Update escrow status to failed if there's an error
+    console.log('\n⚠️  Marking escrow as cancelled...');
     await supabase
       .from('escrow_transactions')
       .update({
-        status: 'failed',
-        updated_at: new Date().toISOString()
+        escrow_status: 'cancelled'
       })
       .eq('delivery_id', deliveryId)
-      .eq('status', 'locked')
+      .eq('escrow_status', 'locked')
       .then(({ error: err }) => {
-        if (err) console.error('Failed to update escrow status:', err);
+        if (err) {
+          console.error('❌ Failed to update escrow status:', err);
+        } else {
+          console.log('✅ Escrow marked as cancelled');
+        }
       });
 
+    console.log('====================================\n');
     throw error;
   }
 }
@@ -105,12 +153,23 @@ export async function lockEscrowForDelivery(
   schoolId: number,
   amount: number
 ) {
+  console.log('\n🔐 ====== LOCK ESCROW FUNCTION START ======');
+  console.log('Input params:', { deliveryId, cateringId, schoolId, amount });
+
   try {
+    // Check blockchain configuration
+    console.log('\n📡 Checking blockchain configuration...');
     if (!escrowContract || !wallet) {
+      console.error('❌ Blockchain not configured!');
+      console.log('   escrowContract:', !!escrowContract);
+      console.log('   wallet:', !!wallet);
       throw new Error('Blockchain not configured');
     }
+    console.log('✅ Blockchain configured');
+    console.log('   Wallet address:', wallet.address);
 
     // Get catering wallet address
+    console.log('\n👨‍🍳 Fetching catering wallet address...');
     const { data: catering, error: cateringError } = await supabase
       .from('caterings')
       .select('wallet_address')
@@ -118,10 +177,13 @@ export async function lockEscrowForDelivery(
       .single();
 
     if (cateringError || !catering) {
+      console.error('❌ Catering not found:', cateringError);
       throw new Error('Catering not found');
     }
+    console.log('✅ Catering found:', { id: cateringId, wallet_address: catering.wallet_address });
 
     // Get school NPSN
+    console.log('\n🏫 Fetching school NPSN...');
     const { data: school, error: schoolError } = await supabase
       .from('schools')
       .select('npsn')
@@ -129,77 +191,113 @@ export async function lockEscrowForDelivery(
       .single();
 
     if (schoolError || !school) {
+      console.error('❌ School not found:', schoolError);
       throw new Error('School not found');
     }
+    console.log('✅ School found:', { id: schoolId, npsn: school.npsn });
 
     const { wallet_address: payee } = catering;
     const { npsn } = school;
 
     // Create escrow transaction record first
+    console.log('\n💾 Creating escrow transaction record in database...');
+    const escrowData = {
+      delivery_id: deliveryId,
+      school_id: schoolId,
+      catering_id: cateringId,
+      amount: amount,
+      escrow_status: 'locked',
+      locked_at: new Date().toISOString(),
+      transaction_type: 'LOCK',
+      status: 'PENDING',
+      executed_at: new Date().toISOString()
+    };
+    console.log('   Escrow data:', escrowData);
+
     const { data: escrowRecord, error: insertError } = await supabase
       .from('escrow_transactions')
-      .insert({
-        delivery_id: deliveryId,
-        school_id: schoolId,
-        catering_id: cateringId,
-        amount: amount,
-        status: 'locked',
-        locked_at: new Date().toISOString()
-      })
+      .insert(escrowData)
       .select('id')
       .single();
 
     if (insertError || !escrowRecord) {
+      console.error('❌ Failed to create escrow record:', insertError);
       throw new Error('Failed to create escrow transaction record');
     }
+    console.log('✅ Escrow record created:', { escrow_id: escrowRecord.id });
 
     const escrowRecordId = escrowRecord.id;
 
     // Generate unique escrow ID
+    console.log('\n🔑 Generating unique escrow ID...');
     const escrowId = ethers.utils.id(`delivery-${deliveryId}-${escrowRecordId}`);
+    console.log('   Escrow ID (hash):', escrowId);
 
     // Convert amount to wei (for demo, 1 IDR = 1 wei, adjust as needed)
     const amountInWei = ethers.utils.parseEther((amount / 1000000).toString()); // Convert to smaller unit
+    console.log('\n💰 Amount conversion:');
+    console.log('   Original amount:', amount, 'IDR');
+    console.log('   Divided by 1M:', amount / 1000000);
+    console.log('   In Wei:', amountInWei.toString());
 
-    console.log(`🔒 Locking escrow for delivery ${deliveryId}...`);
-    console.log(`   Escrow ID: ${escrowId}`);
-    console.log(`   Payee: ${payee}`);
-    console.log(`   Amount: ${amount} IDR (${amountInWei} wei)`);
-    console.log(`   School NPSN: ${npsn}`);
+    console.log('\n🔒 ====== BLOCKCHAIN TRANSACTION ======');
+    console.log('   Escrow ID:', escrowId);
+    console.log('   Payee (Catering Wallet):', payee);
+    console.log('   School NPSN:', npsn);
+    console.log('   Amount in Wei:', amountInWei.toString());
 
     // Call lockFund on smart contract
+    console.log('\n📤 Sending transaction to blockchain...');
     const tx = await escrowContract.lockFund(escrowId, payee, npsn, {
       value: amountInWei
     });
-
-    console.log(`   Transaction sent: ${tx.hash}`);
+    console.log('✅ Transaction sent!');
+    console.log('   Transaction Hash:', tx.hash);
+    console.log('   Waiting for confirmation...');
 
     const receipt = await tx.wait();
-    console.log(`✅ Escrow locked! Block: ${receipt.blockNumber}`);
+    console.log('✅ Transaction confirmed!');
+    console.log('   Block Number:', receipt.blockNumber);
+    console.log('   Gas Used:', receipt.gasUsed?.toString());
 
     // Update escrow transaction with blockchain details
+    console.log('\n💾 Updating escrow record with blockchain details...');
+    const updateData = {
+      tx_hash: receipt.transactionHash,
+      blockchain_block_number: receipt.blockNumber,
+      blockchain_confirmed: true,
+      status: 'CONFIRMED'
+    };
+    console.log('   Update data:', updateData);
+
     const { error: updateError } = await supabase
       .from('escrow_transactions')
-      .update({
-        tx_hash: receipt.transactionHash,
-        block_number: receipt.blockNumber,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', escrowRecordId);
 
     if (updateError) {
+      console.error('❌ Failed to update escrow record:', updateError);
       throw updateError;
     }
+    console.log('✅ Escrow record updated');
 
-    return {
+    const result = {
       success: true,
       transactionHash: receipt.transactionHash,
       blockNumber: receipt.blockNumber,
       escrowId: escrowId
     };
 
+    console.log('\n✅ ====== LOCK ESCROW COMPLETE ======');
+    console.log('Result:', result);
+    console.log('======================================\n');
+
+    return result;
+
   } catch (error) {
-    console.error('❌ Lock escrow error:', error);
+    console.log('\n❌ ====== LOCK ESCROW FAILED ======');
+    console.error('Error details:', error);
+    console.log('====================================\n');
     throw error;
   }
 }
