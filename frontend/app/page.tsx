@@ -58,7 +58,7 @@ export default function Home() {
   useEffect(() => {
     const fetchChartData = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/public/allocation-chart');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/public/allocation-chart`);
         const data = await response.json();
         setChartData(data.chartData || []);
       } catch (error) {
@@ -70,7 +70,7 @@ export default function Home() {
 
     const fetchPrioritySchools = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/public/priority-schools?limit=6');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/public/priority-schools?limit=6`);
         const data = await response.json();
         setPrioritySchools(data.prioritySchools || []);
       } catch (error) {
