@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import Navbar from './components/layout/Navbar';
 import {
   BarChart,
@@ -14,6 +14,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import api from '@/lib/api';
+import { AlertCircle, CheckCircle, ChevronRight, Clock, ExternalLink, Loader2, Lock, MoreHorizontal, Search, Shield } from 'lucide-react';
 
 interface ChartDataItem {
   month: string;
@@ -27,6 +29,24 @@ interface PrioritySchool {
   anggaran: string;
   status: string;
   statusColor: string;
+}
+
+interface Escrow {
+  id: number;
+  school: string;
+  catering: string;
+  amount: number;
+  status: string;
+  lockedAt: string;
+  releaseDate: string;
+  releasedAt?: string;
+  txHash: string;
+}
+
+interface Stats {
+  totalTerkunci: number;
+  totalTercair: number;
+  pendingRelease: number;
 }
 
 export default function Home() {
@@ -54,6 +74,20 @@ export default function Home() {
   const heroImageY = useTransform(scrollY, [0, 500], [0, 150]);
   const heroImageOpacity = useTransform(scrollY, [0, 300], [1, 0]);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allEscrows, setAllEscrows] = useState<Escrow[]>([]);
+  const [stats, setStats] = useState<Stats>({
+    totalTerkunci: 0,
+    totalTercair: 0,
+    pendingRelease: 0,
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isReleasing, setIsReleasing] = useState<number | null>(null);
+  const itemsPerPage = 6;
+  const shouldReduceMotion = useReducedMotion();
+
   // Fetch data dari backend saat component mount
   useEffect(() => {
     const fetchChartData = async () => {
@@ -80,6 +114,28 @@ export default function Home() {
       }
     };
 
+    const fetchEscrowData = async () => {
+      setIsLoading(true);
+      try {
+        const [escrowsResponse, statsResponse] = await Promise.all([
+          api.get('/api/escrow'),
+          api.get('/api/escrow/stats'),
+        ]);
+        setStats(statsResponse.stats || {
+        totalTerkunci: 0,
+        totalTercair: 0,
+        pendingRelease: 0,
+      });
+        setAllEscrows(escrowsResponse.escrows || []);
+      } catch (error: any) {
+        console.error('Error fetching escrow data:', error);
+        alert(error.response?.data?.error || 'Gagal memuat data escrow');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEscrowData();
     fetchChartData();
     fetchPrioritySchools();
   }, []);
@@ -107,6 +163,78 @@ export default function Home() {
       },
     },
   };
+
+  const filteredEscrows = allEscrows.filter((escrow) => {
+    const matchesSearch =
+      escrow.school.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      escrow.catering.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      escrow.txHash.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === '' || escrow.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalPages = Math.ceil(filteredEscrows.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentEscrows = filteredEscrows.slice(startIndex, endIndex);
+
+  const containerEscrowVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: shouldReduceMotion ? 0 : 0.03,
+        delayChildren: shouldReduceMotion ? 0 : 0.1,
+      },
+    },
+  };
+
+  const itemEscrowVariants = {
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: shouldReduceMotion ? 0.01 : 0.3,
+        ease: [0.4, 0, 0.2, 1] as const,
+      },
+    },
+  };
+  
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case 'Terkunci':
+        return 'bg-blue-100 text-blue-700';
+      case 'Menunggu Rilis':
+        return 'bg-yellow-100 text-yellow-700';
+      case 'Tercairkan':
+        return 'bg-green-100 text-green-700';
+      case 'Tertunda':
+        return 'bg-orange-100 text-orange-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-purple-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Memuat data escrow...</p>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -432,6 +560,200 @@ export default function Home() {
                 </div>
               )}
             </motion.div>
+            <motion.div variants={itemEscrowVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Total Terkunci */}
+          <div className="bg-white rounded-xl p-6 border border-gray-200 stat-card-hover card-optimized">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                <Lock className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Total Terkunci</p>
+                <p className="text-2xl font-bold text-gray-900 stat-number">
+                  {formatCurrency(stats.totalTerkunci)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Total Tercair */}
+          <div className="bg-white rounded-xl p-6 border border-gray-200 stat-card-hover card-optimized">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Total Tercair</p>
+                <p className="text-2xl font-bold text-gray-900 stat-number">
+                  {formatCurrency(stats.totalTercair)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Pending Release */}
+          <div className="bg-white rounded-xl p-6 border border-gray-200 stat-card-hover card-optimized">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
+                <Clock className="w-6 h-6 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Pending Release</p>
+                <p className="text-2xl font-bold text-gray-900 stat-number">
+                  {formatCurrency(stats.pendingRelease)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Filters */}
+        <motion.div variants={itemEscrowVariants} className="bg-white rounded-xl p-6 border border-gray-200">
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Cari Berdasarkan Sekolah, Katering, Atau TX Hash..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-smooth outline-none text-sm"
+              />
+            </div>
+
+            {/* Filter Status */}
+            <div className="relative">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="pl-4 pr-10 py-2.5 border border-gray-300 rounded-lg text-gray-900 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-smooth appearance-none bg-white text-sm min-w-[180px]"
+              >
+                <option value="">Semua Status</option>
+                <option value="Terkunci">Terkunci</option>
+                <option value="Menunggu Rilis">Menunggu Rilis</option>
+                <option value="Tercairkan">Tercairkan</option>
+                <option value="Tertunda">Tertunda</option>
+              </select>
+              <ChevronRight className="absolute right-3 top-1/2 transform -translate-y-1/2 rotate-90 w-4 h-4 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Escrow Table */}
+        <motion.div variants={itemEscrowVariants} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200 bg-gray-50">
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">ID</th>
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">Sekolah</th>
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">Katering</th>
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">Jumlah</th>
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">Status</th>
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">Tanggal Terkunci</th>
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">TX Hash</th>
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentEscrows.map((escrow, index) => (
+                  <motion.tr
+                    key={escrow.id}
+                    initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: shouldReduceMotion ? 0.01 : 0.2,
+                      delay: shouldReduceMotion ? 0 : index * 0.03,
+                      ease: [0.4, 0, 0.2, 1] as const,
+                    }}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-smooth"
+                  >
+                    <td className="p-4">
+                      <span className="font-mono text-sm text-gray-600">#{escrow.id}</span>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                          <Shield className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="font-medium text-gray-900 text-sm">{escrow.school}</span>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <span className="text-gray-600 text-sm">{escrow.catering}</span>
+                    </td>
+                    <td className="p-4">
+                      <span className="font-semibold text-gray-900 text-sm stat-number">
+                        {formatCurrency(escrow.amount)}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <span
+                        className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(
+                          escrow.status
+                        )}`}
+                      >
+                        {escrow.status}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <span className="text-gray-600 text-sm">
+                        {new Date(escrow.lockedAt).toLocaleDateString('id-ID')}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <a
+                        href={`https://sepolia.etherscan.io/tx/${escrow.txHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-purple-600 hover:text-purple-700 text-xs font-mono flex items-center gap-1 transition-smooth"
+                      >
+                        {escrow.txHash.substring(0, 10)}...
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Menampilkan {startIndex + 1} Dari {Math.min(endIndex, filteredEscrows.length)} Escrow
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              >
+                Sebelumnya
+              </button>
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              >
+                Berikutnya
+              </button>
+            </div>
+          </div>
+        </motion.div>
+        <motion.div variants={itemEscrowVariants} className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-sm font-semibold text-blue-900 mb-1">Informasi Smart Contract Escrow</h4>
+              <p className="text-sm text-blue-700">
+                Semua transaksi escrow dikelola melalui smart contract blockchain untuk transparansi dan keamanan maksimal.
+                Dana akan otomatis tercairkan ketika semua kondisi terpenuhi atau dapat di-release secara manual oleh admin.
+              </p>
+            </div>
+          </div>
+        </motion.div>
           </motion.div>
         </div>
       </section>

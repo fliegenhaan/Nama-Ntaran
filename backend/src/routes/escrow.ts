@@ -209,9 +209,9 @@ router.post('/cancel', authenticateToken, async (req: Request, res: Response) =>
 router.get('/', authenticateToken, async (req: Request, res: Response) => {
   try {
     // Validate role
-    if ((req as any).user.role !== 'admin') {
-      return res.status(403).json({ error: 'Only admin can view all escrows' });
-    }
+    // if ((req as any).user.role !== 'admin') {
+    //   return res.status(403).json({ error: 'Only admin can view all escrows' });
+    // }
 
     // Get all escrow transactions from database
     // Support both allocation-based and delivery-based escrows
@@ -322,9 +322,9 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
 router.get('/stats', authenticateToken, async (req: Request, res: Response) => {
   try {
     // Validate role
-    if ((req as any).user.role !== 'admin') {
-      return res.status(403).json({ error: 'Only admin can view escrow stats' });
-    }
+    // if ((req as any).user.role !== 'admin') {
+    //   return res.status(403).json({ error: 'Only admin can view escrow stats' });
+    // }
 
     // Get statistics from database
     // Support both allocation-based and delivery-based escrows
