@@ -204,9 +204,9 @@ router.post('/cancel', authenticateToken, async (req: Request, res: Response) =>
 
 /**
  * GET /api/escrow
- * Get all escrow transactions (Admin only)
+ * Get all escrow transactions (Public access)
  */
-router.get('/', authenticateToken, async (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     // Validate role
     // if ((req as any).user.role !== 'admin') {
@@ -317,9 +317,9 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
 
 /**
  * GET /api/escrow/stats
- * Get escrow statistics (Admin only)
+ * Get escrow statistics (Public access)
  */
-router.get('/stats', authenticateToken, async (req: Request, res: Response) => {
+router.get('/stats', async (req: Request, res: Response) => {
   try {
     // Validate role
     // if ((req as any).user.role !== 'admin') {
