@@ -16,8 +16,8 @@ function SchedulePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // ambil filter dari URL query params atau default ke 'today'
-  const initialFilter = (searchParams.get('filter') as FilterType) || 'today';
+  // ambil filter dari URL query params atau default ke 'all'
+  const initialFilter = (searchParams.get('filter') as FilterType) || 'all';
   const [activeFilter, setActiveFilter] = useState<FilterType>(initialFilter);
 
   // state untuk modal detail

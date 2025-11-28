@@ -86,6 +86,243 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* section 2: hasil analisis dengan grafik */}
+      <section ref={section2Ref} className="py-20 bg-gradient-to-br from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={section2InView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 text-center">
+              Mengapa Kami Hadir?
+            </h2>
+
+            <div className="max-w-5xl mx-auto mb-16">
+              <motion.div
+                className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100"
+                initial={{ opacity: 0, y: 20 }}
+                animate={section2InView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.8 }}
+              >
+                <p className="text-gray-700 text-lg leading-relaxed text-justify mb-6">
+                  Setelah menganalisis ribuan feedback masyarakat tentang Program Makan Bergizi Gratis menggunakan
+                  teknologi AI, kami menemukan pola mengkhawatirkan: kata-kata seperti <span className="font-semibold text-red-600">"racun"</span>,
+                  <span className="font-semibold text-red-600">"keracunan"</span>, <span className="font-semibold text-orange-600">"masalah"</span>,
+                  dan <span className="font-semibold text-orange-600">"tahan"</span> muncul secara signifikan dalam diskusi publik.
+                </p>
+                <p className="text-gray-700 text-lg leading-relaxed text-justify mb-6">
+                  Temuan ini mengungkapkan realita yang memprihatinkan: meskipun program bernilai triliunan rupiah
+                  telah berjalan, masih banyak titik kebocoran dalam rantai distribusi—mulai dari alokasi dana yang
+                  tidak tepat sasaran, kualitas makanan yang tidak terjamin, hingga transparansi yang minim sehingga
+                  sulit melacak kemana dana benar-benar mengalir.
+                </p>
+                <p className="text-gray-700 text-lg leading-relaxed text-justify">
+                  Dari situlah <span className="font-bold text-purple-600">Makan Bergizi Ga Bocor</span> lahir—sebuah platform
+                  berbasis AI dan blockchain yang dirancang khusus untuk menutup celah-celah tersebut, memastikan setiap
+                  rupiah dana publik tersalur dengan benar dan setiap siswa mendapatkan makanan bergizi yang layak mereka terima.
+                </p>
+              </motion.div>
+            </div>
+
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 text-center">
+              Monitoring dan Analisis Feedback Masyarakat
+            </h3>
+            <p className="text-gray-600 text-center mb-12 max-w-3xl mx-auto">
+              Kami telah melakukan monitoring dan analisis feedback masyarakat menggunakan Support Vector Machine (SVM)
+              untuk memahami respons dan persepsi terhadap Program Makan Bergizi Gratis melalui data komentar media sosial
+            </p>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <motion.div
+                className="space-y-6"
+                initial={{ opacity: 0, x: -30 }}
+                animate={section2InView ? { opacity: 1, x: 0 } : {}}
+                transition={{ delay: 0.2, duration: 0.8 }}
+              >
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 p-6 rounded-2xl border-l-4 border-red-500">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Feedback Buruk yang Perlu Diperhatikan</h3>
+                  <p className="text-gray-700 leading-relaxed text-justify">
+                    Hasil analisis menunjukkan masih terdapat feedback buruk yang menurunkan keefektifan
+                    Program Makan Bergizi Gratis. Masyarakat melaporkan berbagai isu krusial terkait
+                    kualitas makanan, distribusi yang tidak merata, dan masalah kesehatan yang timbul
+                    dari implementasi program.
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-orange-50 to-yellow-50 p-6 rounded-2xl border-l-4 border-orange-500">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Indikasi Kebocoran dan Distribusi Buruk</h3>
+                  <p className="text-gray-700 leading-relaxed text-justify">
+                    Kata-kata seperti "racun", "keracunan", "tahan", dan "masalah" muncul secara signifikan
+                    dalam feedback masyarakat. Hal ini menggambarkan bahwa masih banyak program Makan Bergizi
+                    Gratis yang bocor atau tidak tersalurkan dengan baik ke sasaran yang tepat, mengindikasikan
+                    perlunya peningkatan pengawasan dan transparansi dalam distribusi.
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-yellow-50 to-amber-50 p-6 rounded-2xl border-l-4 border-yellow-600">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Urgensi Sistem Blockchain</h3>
+                  <p className="text-gray-700 leading-relaxed text-justify">
+                    Feedback negatif ini memperkuat urgensi implementasi platform berbasis blockchain untuk
+                    memastikan setiap tahap distribusi tercatat transparan, mengurangi kebocoran, dan
+                    meningkatkan akuntabilitas seluruh stakeholder dalam ekosistem MBG.
+                  </p>
+                </div>
+              </motion.div>
+
+              <motion.div
+                className="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100"
+                initial={{ opacity: 0, x: 30 }}
+                animate={section2InView ? { opacity: 1, x: 0 } : {}}
+                transition={{ delay: 0.4, duration: 0.8 }}
+              >
+                <img
+                  src="/output-comment-analysis-1.png"
+                  alt="Grafik Perbandingan Akurasi Kernel SVM"
+                  className="w-full h-auto rounded-lg"
+                  loading="lazy"
+                />
+                <p className="text-gray-600 text-sm text-center mt-4">
+                  Perbandingan akurasi berbagai kernel SVM dalam analisis sentimen feedback masyarakat
+                </p>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* section 3: wordcloud */}
+      <section ref={section3Ref} className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={section3InView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 text-center">
+              Visualisasi Kata Kunci Feedback Masyarakat
+            </h2>
+            <p className="text-gray-600 text-center mb-12 max-w-3xl mx-auto">
+              Word Cloud menampilkan kata-kata yang paling sering dibicarakan masyarakat, termasuk
+              kata-kata krusial yang mengindikasikan masalah dalam distribusi program
+            </p>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <motion.div
+                className="space-y-6 order-2 lg:order-1"
+                initial={{ opacity: 0, x: -30 }}
+                animate={section3InView ? { opacity: 1, x: 0 } : {}}
+                transition={{ delay: 0.2, duration: 0.8 }}
+              >
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 p-6 rounded-2xl border-l-4 border-red-500">
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">Kata-kata Krusial yang Muncul</h3>
+                  <p className="text-gray-600 leading-relaxed text-justify mb-4">
+                    Analisis word cloud menunjukkan kemunculan kata-kata seperti <span className="font-bold text-red-600">"racun"</span>,{' '}
+                    <span className="font-bold text-red-600">"keracunan"</span>, <span className="font-bold text-orange-600">"tahan"</span>, dan{' '}
+                    <span className="font-bold text-orange-600">"masalah"</span> yang mengindikasikan
+                    isu-isu serius dalam pelaksanaan program MBG.
+                  </p>
+                  <p className="text-gray-600 leading-relaxed text-justify">
+                    Kemunculan kata-kata negatif ini secara signifikan dalam diskusi publik menunjukkan
+                    bahwa masyarakat mengalami dan melaporkan masalah nyata terkait kualitas dan
+                    keamanan makanan yang disalurkan.
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-orange-50 to-yellow-50 p-6 rounded-2xl border-l-4 border-orange-500">
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">Indikasi Kebocoran Distribusi</h3>
+                  <p className="text-gray-600 leading-relaxed text-justify">
+                    Kata-kata ini menggambarkan bahwa masih banyak program Makan Bergizi Gratis yang
+                    bocor atau tidak tersalurkan dengan baik ke sasaran yang tepat. Hal ini mengindikasikan
+                    adanya celah dalam rantai distribusi, mulai dari vendor katering hingga penerima akhir,
+                    yang menyebabkan penurunan kualitas makanan atau bahkan kasus keracunan.
+                  </p>
+                </div>
+              </motion.div>
+
+              <motion.div
+                className="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100 order-1 lg:order-2"
+                initial={{ opacity: 0, x: 30 }}
+                animate={section3InView ? { opacity: 1, x: 0 } : {}}
+                transition={{ delay: 0.4, duration: 0.8 }}
+              >
+                <img
+                  src="/output-wordcloud.png"
+                  alt="Word Cloud Analisis Sentimen"
+                  className="w-full h-auto rounded-lg"
+                  loading="lazy"
+                />
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* section platform solution */}
+      <section className="py-20 bg-gradient-to-br from-purple-50 via-white to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+              Disinilah Platform Makan Bergizi Ga Bocor Hadir
+            </h2>
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+              Solusi komprehensif berbasis teknologi untuk memastikan transparansi dan akuntabilitas
+              dalam setiap tahap distribusi Program Makan Bergizi Gratis
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              className="relative order-2 lg:order-1"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="relative rounded-3xl overflow-hidden">
+                <img
+                  src="/aesthetic view 5.jpg"
+                  alt="Platform MBG"
+                  className="w-full h-[400px] md:h-[500px] object-cover transform hover:scale-105 transition-transform duration-700 rounded-3xl shadow-2xl"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-purple-900/20 to-transparent rounded-3xl" />
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="space-y-6 order-1 lg:order-2"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+            >
+              <p className="text-gray-700 text-lg leading-relaxed text-justify">
+                <span className="font-bold text-blue-600">Blockchain untuk Transparansi:</span> Setiap transaksi tercatat permanen, mencegah manipulasi data dan memastikan audit trail yang jelas dari pemerintah hingga siswa.
+              </p>
+              <p className="text-gray-700 text-lg leading-relaxed text-justify">
+                <span className="font-bold text-purple-600">AI untuk Analisis & Deteksi:</span> Sistem AI menganalisis pola distribusi, mendeteksi anomali, dan mengidentifikasi potensi penyalahgunaan dana.
+              </p>
+              <p className="text-gray-700 text-lg leading-relaxed text-justify">
+                <span className="font-bold text-green-600">QR Code untuk Verifikasi:</span> Memastikan makanan benar-benar diterima siswa dengan rekaman digital dan timestamp yang akurat, mencegah pengalihan dana.
+              </p>
+              <p className="text-gray-700 text-lg leading-relaxed text-justify">
+                <span className="font-bold text-orange-600">Smart Contract Escrow:</span> Dana terkunci dan tercairkan otomatis hanya ketika semua kondisi terpenuhi, menghilangkan risiko korupsi.
+              </p>
+              <p className="text-gray-700 text-lg leading-relaxed text-justify">
+                <span className="font-bold text-red-600">Real-time Monitoring:</span> Dashboard live memberikan visibilitas penuh kepada semua stakeholder untuk memantau distribusi kapan saja dan dari mana saja.
+              </p>
+              <p className="text-gray-700 text-lg leading-relaxed text-justify">
+                <span className="font-bold text-teal-600">Partisipasi Masyarakat:</span> Platform terbuka memungkinkan masyarakat melaporkan masalah dan mengawasi jalannya program sebagai kontrol sosial yang efektif.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* section 1: siapa saja yang terlibat */}
       <section ref={section1Ref} className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -424,177 +661,6 @@ export default function AboutPage() {
               </div>
             </motion.div>
           </div>
-        </div>
-      </section>
-
-      {/* section 2: hasil analisis dengan grafik */}
-      <section ref={section2Ref} className="py-20 bg-gradient-to-br from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={section2InView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 text-center">
-              Latar Belakang Program MBG
-            </h2>
-
-            <div className="max-w-5xl mx-auto mb-16">
-              <motion.div
-                className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100"
-                initial={{ opacity: 0, y: 20 }}
-                animate={section2InView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8 }}
-              >
-                <p className="text-gray-700 text-lg leading-relaxed text-justify mb-6">
-                  Program Makan Bergizi Gratis (MBG) resmi dimulai pada 6 Januari 2025 sebagai program strategis
-                  nasional untuk memperbaiki gizi 44,2 juta siswa dari PAUD hingga SMP, dengan anggaran mencapai
-                  ±Rp15 triliun. Program ini sangat penting mengingat Indonesia masih memiliki 21,5% prevalensi
-                  stunting, 9,8% kasus wasting, dan lebih dari 30% anak sekolah kekurangan asupan gizi harian.
-                </p>
-                <p className="text-gray-700 text-lg leading-relaxed text-justify mb-6">
-                  Namun, berbagai tantangan signifikan masih terjadi: 33% sekolah di wilayah 3T mengalami
-                  keterlambatan distribusi, 27% belanja program terlambat direalisasikan, terdapat 18.700 laporan
-                  ketidaksesuaian porsi dan kualitas, serta 62% vendor katering melaporkan keterlambatan pembayaran.
-                  Ketidakefisienan 5–10% saja dapat menyebabkan potensi pemborosan Rp750 miliar hingga Rp1,5 triliun per tahun.
-                </p>
-                <p className="text-gray-700 text-lg leading-relaxed text-justify">
-                  Oleh karena itu, diperlukan platform terpadu berbasis AI dan blockchain untuk memastikan alokasi
-                  berbasis data, distribusi tepat waktu, serta transparansi nasional yang dapat diaudit publik.
-                </p>
-              </motion.div>
-            </div>
-
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 text-center">
-              Monitoring dan Analisis Feedback Masyarakat
-            </h3>
-            <p className="text-gray-600 text-center mb-12 max-w-3xl mx-auto">
-              Kami telah melakukan monitoring dan analisis feedback masyarakat menggunakan Support Vector Machine (SVM)
-              untuk memahami respons dan persepsi terhadap Program Makan Bergizi Gratis melalui data komentar media sosial
-            </p>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <motion.div
-                className="space-y-6"
-                initial={{ opacity: 0, x: -30 }}
-                animate={section2InView ? { opacity: 1, x: 0 } : {}}
-                transition={{ delay: 0.2, duration: 0.8 }}
-              >
-                <div className="bg-gradient-to-br from-red-50 to-orange-50 p-6 rounded-2xl border-l-4 border-red-500">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Feedback Buruk yang Perlu Diperhatikan</h3>
-                  <p className="text-gray-700 leading-relaxed text-justify">
-                    Hasil analisis menunjukkan masih terdapat feedback buruk yang menurunkan keefektifan
-                    Program Makan Bergizi Gratis. Masyarakat melaporkan berbagai isu krusial terkait
-                    kualitas makanan, distribusi yang tidak merata, dan masalah kesehatan yang timbul
-                    dari implementasi program.
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-br from-orange-50 to-yellow-50 p-6 rounded-2xl border-l-4 border-orange-500">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Indikasi Kebocoran dan Distribusi Buruk</h3>
-                  <p className="text-gray-700 leading-relaxed text-justify">
-                    Kata-kata seperti "racun", "keracunan", "tahan", dan "masalah" muncul secara signifikan
-                    dalam feedback masyarakat. Hal ini menggambarkan bahwa masih banyak program Makan Bergizi
-                    Gratis yang bocor atau tidak tersalurkan dengan baik ke sasaran yang tepat, mengindikasikan
-                    perlunya peningkatan pengawasan dan transparansi dalam distribusi.
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-br from-yellow-50 to-amber-50 p-6 rounded-2xl border-l-4 border-yellow-600">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Urgensi Sistem Blockchain</h3>
-                  <p className="text-gray-700 leading-relaxed text-justify">
-                    Feedback negatif ini memperkuat urgensi implementasi platform berbasis blockchain untuk
-                    memastikan setiap tahap distribusi tercatat transparan, mengurangi kebocoran, dan
-                    meningkatkan akuntabilitas seluruh stakeholder dalam ekosistem MBG.
-                  </p>
-                </div>
-              </motion.div>
-
-              <motion.div
-                className="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100"
-                initial={{ opacity: 0, x: 30 }}
-                animate={section2InView ? { opacity: 1, x: 0 } : {}}
-                transition={{ delay: 0.4, duration: 0.8 }}
-              >
-                <img
-                  src="/output-comment-analysis-1.png"
-                  alt="Grafik Perbandingan Akurasi Kernel SVM"
-                  className="w-full h-auto rounded-lg"
-                  loading="lazy"
-                />
-                <p className="text-gray-600 text-sm text-center mt-4">
-                  Perbandingan akurasi berbagai kernel SVM dalam analisis sentimen feedback masyarakat
-                </p>
-              </motion.div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* section 3: wordcloud */}
-      <section ref={section3Ref} className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={section3InView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 text-center">
-              Visualisasi Kata Kunci Feedback Masyarakat
-            </h2>
-            <p className="text-gray-600 text-center mb-12 max-w-3xl mx-auto">
-              Word Cloud menampilkan kata-kata yang paling sering dibicarakan masyarakat, termasuk
-              kata-kata krusial yang mengindikasikan masalah dalam distribusi program
-            </p>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <motion.div
-                className="space-y-6 order-2 lg:order-1"
-                initial={{ opacity: 0, x: -30 }}
-                animate={section3InView ? { opacity: 1, x: 0 } : {}}
-                transition={{ delay: 0.2, duration: 0.8 }}
-              >
-                <div className="bg-gradient-to-br from-red-50 to-orange-50 p-6 rounded-2xl border-l-4 border-red-500">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Kata-kata Krusial yang Muncul</h3>
-                  <p className="text-gray-600 leading-relaxed text-justify mb-4">
-                    Analisis word cloud menunjukkan kemunculan kata-kata seperti <span className="font-bold text-red-600">"racun"</span>,{' '}
-                    <span className="font-bold text-red-600">"keracunan"</span>, <span className="font-bold text-orange-600">"tahan"</span>, dan{' '}
-                    <span className="font-bold text-orange-600">"masalah"</span> yang mengindikasikan
-                    isu-isu serius dalam pelaksanaan program MBG.
-                  </p>
-                  <p className="text-gray-600 leading-relaxed text-justify">
-                    Kemunculan kata-kata negatif ini secara signifikan dalam diskusi publik menunjukkan
-                    bahwa masyarakat mengalami dan melaporkan masalah nyata terkait kualitas dan
-                    keamanan makanan yang disalurkan.
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-br from-orange-50 to-yellow-50 p-6 rounded-2xl border-l-4 border-orange-500">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Indikasi Kebocoran Distribusi</h3>
-                  <p className="text-gray-600 leading-relaxed text-justify">
-                    Kata-kata ini menggambarkan bahwa masih banyak program Makan Bergizi Gratis yang
-                    bocor atau tidak tersalurkan dengan baik ke sasaran yang tepat. Hal ini mengindikasikan
-                    adanya celah dalam rantai distribusi, mulai dari vendor katering hingga penerima akhir,
-                    yang menyebabkan penurunan kualitas makanan atau bahkan kasus keracunan.
-                  </p>
-                </div>
-              </motion.div>
-
-              <motion.div
-                className="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100 order-1 lg:order-2"
-                initial={{ opacity: 0, x: 30 }}
-                animate={section3InView ? { opacity: 1, x: 0 } : {}}
-                transition={{ delay: 0.4, duration: 0.8 }}
-              >
-                <img
-                  src="/output-wordcloud.png"
-                  alt="Word Cloud Analisis Sentimen"
-                  className="w-full h-auto rounded-lg"
-                  loading="lazy"
-                />
-              </motion.div>
-            </div>
-          </motion.div>
         </div>
       </section>
 

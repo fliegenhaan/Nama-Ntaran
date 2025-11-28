@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { QrCode, Download, CheckCircle, Upload, Loader2, AlertCircle } from 'lucide-react';
+import { QrCode, Download, CheckCircle, Upload, Loader2, AlertCircle, ClipboardList } from 'lucide-react';
 import QRCodeLib from 'qrcode';
 import { uploadQRCode } from '@/lib/supabase-storage';
 import axios from 'axios';
@@ -132,14 +132,14 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
   };
 
   return (
-    <div className="glass-subtle rounded-xl p-6">
+    <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 shadow-xl border border-slate-700">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 gradient-bg-3 rounded-lg flex items-center justify-center">
+        <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
           <QrCode className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h3 className="font-bold text-white">QR Code Delivery</h3>
-          <p className="text-sm text-gray-300">Untuk verifikasi sekolah</p>
+          <h3 className="font-bold text-white text-lg">QR Code Delivery</h3>
+          <p className="text-sm text-slate-300">Untuk verifikasi sekolah</p>
         </div>
       </div>
 
@@ -149,23 +149,23 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
       </div>
 
       {generated && !uploaded && (
-        <div className="flex items-center gap-2 mb-4 p-3 bg-green-500/20 border border-green-500/30 rounded-lg">
-          <CheckCircle className="w-4 h-4 text-green-400" />
-          <p className="text-sm text-green-100">QR Code berhasil dibuat!</p>
+        <div className="flex items-center gap-2 mb-4 p-3 bg-green-500 border border-green-600 rounded-lg shadow-md">
+          <CheckCircle className="w-5 h-5 text-white" />
+          <p className="text-sm font-semibold text-white">QR Code berhasil dibuat!</p>
         </div>
       )}
 
       {uploaded && (
-        <div className="flex items-center gap-2 mb-4 p-3 bg-blue-500/20 border border-blue-500/30 rounded-lg">
-          <CheckCircle className="w-4 h-4 text-blue-400" />
-          <p className="text-sm text-blue-100">QR Code tersimpan di cloud!</p>
+        <div className="flex items-center gap-2 mb-4 p-3 bg-blue-500 border border-blue-600 rounded-lg shadow-md">
+          <CheckCircle className="w-5 h-5 text-white" />
+          <p className="text-sm font-semibold text-white">QR Code tersimpan di cloud!</p>
         </div>
       )}
 
       {uploadError && (
-        <div className="flex items-center gap-2 mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
-          <AlertCircle className="w-4 h-4 text-red-400" />
-          <p className="text-sm text-red-100">{uploadError}</p>
+        <div className="flex items-center gap-2 mb-4 p-3 bg-red-500 border border-red-600 rounded-lg shadow-md">
+          <AlertCircle className="w-5 h-5 text-white" />
+          <p className="text-sm font-semibold text-white">{uploadError}</p>
         </div>
       )}
 
@@ -174,30 +174,30 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
         <button
           onClick={downloadQRCode}
           disabled={!generated}
-          className="gradient-bg-2 text-white px-4 py-3 rounded-xl font-semibold hover:shadow-glow transition-smooth flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-3 rounded-xl font-bold hover:from-orange-600 hover:to-orange-700 hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:from-orange-500 disabled:hover:to-orange-600"
         >
-          <Download className="w-4 h-4" />
+          <Download className="w-5 h-5" />
           Download
         </button>
 
         <button
           onClick={uploadQRCodeToStorage}
           disabled={!generated || uploading || uploaded}
-          className="bg-purple-600 text-white px-4 py-3 rounded-xl font-semibold hover:bg-purple-700 hover:shadow-glow transition-smooth flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-3 rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:from-purple-600 disabled:hover:to-indigo-600"
         >
           {uploading ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-5 h-5 animate-spin" />
               Uploading...
             </>
           ) : uploaded ? (
             <>
-              <CheckCircle className="w-4 h-4" />
+              <CheckCircle className="w-5 h-5" />
               Uploaded
             </>
           ) : (
             <>
-              <Upload className="w-4 h-4" />
+              <Upload className="w-5 h-5" />
               Save to Cloud
             </>
           )}
@@ -205,11 +205,14 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
       </div>
 
       {/* Info */}
-      <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-        <p className="text-xs text-blue-100 mb-2">
-          <strong>Cara Pakai:</strong>
-        </p>
-        <ol className="text-xs text-blue-100 space-y-1 list-decimal list-inside">
+      <div className="p-4 bg-slate-700/80 border border-slate-600 rounded-lg shadow-inner">
+        <div className="flex items-center gap-2 mb-2">
+          <ClipboardList className="w-4 h-4 text-white" />
+          <p className="text-sm text-white font-bold">
+            Cara Pakai:
+          </p>
+        </div>
+        <ol className="text-sm text-slate-200 space-y-1.5 list-decimal list-inside leading-relaxed">
           <li>Klik "Save to Cloud" untuk menyimpan QR code</li>
           <li>Download atau cetak QR code</li>
           <li>Tempel QR code di kotak makanan</li>
@@ -218,10 +221,13 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
       </div>
 
       {qrCodeUrl && (
-        <div className="mt-3 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-          <p className="text-xs text-green-100 break-all">
-            <strong>URL:</strong> {qrCodeUrl}
-          </p>
+        <div className="mt-3 p-4 bg-green-600/90 border border-green-500 rounded-lg shadow-md">
+          <div className="flex items-start gap-2">
+            <CheckCircle className="w-4 h-4 text-white mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-white break-all">
+              <strong className="font-bold">URL:</strong> {qrCodeUrl}
+            </p>
+          </div>
         </div>
       )}
     </div>
