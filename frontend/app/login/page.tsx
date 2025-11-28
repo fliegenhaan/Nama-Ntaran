@@ -197,7 +197,7 @@ export default function LoginPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 gpu-accelerate placeholder:text-gray-400 placeholder:font-normal relative z-0"
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 gpu-accelerate placeholder:text-gray-400 placeholder:font-normal font-semibold text-gray-900 relative z-0"
                   placeholder="Masukkan nama pengguna atau email Anda"
                 />
               </div>
@@ -236,7 +236,7 @@ export default function LoginPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
-                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 gpu-accelerate placeholder:text-gray-400 placeholder:font-normal relative z-0"
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 gpu-accelerate placeholder:text-gray-400 placeholder:font-normal font-semibold text-gray-900 relative z-0"
                   placeholder="Masukkan kata sandi Anda"
                 />
               </div>

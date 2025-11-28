@@ -211,7 +211,7 @@ export default function RegisterPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, namaLengkap: e.target.value })
                   }
-                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 gpu-accelerate placeholder:text-gray-400 placeholder:font-normal relative z-0"
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 gpu-accelerate placeholder:text-gray-400 placeholder:font-normal font-semibold text-gray-900 relative z-0"
                   placeholder="Nama Lengkap Anda"
                 />
               </div>
@@ -250,7 +250,7 @@ export default function RegisterPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 gpu-accelerate placeholder:text-gray-400 placeholder:font-normal relative z-0"
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 gpu-accelerate placeholder:text-gray-400 placeholder:font-normal font-semibold text-gray-900 relative z-0"
                   placeholder="email@example.com"
                 />
               </div>
@@ -289,7 +289,7 @@ export default function RegisterPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
-                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 gpu-accelerate placeholder:text-gray-400 placeholder:font-normal relative z-0"
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 gpu-accelerate placeholder:text-gray-400 placeholder:font-normal font-semibold text-gray-900 relative z-0"
                   placeholder="Minimal 8 karakter"
                 />
               </div>
@@ -331,7 +331,7 @@ export default function RegisterPage() {
                       confirmPassword: e.target.value,
                     })
                   }
-                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 gpu-accelerate placeholder:text-gray-400 placeholder:font-normal relative z-0"
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 gpu-accelerate placeholder:text-gray-400 placeholder:font-normal font-semibold text-gray-900 relative z-0"
                   placeholder="Masukkan ulang kata sandi Anda"
                 />
               </div>

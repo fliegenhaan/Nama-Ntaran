@@ -15,6 +15,7 @@ export default function Navbar({ role = 'public' }: NavbarProps) {
 
   // menu navigasi untuk public
   const publicLinks = [
+    { href: '/about', label: 'Tentang' },
     { href: '/transparansi', label: 'Dashboard Publik' },
     { href: '/login', label: 'Portal Internal' },
   ];

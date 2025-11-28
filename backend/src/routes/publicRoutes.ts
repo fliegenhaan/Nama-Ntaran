@@ -108,27 +108,42 @@ router.get('/priority-schools', async (req: Request, res: Response) => {
     const { limit = '6' } = req.query;
     const limitNum = parseInt(limit as string);
 
-    // Fetch top priority schools with their total deliveries
-    const { data: schools, error } = await supabase
+    // Get all schools with deliveries and calculate total budget
+    const { data: deliveries, error: deliveriesError } = await supabase
+      .from('deliveries')
+      .select('school_id, amount');
+
+    if (deliveriesError) throw deliveriesError;
+
+    // Group deliveries by school and calculate total budget
+    const schoolBudgets = new Map<number, number>();
+    (deliveries || []).forEach(delivery => {
+      const currentTotal = schoolBudgets.get(delivery.school_id) || 0;
+      schoolBudgets.set(delivery.school_id, currentTotal + (delivery.amount || 0));
+    });
+
+    // Get school IDs with deliveries, sorted by budget (highest first)
+    const topSchoolIds = Array.from(schoolBudgets.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, limitNum)
+      .map(([schoolId]) => schoolId);
+
+    if (topSchoolIds.length === 0) {
+      return res.json({ prioritySchools: [] });
+    }
+
+    // Fetch school details for top schools
+    const { data: schools, error: schoolsError } = await supabase
       .from('schools')
       .select('id, npsn, name, city, province, status, priority_score')
-      .order('priority_score', { ascending: false })
-      .limit(limitNum);
+      .in('id', topSchoolIds);
 
-    if (error) throw error;
+    if (schoolsError) throw schoolsError;
 
-    // For each school, get the total budget from deliveries
-    const schoolsWithBudget = await Promise.all(
-      (schools || []).map(async (school) => {
-        const { data: deliveries } = await supabase
-          .from('deliveries')
-          .select('amount')
-          .eq('school_id', school.id);
-
-        const totalBudget = (deliveries || []).reduce(
-          (sum, delivery) => sum + (delivery.amount || 0),
-          0
-        );
+    // Map schools with their budgets and format
+    const schoolsWithBudget = (schools || [])
+      .map(school => {
+        const totalBudget = schoolBudgets.get(school.id) || 0;
 
         // Format budget to Rupiah
         const formattedBudget =
@@ -157,10 +172,12 @@ router.get('/priority-schools', async (req: Request, res: Response) => {
           kota: school.city || school.province || 'N/A',
           anggaran: formattedBudget,
           status: statusDisplay,
-          statusColor
+          statusColor,
+          totalBudget // Include for sorting
         };
       })
-    );
+      .sort((a, b) => b.totalBudget - a.totalBudget) // Sort by budget
+      .map(({ totalBudget, ...school }) => school); // Remove totalBudget from response
 
     res.json({ prioritySchools: schoolsWithBudget });
   } catch (error) {

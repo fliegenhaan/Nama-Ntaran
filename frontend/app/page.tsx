@@ -132,14 +132,15 @@ export default function Home() {
                 Transparansi Dan Program Distribusi Pangan
               </motion.h1>
               <motion.p
-                className="text-lg text-gray-600 leading-relaxed"
+                className="text-lg text-gray-600 leading-relaxed text-justify"
                 initial={{ opacity: 0, y: 20 }}
                 animate={heroInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: 0.4, duration: 0.8 }}
               >
-                MBG berkomitmen untuk memastikan bahwa setiap donasi mencapai
-                tujuan yang diinginkan, memberdayakan komunitas dan memberikan
-                nutrisi penting kepada mereka yang paling membutuhkannya.
+                MBG berkomitmen untuk memastikan bahwa setiap dana Program Makan
+                Bergizi Gratis mencapai tujuan yang diinginkan, memberdayakan
+                komunitas pendidikan dan memberikan nutrisi penting kepada para
+                penerima manfaat yang paling membutuhkannya.
               </motion.p>
             </motion.div>
 
@@ -188,13 +189,17 @@ export default function Home() {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              What's Poke
+              Apa Itu MBG?
             </h2>
-            <p className="text-gray-600 text-lg leading-relaxed">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
+            <p className="text-gray-600 text-lg leading-relaxed text-justify">
+              Program Makan Bergizi Gratis merupakan program makan siang gratis Indonesia pada
+              pemerintahan Prabowo Subianto yang berjalan secara bertahap sejak 6 Januari 2025.
+              Program ini menargetkan para pelajar dan kelompok rentan termasuk ibu hamil dan menyusui.
+              MBG (Makan Bergizi Ga Bocor) hadir sebagai platform transparansi berbasis blockchain
+              yang memastikan setiap dana program tersalurkan tepat sasaran tanpa kebocoran. Melalui
+              teknologi smart contract, kami menciptakan ekosistem distribusi yang akuntabel, di mana
+              setiap transaksi tercatat secara permanen dan dapat diverifikasi oleh publik. Bersama MBG,
+              wujudkan program bantuan pangan yang benar-benar sampai kepada yang membutuhkan.
             </p>
           </motion.div>
         </div>
@@ -297,18 +302,25 @@ export default function Home() {
               transition={{ duration: 0.8 }}
             >
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-                Lorem
+                Teknologi Blockchain untuk Transparansi Maksimal
               </h2>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              <p className="text-gray-600 text-lg leading-relaxed text-justify">
+                Dengan memanfaatkan teknologi blockchain, setiap alokasi dan distribusi dana
+                Program Makan Bergizi Gratis tercatat secara permanen dan tidak dapat dimanipulasi.
+                Smart contract memastikan dana otomatis tersalur sesuai kriteria yang telah
+                ditetapkan, menjamin bahwa bantuan pangan benar-benar sampai kepada seluruh
+                penerima manfaat tanpa potongan atau kebocoran sedikitpun.
               </p>
-              <h3 className="text-2xl font-bold text-gray-900 pt-6">Lorem</h3>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                irure dolor in reprehenderit in voluptate velit esse cillum
-                dolore eu fugiat nulla pariatur.
+              <h3 className="text-2xl font-bold text-gray-900 pt-6">
+                Akuntabilitas dari Sumber hingga Penerima
+              </h3>
+              <p className="text-gray-600 text-lg leading-relaxed text-justify">
+                Sistem kami memberikan visibilitas penuh terhadap alur dana dari pemerintah, katering,
+                hingga ke sekolah-sekolah penerima manfaat. Masyarakat dapat memantau secara real-time
+                distribusi bantuan pangan Program Makan Bergizi Gratis, memastikan tidak ada kebocoran
+                atau penyalahgunaan anggaran di setiap tahapan distribusi. Transparansi ini menjadi
+                kunci keberhasilan program yang bertujuan memberikan nutrisi berkualitas bagi generasi
+                masa depan Indonesia.
               </p>
             </motion.div>
 
@@ -462,7 +474,7 @@ export default function Home() {
                     href="#"
                     className="text-gray-400 hover:text-white transition-colors text-sm"
                   >
-                    Kara
+                    Karir
                   </a>
                 </li>
                 <li>
