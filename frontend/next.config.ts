@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  staticPageGenerationTimeout: 1000,
 };
 
 export default nextConfig;

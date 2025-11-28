@@ -30,7 +30,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
       opacity: 1,
       transition: {
         duration: 0.6,
-        ease: [0.4, 0, 0.2, 1],
+        ease: [0.4, 0, 0.2, 1] as const,
       },
     },
   };
@@ -42,7 +42,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
       y: 0,
       transition: {
         duration: 0.5,
-        ease: [0.4, 0, 0.2, 1],
+        ease: [0.4, 0, 0.2, 1] as const,
         delay: 0.2,
       },
     },

@@ -168,8 +168,8 @@ export default function SchoolDashboard() {
   // School info from user data
   const schoolInfo = {
     name: user.school_name || 'Sekolah',
-    npsn: user.school_npsn || '-',
-    address: user.school_address || '-',
+    npsn: user.school_id || '-',
+    address: user.school_name || '-',
   };
 
   return (

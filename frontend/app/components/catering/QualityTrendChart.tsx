@@ -85,7 +85,7 @@ const QualityTrendChart: React.FC<QualityTrendChartProps> = ({ data = [] }) => {
       y: 0,
       transition: {
         duration: 0.5,
-        ease: [0.4, 0, 0.2, 1],
+        ease: [0.4, 0, 0.2, 1] as const,
       },
     },
   };
@@ -100,7 +100,7 @@ const QualityTrendChart: React.FC<QualityTrendChartProps> = ({ data = [] }) => {
       opacity: 1,
       transition: {
         duration: 2,
-        ease: [0.4, 0, 0.2, 1],
+        ease: [0.4, 0, 0.2, 1] as const,
         delay: 0.3,
       },
     },
@@ -114,7 +114,7 @@ const QualityTrendChart: React.FC<QualityTrendChartProps> = ({ data = [] }) => {
       opacity: 0.2,
       transition: {
         duration: 1.5,
-        ease: [0.4, 0, 0.2, 1],
+        ease: [0.4, 0, 0.2, 1] as const,
         delay: 0.5,
       },
     },

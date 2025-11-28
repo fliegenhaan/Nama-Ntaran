@@ -423,7 +423,7 @@ export default function RegisterPage() {
         className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-800 via-gray-900 to-black items-center justify-center relative overflow-hidden"
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, ease: [0.6, 0.05, 0.01, 0.9] }}
+        transition={{ duration: 0.8, ease: [0.6, 0.05, 0.01, 0.9] as const }}
       >
         {/* overlay gelap untuk efek cinematic */}
         <div className="absolute inset-0 bg-black/40 z-10" />

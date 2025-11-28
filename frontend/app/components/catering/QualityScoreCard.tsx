@@ -24,7 +24,7 @@ const QualityScoreCard: React.FC<QualityScoreCardProps> = ({
       y: 0,
       transition: {
         duration: 0.5,
-        ease: [0.4, 0, 0.2, 1],
+        ease: [0.4, 0, 0.2, 1] as const,
       },
     },
   };
@@ -117,7 +117,7 @@ const QualityScoreCard: React.FC<QualityScoreCardProps> = ({
           <motion.div
             initial={{ width: 0 }}
             animate={isInView ? { width: `${(score / 10) * 100}%` } : { width: 0 }}
-            transition={{ duration: 1, delay: 0.5, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ duration: 1, delay: 0.5, ease: [0.4, 0, 0.2, 1] as const }}
             className={`h-full rounded-full ${
               score >= 9 ? 'bg-blue-500' : score >= 7 ? 'bg-yellow-500' : 'bg-red-500'
             }`}

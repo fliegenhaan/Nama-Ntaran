@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle, AlertTriangle, Info, TrendingUp, Eye, Sparkles } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Info, TrendingUp, Eye, Sparkles, Package } from 'lucide-react';
 import GlassPanel from '../ui/GlassPanel';
 
 interface AIQualityScoresProps {

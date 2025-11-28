@@ -91,7 +91,7 @@ const UpcomingDeliveries: React.FC<UpcomingDeliveriesProps> = ({
       y: 0,
       transition: {
         duration: 0.5,
-        ease: [0.4, 0, 0.2, 1],
+        ease: [0.4, 0, 0.2, 1] as const,
         staggerChildren: 0.08,
       },
     },
@@ -104,7 +104,7 @@ const UpcomingDeliveries: React.FC<UpcomingDeliveriesProps> = ({
       x: 0,
       transition: {
         duration: 0.3,
-        ease: [0.4, 0, 0.2, 1],
+        ease: [0.4, 0, 0.2, 1] as const,
       },
     },
   };

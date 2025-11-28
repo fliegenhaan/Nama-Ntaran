@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CateringSidebar from '../../components/catering/CateringSidebar';
@@ -11,7 +11,8 @@ import ScheduleDetailModal from '../../components/catering/ScheduleDetailModal';
 import { useScheduleData, ScheduleItem } from '../../hooks/useScheduleData';
 import { Calendar, RefreshCw, AlertTriangle } from 'lucide-react';
 
-export default function SchedulePage() {
+// Pisahkan komponen yang pakai useSearchParams
+function SchedulePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -58,25 +59,17 @@ export default function SchedulePage() {
       const token = localStorage.getItem('token');
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-      // Map UI status to database status
-      // IMPORTANT: Catering can ONLY update status up to 'delivered'
-      // School must verify to change status to 'verified'
-      // UI: 'scheduled' -> 'in_progress' -> 'delivered' (STOPPED HERE)
-      // DB: 'pending/scheduled' -> 'delivered' -> (wait for school verification)
       let dbStatus: string;
       if (newStatus === 'in_progress') {
-        dbStatus = 'delivered'; // Mulai pengiriman = delivered di database
+        dbStatus = 'delivered';
       } else if (newStatus === 'delivered') {
-        // FIXED: Catering marks as delivered, NOT verified
-        // School will verify later via verifications endpoint
-        dbStatus = 'delivered'; // Already delivered, waiting for school verification
+        dbStatus = 'delivered';
       } else {
-        dbStatus = 'scheduled'; // Fallback
+        dbStatus = 'scheduled';
       }
 
       console.log('Mapped DB Status:', dbStatus);
 
-      // Update status via API
       const response = await fetch(`${apiUrl}/api/deliveries/${id}/status`, {
         method: 'PATCH',
         headers: {
@@ -96,19 +89,15 @@ export default function SchedulePage() {
 
       console.log('✅ Status updated successfully');
 
-      // Clear cache untuk force fresh data
       localStorage.removeItem('schedule_data_cache');
-
-      // Refetch data setelah berhasil update
       await refetch();
 
-      // Update selectedSchedule jika modal masih terbuka
       if (selectedSchedule && selectedSchedule.id === id) {
         setSelectedSchedule(prev => prev ? { ...prev, status: newStatus } : null);
       }
     } catch (error) {
       console.error('❌ Error updating delivery status:', error);
-      throw error; // Re-throw untuk handling di modal
+      throw error;
     }
   }, [refetch, selectedSchedule]);
 
@@ -161,10 +150,8 @@ export default function SchedulePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* sidebar */}
       <CateringSidebar />
 
-      {/* konten utama */}
       <main
         className="min-h-screen ml-72"
         style={{
@@ -173,20 +160,17 @@ export default function SchedulePage() {
         }}
       >
         <div className="max-w-5xl mx-auto px-6 py-6">
-          {/* header halaman */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
               Jadwal Pengiriman
             </h1>
 
-            {/* filter tabs */}
             <ScheduleFilterTabs
               activeFilter={activeFilter}
               onFilterChange={handleFilterChange}
             />
           </div>
 
-          {/* konten jadwal */}
           <AnimatePresence mode="wait">
             {isLoading ? (
               <motion.div
@@ -241,12 +225,10 @@ export default function SchedulePage() {
             )}
           </AnimatePresence>
 
-          {/* footer */}
           <CateringFooter />
         </div>
       </main>
 
-      {/* modal detail */}
       <ScheduleDetailModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -254,5 +236,20 @@ export default function SchedulePage() {
         onUpdateStatus={handleUpdateStatus}
       />
     </div>
+  );
+}
+
+export default function SchedulePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <SchedulePageContent />
+    </Suspense>
   );
 }
