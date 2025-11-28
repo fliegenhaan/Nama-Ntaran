@@ -82,8 +82,6 @@ export default function Home() {
     totalTercair: 0,
     pendingRelease: 0,
   });
-  const [isLoading, setIsLoading] = useState(true);
-  const [isReleasing, setIsReleasing] = useState<number | null>(null);
   const itemsPerPage = 6;
   const shouldReduceMotion = useReducedMotion();
 
@@ -114,7 +112,6 @@ export default function Home() {
     };
 
     const fetchEscrowData = async () => {
-      setIsLoading(true);
       try {
         const [escrowsResponse, statsResponse] = await Promise.all([
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/escrow`).then(res => res.json()),
@@ -134,14 +131,12 @@ export default function Home() {
           pendingRelease: 0,
         });
         setAllEscrows([]);
-      } finally {
-        setIsLoading(false);
       }
     };
 
-    fetchEscrowData();
     fetchChartData();
     fetchPrioritySchools();
+    fetchEscrowData();
   }, []);
 
   // variasi animasi untuk stagger effect
@@ -227,17 +222,6 @@ export default function Home() {
       minimumFractionDigits: 0,
     }).format(amount);
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 text-purple-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Memuat data escrow...</p>
-        </div>
-      </div>
-    );
-  }
 
 
   return (
