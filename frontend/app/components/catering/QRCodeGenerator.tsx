@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { QrCode, Download, CheckCircle } from 'lucide-react';
+import { QrCode, Download, CheckCircle, Upload, Loader2, AlertCircle } from 'lucide-react';
 import QRCodeLib from 'qrcode';
+import { uploadQRCode } from '@/lib/supabase-storage';
+import axios from 'axios';
 
 interface DeliveryQRData {
   deliveryId: number;
@@ -30,6 +32,10 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [generated, setGenerated] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploaded, setUploaded] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
   useEffect(() => {
     generateQRCode();
@@ -88,6 +94,43 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
     link.click();
   };
 
+  const uploadQRCodeToStorage = async () => {
+    if (!canvasRef.current) return;
+
+    try {
+      setUploading(true);
+      setUploadError(null);
+
+      // Upload to Supabase Storage
+      const { publicUrl, error: storageError } = await uploadQRCode(
+        canvasRef.current,
+        deliveryId
+      );
+
+      if (storageError || !publicUrl) {
+        throw storageError || new Error('Failed to upload QR code');
+      }
+
+      setQrCodeUrl(publicUrl);
+
+      // Save URL to backend (delivery record)
+      const token = localStorage.getItem('token');
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/deliveries/${deliveryId}`,
+        { qr_code_url: publicUrl },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setUploaded(true);
+      console.log('✅ QR code uploaded and saved:', publicUrl);
+    } catch (error: any) {
+      console.error('❌ QR upload failed:', error);
+      setUploadError(error.message || 'Gagal upload QR code');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="glass-subtle rounded-xl p-6">
       <div className="flex items-center gap-3 mb-4">
@@ -105,29 +148,82 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
         <canvas ref={canvasRef} className="rounded-lg" />
       </div>
 
-      {generated && (
+      {generated && !uploaded && (
         <div className="flex items-center gap-2 mb-4 p-3 bg-green-500/20 border border-green-500/30 rounded-lg">
           <CheckCircle className="w-4 h-4 text-green-400" />
           <p className="text-sm text-green-100">QR Code berhasil dibuat!</p>
         </div>
       )}
 
-      {/* Download Button */}
-      <button
-        onClick={downloadQRCode}
-        className="w-full gradient-bg-2 text-white px-4 py-3 rounded-xl font-semibold hover:shadow-glow transition-smooth flex items-center justify-center gap-2"
-      >
-        <Download className="w-4 h-4" />
-        Download QR Code
-      </button>
+      {uploaded && (
+        <div className="flex items-center gap-2 mb-4 p-3 bg-blue-500/20 border border-blue-500/30 rounded-lg">
+          <CheckCircle className="w-4 h-4 text-blue-400" />
+          <p className="text-sm text-blue-100">QR Code tersimpan di cloud!</p>
+        </div>
+      )}
+
+      {uploadError && (
+        <div className="flex items-center gap-2 mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+          <AlertCircle className="w-4 h-4 text-red-400" />
+          <p className="text-sm text-red-100">{uploadError}</p>
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <button
+          onClick={downloadQRCode}
+          disabled={!generated}
+          className="gradient-bg-2 text-white px-4 py-3 rounded-xl font-semibold hover:shadow-glow transition-smooth flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Download className="w-4 h-4" />
+          Download
+        </button>
+
+        <button
+          onClick={uploadQRCodeToStorage}
+          disabled={!generated || uploading || uploaded}
+          className="bg-purple-600 text-white px-4 py-3 rounded-xl font-semibold hover:bg-purple-700 hover:shadow-glow transition-smooth flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {uploading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Uploading...
+            </>
+          ) : uploaded ? (
+            <>
+              <CheckCircle className="w-4 h-4" />
+              Uploaded
+            </>
+          ) : (
+            <>
+              <Upload className="w-4 h-4" />
+              Save to Cloud
+            </>
+          )}
+        </button>
+      </div>
 
       {/* Info */}
-      <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-        <p className="text-xs text-blue-100">
-          <strong>Cara Pakai:</strong> Cetak dan tempel QR code ini di kotak makanan.
-          Sekolah akan scan QR ini saat verifikasi penerimaan.
+      <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+        <p className="text-xs text-blue-100 mb-2">
+          <strong>Cara Pakai:</strong>
         </p>
+        <ol className="text-xs text-blue-100 space-y-1 list-decimal list-inside">
+          <li>Klik "Save to Cloud" untuk menyimpan QR code</li>
+          <li>Download atau cetak QR code</li>
+          <li>Tempel QR code di kotak makanan</li>
+          <li>Sekolah akan scan QR saat verifikasi penerimaan</li>
+        </ol>
       </div>
+
+      {qrCodeUrl && (
+        <div className="mt-3 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+          <p className="text-xs text-green-100 break-all">
+            <strong>URL:</strong> {qrCodeUrl}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

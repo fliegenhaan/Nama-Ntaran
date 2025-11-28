@@ -39,6 +39,11 @@ export default function SchedulePage() {
   const handleCardClick = useCallback((schedule: ScheduleItem) => {
     setSelectedSchedule({
       ...schedule,
+      deliveryId: schedule.deliveryId,
+      schoolId: schedule.schoolId,
+      cateringId: schedule.cateringId,
+      deliveryDate: schedule.deliveryDate,
+      qrCodeUrl: schedule.qrCodeUrl,
       contactName: 'Kepala Sekolah',
       contactPhone: '081234567890',
       contactEmail: 'sekolah@email.com',

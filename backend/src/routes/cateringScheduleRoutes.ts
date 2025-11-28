@@ -72,6 +72,9 @@ router.get('/', async (req: AuthRequest, res: Response) => {
         delivery_date,
         portions,
         status,
+        school_id,
+        catering_id,
+        qr_code_url,
         schools!inner(name, address)
       `)
       .eq('catering_id', cateringId);
@@ -112,12 +115,17 @@ router.get('/', async (req: AuthRequest, res: Response) => {
     // Transform data to match frontend expectations
     const transformedSchedules = (schedules || []).map((schedule: any, index: number) => ({
       id: schedule.id.toString(),
+      deliveryId: schedule.id, // numeric ID for QR generation
+      schoolId: schedule.school_id,
+      cateringId: schedule.catering_id,
       schoolName: schedule.schools?.name || 'Unknown School',
       address: schedule.schools?.address || 'Alamat tidak tersedia',
       timeRange: '08:00 - 10:00', // Default time range, can be enhanced with actual time fields
       portions: schedule.portions || 0,
       status: mapScheduleStatus(schedule.status, schedule.delivery_date),
       date: schedule.delivery_date,
+      deliveryDate: schedule.delivery_date, // for QR generation
+      qrCodeUrl: schedule.qr_code_url || null,
       iconVariant: index % 2 === 0 ? 'primary' : 'secondary',
     }));
 

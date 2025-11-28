@@ -30,6 +30,7 @@ import cateringScheduleRoutes from './routes/cateringScheduleRoutes.js';
 import schedulerRoutes from './routes/schedulerRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import qrScansRoutes from './routes/qrScans.js';
 
 // Import scheduler service
 import schedulerService from './services/schedulerService.js';
@@ -81,6 +82,7 @@ app.use('/api/catering/history', cateringHistoryRoutes);
 app.use('/api/catering/menu', cateringMenuRoutes);
 app.use('/api/catering/issues', cateringIssuesRoutes);
 app.use('/api/scheduler', schedulerRoutes); // 🕐 Scheduler endpoints
+app.use('/api/qr-scans', qrScansRoutes); // 📱 QR Scan logging endpoints
 
 // Health check route
 app.get('/api/health', async (req, res) => {

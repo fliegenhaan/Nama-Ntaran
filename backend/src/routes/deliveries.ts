@@ -259,6 +259,59 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
   }
 });
 
+// PATCH /api/deliveries/:id - Update delivery (general)
+// Supports updating: qr_code_url, notes, portions, amount, etc.
+router.patch('/:id', async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  const allowedFields = ['qr_code_url', 'notes', 'portions', 'amount'];
+
+  // Filter only allowed fields from request body
+  const updateData: any = {};
+  for (const field of allowedFields) {
+    if (req.body[field] !== undefined) {
+      updateData[field] = req.body[field];
+    }
+  }
+
+  // Check if there's anything to update
+  if (Object.keys(updateData).length === 0) {
+    return res.status(400).json({
+      error: 'No valid fields to update',
+      allowed_fields: allowedFields
+    });
+  }
+
+  try {
+    // Add updated_at timestamp
+    updateData.updated_at = new Date().toISOString();
+
+    const { data: delivery, error } = await supabase
+      .from('deliveries')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error || !delivery) {
+      return res.status(404).json({ error: 'Delivery not found or update failed' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Delivery updated successfully',
+      delivery,
+      updated_fields: Object.keys(updateData).filter(k => k !== 'updated_at')
+    });
+  } catch (error) {
+    console.error('Update delivery error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update delivery',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 // PATCH /api/deliveries/:id/status - Update delivery status
 router.patch('/:id/status', async (req: AuthRequest, res: Response) => {
   const { id } = req.params;

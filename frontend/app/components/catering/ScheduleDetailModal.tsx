@@ -13,9 +13,15 @@ import {
   CheckCircle,
   Loader2,
 } from 'lucide-react';
+import QRCodeGenerator from './QRCodeGenerator';
 
 interface ScheduleDetail {
   id: string;
+  deliveryId?: number; // for QR generation
+  schoolId?: number;
+  cateringId?: number;
+  deliveryDate?: string;
+  qrCodeUrl?: string | null;
   schoolName: string;
   address: string;
   timeRange: string;
@@ -210,6 +216,19 @@ const ScheduleDetailModal: React.FC<ScheduleDetailModalProps> = ({
                   </div>
                 )}
               </div>
+
+              {/* QR Code Generator */}
+              {schedule.deliveryId && schedule.schoolId && schedule.cateringId && schedule.deliveryDate && (
+                <div className="mt-6">
+                  <QRCodeGenerator
+                    deliveryId={schedule.deliveryId}
+                    schoolId={schedule.schoolId}
+                    cateringId={schedule.cateringId}
+                    portions={schedule.portions}
+                    deliveryDate={schedule.deliveryDate}
+                  />
+                </div>
+              )}
             </div>
 
             {/* footer modal */}

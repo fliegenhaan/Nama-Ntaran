@@ -5,12 +5,17 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 // tipe data untuk jadwal pengiriman
 interface ScheduleItem {
   id: string;
+  deliveryId: number; // numeric ID for QR generation
+  schoolId: number;
+  cateringId: number;
   schoolName: string;
   address: string;
   timeRange: string;
   portions: number;
   status: 'in_progress' | 'scheduled' | 'delivered';
   date: string;
+  deliveryDate: string; // for QR generation
+  qrCodeUrl: string | null;
   iconVariant: 'primary' | 'secondary';
 }
 

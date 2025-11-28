@@ -42,6 +42,8 @@ export default function VerifyQRPage() {
   const [error, setError] = useState('');
   const [validating, setValidating] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
+  const [blockchainData, setBlockchainData] = useState<any>(null);
+  const [blockchainLoading, setBlockchainLoading] = useState(false);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -196,7 +198,7 @@ export default function VerifyQRPage() {
   };
 
   // callback saat QR berhasil di-scan
-  const onScanSuccess = (decodedText: string) => {
+  const onScanSuccess = async (decodedText: string) => {
     try {
       const data: DeliveryQRData = JSON.parse(decodedText);
 
@@ -206,13 +208,52 @@ export default function VerifyQRPage() {
 
       if (data.hash !== expectedHash) {
         setError('QR Code tidak valid atau telah dimodifikasi!');
+        // Log failed scan
+        await logQRScan(data, 'invalid', 'Hash mismatch - QR code may be tampered');
         return;
       }
 
       setScannedData(data);
+
+      // 🔗 FETCH BLOCKCHAIN DATA
+      setBlockchainLoading(true);
+      let fetchedBlockchainData = null;
+      let blockchainVerified = false;
+      let txHash = null;
+
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/blockchain/delivery/${data.deliveryId}`
+        );
+
+        if (response.data.success) {
+          fetchedBlockchainData = response.data.data;
+          setBlockchainData(fetchedBlockchainData);
+          blockchainVerified = true;
+          txHash = fetchedBlockchainData.txHash;
+        }
+      } catch (err) {
+        console.warn('Blockchain data not available:', err);
+        // Blockchain data tidak tersedia bukan error fatal
+      } finally {
+        setBlockchainLoading(false);
+      }
+
+      // Log successful scan
+      await logQRScan(
+        data,
+        'success',
+        undefined,
+        blockchainVerified,
+        txHash,
+        fetchedBlockchainData
+      );
+
       stopScanning();
     } catch (err) {
       setError('Format QR Code tidak valid');
+      // Log error scan
+      await logQRScan(null, 'error', 'Invalid QR code format');
     }
   };
 
@@ -225,6 +266,43 @@ export default function VerifyQRPage() {
       hash = hash & hash;
     }
     return Math.abs(hash).toString(36);
+  };
+
+  // Function untuk log QR scan
+  const logQRScan = async (
+    data: DeliveryQRData | null,
+    result: 'success' | 'invalid' | 'error',
+    errorMsg?: string,
+    blockchainVerified: boolean = false,
+    blockchainTxHash?: string,
+    blockchainData?: any
+  ) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/qr-scans`,
+        {
+          delivery_id: data?.deliveryId,
+          scan_method: showCamera ? 'camera' : 'upload',
+          scan_data: data,
+          scan_result: result,
+          error_message: errorMsg,
+          blockchain_verified: blockchainVerified,
+          blockchain_tx_hash: blockchainTxHash,
+          blockchain_data: blockchainData,
+          device_info: {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            screenWidth: window.screen.width,
+            screenHeight: window.screen.height
+          }
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (err) {
+      console.error('Failed to log QR scan:', err);
+      // Don't block the user flow if logging fails
+    }
   };
 
   // handle verifikasi pengiriman
@@ -434,6 +512,106 @@ export default function VerifyQRPage() {
                     </span>
                   </div>
                 </div>
+              </motion.div>
+            )}
+
+            {/* blockchain verification info */}
+            {scannedData && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1], delay: 0.1 }}
+                className="mt-4 p-6 bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-200 rounded-xl"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">Verifikasi Blockchain</h3>
+                    <p className="text-xs text-gray-600">Transparansi & Keamanan Transaksi</p>
+                  </div>
+                </div>
+
+                {blockchainLoading ? (
+                  <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
+                    <Loader2 className="w-5 h-5 text-purple-600 animate-spin" />
+                    <span className="text-sm text-gray-700">Memverifikasi data blockchain...</span>
+                  </div>
+                ) : blockchainData ? (
+                  <div className="space-y-3">
+                    <div className="p-4 bg-white/70 rounded-lg border border-purple-100">
+                      <div className="flex items-center gap-2 mb-3">
+                        <CheckCircle className="w-5 h-5 text-green-600" />
+                        <span className="text-sm font-semibold text-green-700">Terverifikasi di Blockchain</span>
+                      </div>
+
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between items-start py-2 border-b border-gray-100">
+                          <span className="text-gray-600">Status:</span>
+                          <span className={`font-semibold px-2 py-1 rounded text-xs ${
+                            blockchainData.status === 'released'
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-yellow-100 text-yellow-700'
+                          }`}>
+                            {blockchainData.status === 'released' ? 'Dana Dirilis' : 'Dana Terkunci'}
+                          </span>
+                        </div>
+
+                        {blockchainData.amount && (
+                          <div className="flex justify-between py-2 border-b border-gray-100">
+                            <span className="text-gray-600">Jumlah Dana:</span>
+                            <span className="font-semibold text-purple-700">
+                              Rp {parseFloat(blockchainData.amount).toLocaleString('id-ID')}
+                            </span>
+                          </div>
+                        )}
+
+                        {blockchainData.txHash && (
+                          <div className="flex justify-between items-start py-2 border-b border-gray-100">
+                            <span className="text-gray-600">TX Hash:</span>
+                            <span className="font-mono text-xs text-blue-600 break-all max-w-[200px]">
+                              {blockchainData.txHash.substring(0, 10)}...{blockchainData.txHash.substring(blockchainData.txHash.length - 8)}
+                            </span>
+                          </div>
+                        )}
+
+                        {blockchainData.blockNumber && (
+                          <div className="flex justify-between py-2 border-b border-gray-100">
+                            <span className="text-gray-600">Block Number:</span>
+                            <span className="font-semibold text-gray-900">#{blockchainData.blockNumber}</span>
+                          </div>
+                        )}
+
+                        {blockchainData.catering?.name && (
+                          <div className="flex justify-between py-2">
+                            <span className="text-gray-600">Catering:</span>
+                            <span className="font-semibold text-gray-900">{blockchainData.catering.name}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <AlertCircle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-blue-800">
+                        Data ini telah dicatat di blockchain dan tidak dapat diubah. Ini menjamin transparansi dan akuntabilitas penuh.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-yellow-800 mb-1">Data Blockchain Tidak Tersedia</p>
+                      <p className="text-xs text-yellow-700">
+                        Transaksi blockchain belum tercatat atau masih dalam proses. Anda tetap dapat melanjutkan verifikasi.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
           </motion.div>

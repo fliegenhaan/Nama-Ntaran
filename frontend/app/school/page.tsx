@@ -101,6 +101,7 @@ export default function SchoolDashboard() {
     { label: 'Dashboard', path: '/school', icon: LayoutDashboard },
     { label: 'Verifikasi Pengiriman', path: '/school/verify', icon: CheckCircle, badge: pendingVerifications },
     { label: 'Verifikasi QR', path: '/school/verify-qr', icon: QrCode },
+    { label: 'Riwayat QR Scan', path: '/school/qr-history', icon: History },
     { label: 'Riwayat Verifikasi', path: '/school/history', icon: History },
     { label: 'Masalah', path: '/school/issues', icon: AlertTriangle, badge: issuesReported },
     { label: 'Laporan Masalah Baru', path: '/school/issues/new', icon: AlertCircle },

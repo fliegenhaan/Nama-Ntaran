@@ -157,6 +157,7 @@ export default function HistoryPage() {
     { label: 'Dashboard', path: '/school', icon: LayoutDashboard },
     { label: 'Verifikasi Pengiriman', path: '/school/verify', icon: CheckCircle },
     { label: 'Verifikasi QR', path: '/school/verify-qr', icon: QrCode },
+    { label: 'Riwayat QR Scan', path: '/school/qr-history', icon: History },
     { label: 'Riwayat Verifikasi', path: '/school/history', icon: History },
     { label: 'Masalah', path: '/school/issues', icon: AlertTriangle },
     { label: 'Laporkan Masalah Baru', path: '/school/issues/new', icon: AlertCircle },

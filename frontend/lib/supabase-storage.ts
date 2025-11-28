@@ -172,3 +172,81 @@ export async function listFiles(folder: string = '') {
     return { files: [], error };
   }
 }
+
+/**
+ * Upload QR code image to Supabase Storage
+ *
+ * @param canvas - HTML Canvas element containing the QR code
+ * @param deliveryId - Delivery ID for filename
+ * @returns Object with publicUrl or error
+ */
+export async function uploadQRCode(
+  canvas: HTMLCanvasElement,
+  deliveryId: number
+): Promise<{ publicUrl: string | null; error: Error | null }> {
+  try {
+    console.log('[Storage] Uploading QR code for delivery:', deliveryId);
+
+    // Convert canvas to blob
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error('Failed to convert canvas to blob'));
+        }
+      }, 'image/png');
+    });
+
+    // Create filename
+    const fileName = `delivery-${deliveryId}-qr.png`;
+    const filePath = `qr-codes/${fileName}`;
+
+    console.log('[Storage] Uploading to path:', filePath);
+
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from(SUPABASE_BUCKET)
+      .upload(filePath, blob, {
+        contentType: 'image/png',
+        upsert: true, // Replace if exists
+      });
+
+    if (error) {
+      console.error('[Storage] QR upload error:', error);
+      return {
+        publicUrl: null,
+        error: new Error(`Upload QR code gagal: ${error.message}`),
+      };
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from(SUPABASE_BUCKET)
+      .getPublicUrl(filePath);
+
+    console.log('[Storage] QR code uploaded successfully:', urlData.publicUrl);
+
+    return {
+      publicUrl: urlData.publicUrl,
+      error: null,
+    };
+  } catch (error: any) {
+    console.error('[Storage] QR upload exception:', error);
+    return {
+      publicUrl: null,
+      error: error instanceof Error ? error : new Error(String(error)),
+    };
+  }
+}
+
+/**
+ * Delete QR code from storage
+ *
+ * @param deliveryId - Delivery ID
+ * @returns Error if failed, null if successful
+ */
+export async function deleteQRCode(deliveryId: number): Promise<Error | null> {
+  const filePath = `qr-codes/delivery-${deliveryId}-qr.png`;
+  return deleteImage(filePath);
+}
