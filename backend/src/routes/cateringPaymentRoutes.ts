@@ -65,14 +65,24 @@ router.get('/dashboard', async (req: AuthRequest, res: Response) => {
     // ============================================
     // 1. Get Fund Status
     // ============================================
-    const { data: payments, error: paymentsError } = await supabase
-      .from('payments')
-      .select('amount, status')
-      .eq('catering_id', cateringId);
+    // Get data from both payments and escrow_transactions tables
+    const [paymentsResponse, escrowResponse] = await Promise.all([
+      supabase
+        .from('payments')
+        .select('amount, status')
+        .eq('catering_id', cateringId),
+      supabase
+        .from('escrow_transactions')
+        .select('amount, status, escrow_status, transaction_type')
+        .eq('catering_id', cateringId)
+    ]);
 
-    if (paymentsError) {
-      throw paymentsError;
+    if (paymentsResponse.error) {
+      throw paymentsResponse.error;
     }
+
+    const payments = paymentsResponse.data;
+    const escrows = escrowResponse.data || [];
 
     // Calculate fund status aggregations
     const fundStatus = {
@@ -82,6 +92,7 @@ router.get('/dashboard', async (req: AuthRequest, res: Response) => {
       total_funds: 0,
     };
 
+    // Process payments table data
     payments?.forEach((p) => {
       const amount = parseFloat(p.amount) || 0;
       fundStatus.total_funds += amount;
@@ -92,6 +103,33 @@ router.get('/dashboard', async (req: AuthRequest, res: Response) => {
         fundStatus.pending_verification += amount;
       } else if (p.status === 'RELEASED' || p.status === 'COMPLETED') {
         fundStatus.released_funds += amount;
+      }
+    });
+
+    // Process escrow_transactions table data (delivery-based escrows)
+    escrows?.forEach((e: any) => {
+      const amount = parseFloat(e.amount) || 0;
+      fundStatus.total_funds += amount;
+
+      // For delivery-based escrows (have escrow_status)
+      if (e.escrow_status) {
+        if (e.escrow_status === 'locked') {
+          fundStatus.locked_funds += amount;
+        } else if (e.escrow_status === 'released') {
+          fundStatus.released_funds += amount;
+        } else {
+          fundStatus.pending_verification += amount;
+        }
+      }
+      // For allocation-based escrows (have transaction_type)
+      else {
+        if (e.transaction_type === 'LOCK' && e.status === 'CONFIRMED') {
+          fundStatus.locked_funds += amount;
+        } else if (e.transaction_type === 'RELEASE' && e.status === 'CONFIRMED') {
+          fundStatus.released_funds += amount;
+        } else {
+          fundStatus.pending_verification += amount;
+        }
       }
     });
 
@@ -159,19 +197,30 @@ router.get('/dashboard', async (req: AuthRequest, res: Response) => {
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-    const { data: cashFlowPayments, error: cashFlowError } = await supabase
-      .from('payments')
-      .select('created_at, amount, status')
-      .eq('catering_id', cateringId)
-      .gte('created_at', sixMonthsAgo.toISOString());
+    const [cashFlowPaymentsResponse, cashFlowEscrowResponse] = await Promise.all([
+      supabase
+        .from('payments')
+        .select('created_at, amount, status')
+        .eq('catering_id', cateringId)
+        .gte('created_at', sixMonthsAgo.toISOString()),
+      supabase
+        .from('escrow_transactions')
+        .select('created_at, amount, status, escrow_status, transaction_type, released_at')
+        .eq('catering_id', cateringId)
+        .gte('created_at', sixMonthsAgo.toISOString())
+    ]);
 
-    if (cashFlowError) {
-      throw cashFlowError;
+    if (cashFlowPaymentsResponse.error) {
+      throw cashFlowPaymentsResponse.error;
     }
+
+    const cashFlowPayments = cashFlowPaymentsResponse.data;
+    const cashFlowEscrows = cashFlowEscrowResponse.data || [];
 
     // Group by month and calculate income
     const monthlyData = new Map<string, { month: string; monthNum: number; income: number }>();
 
+    // Process payments
     cashFlowPayments?.forEach((p) => {
       const date = new Date(p.created_at);
       const monthName = date.toLocaleString('en-US', { month: 'short' });
@@ -185,6 +234,27 @@ router.get('/dashboard', async (req: AuthRequest, res: Response) => {
       const existing = monthlyData.get(key)!;
       if (p.status === 'RELEASED' || p.status === 'COMPLETED') {
         existing.income += parseFloat(p.amount) || 0;
+      }
+    });
+
+    // Process escrow transactions (count as income when released)
+    cashFlowEscrows?.forEach((e: any) => {
+      // Use released_at if available, otherwise created_at
+      const dateToUse = e.released_at || e.created_at;
+      const date = new Date(dateToUse);
+      const monthName = date.toLocaleString('en-US', { month: 'short' });
+      const monthNum = date.getMonth() + 1;
+      const key = `${monthNum}-${monthName}`;
+
+      if (!monthlyData.has(key)) {
+        monthlyData.set(key, { month: monthName, monthNum, income: 0 });
+      }
+
+      const existing = monthlyData.get(key)!;
+
+      // Only count released escrows as income
+      if (e.escrow_status === 'released' || (e.transaction_type === 'RELEASE' && e.status === 'CONFIRMED')) {
+        existing.income += parseFloat(e.amount) || 0;
       }
     });
 

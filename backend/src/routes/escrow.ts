@@ -213,17 +213,25 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
       return res.status(403).json({ error: 'Only admin can view all escrows' });
     }
 
-    // Get all escrow transactions from database with allocations join
+    // Get all escrow transactions from database
+    // Support both allocation-based and delivery-based escrows
     const { data: escrows, error } = await supabase
       .from('escrow_transactions')
       .select(`
         *,
-        allocations!inner(
+        allocations(
           id,
           school_id,
           catering_id,
-          schools!inner(name),
-          caterings!inner(name)
+          schools(name),
+          caterings(name)
+        ),
+        deliveries(
+          id,
+          school_id,
+          catering_id,
+          schools(name),
+          caterings(name)
         )
       `)
       .order('created_at', { ascending: false });
@@ -233,43 +241,67 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
       return res.status(500).json({ error: 'Failed to fetch escrow transactions' });
     }
 
-    // Check which allocations have been released
-    const allocationIds = [...new Set(escrows.map((e: any) => e.allocation_id))];
-    const releasedAllocations = new Set(
-      escrows
-        .filter((e: any) => e.transaction_type === 'RELEASE' && e.status === 'CONFIRMED')
-        .map((e: any) => e.allocation_id)
-    );
-
     // Format the data for frontend
+    // Support both allocation-based and delivery-based escrows
     const formattedEscrows = escrows.map((escrow: any) => {
-      const isReleased = releasedAllocations.has(escrow.allocation_id);
+      // Determine if this is allocation-based or delivery-based
+      const isAllocationBased = !!escrow.allocation_id;
+      const isDeliveryBased = !!escrow.delivery_id;
 
+      // Get school and catering info from the appropriate relation
+      let schoolName = 'Unknown School';
+      let cateringName = 'Unknown Catering';
+
+      if (isAllocationBased && escrow.allocations) {
+        schoolName = escrow.allocations.schools?.name || 'Unknown School';
+        cateringName = escrow.allocations.caterings?.name || 'Unknown Catering';
+      } else if (isDeliveryBased && escrow.deliveries) {
+        schoolName = escrow.deliveries.schools?.name || 'Unknown School';
+        cateringName = escrow.deliveries.caterings?.name || 'Unknown Catering';
+      }
+
+      // Determine status based on escrow_status column (for delivery-based)
+      // or transaction_type (for allocation-based)
       let status: string;
-      if (escrow.transaction_type === 'LOCK' && escrow.status === 'CONFIRMED' && !isReleased) {
-        status = 'Menunggu Rilis'; // LOCK that's confirmed but not released yet
-      } else if (escrow.transaction_type === 'LOCK' && escrow.status === 'CONFIRMED' && isReleased) {
-        status = 'Terkunci'; // LOCK that has been released (historical record)
-      } else if (escrow.transaction_type === 'RELEASE' && escrow.status === 'CONFIRMED') {
-        status = 'Tercairkan'; // RELEASE transaction
-      } else if (escrow.status === 'FAILED') {
-        status = 'Gagal'; // Failed transaction
-      } else if (escrow.status === 'PENDING') {
-        status = 'Tertunda'; // Pending confirmation
+
+      if (escrow.escrow_status) {
+        // Delivery-based escrow uses escrow_status
+        if (escrow.escrow_status === 'locked') {
+          status = 'Terkunci';
+        } else if (escrow.escrow_status === 'released') {
+          status = 'Tercairkan';
+        } else if (escrow.escrow_status === 'disputed') {
+          status = 'Sengketa';
+        } else if (escrow.escrow_status === 'cancelled') {
+          status = 'Dibatalkan';
+        } else {
+          status = 'Tertunda';
+        }
       } else {
-        status = 'Tertunda'; // Default fallback
+        // Allocation-based escrow uses transaction_type
+        if (escrow.transaction_type === 'LOCK' && escrow.status === 'CONFIRMED') {
+          status = 'Terkunci';
+        } else if (escrow.transaction_type === 'RELEASE' && escrow.status === 'CONFIRMED') {
+          status = 'Tercairkan';
+        } else if (escrow.status === 'FAILED') {
+          status = 'Gagal';
+        } else if (escrow.status === 'PENDING') {
+          status = 'Tertunda';
+        } else {
+          status = 'Tertunda';
+        }
       }
 
       return {
         id: escrow.id,
-        school: escrow.allocations?.schools?.name || 'Unknown School',
-        catering: escrow.allocations?.caterings?.name || 'Unknown Catering',
+        school: schoolName,
+        catering: cateringName,
         amount: escrow.amount,
         status,
-        lockedAt: escrow.executed_at || escrow.created_at,
-        releaseDate: escrow.confirmed_at || escrow.executed_at || escrow.created_at,
-        releasedAt: escrow.transaction_type === 'RELEASE' ? escrow.confirmed_at : null,
-        txHash: escrow.blockchain_tx_hash || '0x0000000000000000000000000000000000000000'
+        lockedAt: escrow.locked_at || escrow.executed_at || escrow.created_at,
+        releaseDate: escrow.released_at || escrow.confirmed_at || escrow.executed_at || escrow.created_at,
+        releasedAt: escrow.released_at || (escrow.transaction_type === 'RELEASE' ? escrow.confirmed_at : null),
+        txHash: escrow.tx_hash || escrow.blockchain_tx_hash || '0x0000000000000000000000000000000000000000'
       };
     });
 
@@ -295,9 +327,10 @@ router.get('/stats', authenticateToken, async (req: Request, res: Response) => {
     }
 
     // Get statistics from database
+    // Support both allocation-based and delivery-based escrows
     const { data: escrows, error } = await supabase
       .from('escrow_transactions')
-      .select('amount, status, transaction_type');
+      .select('amount, status, transaction_type, escrow_status');
 
     if (error) {
       console.error('Error fetching escrow stats:', error);
@@ -314,17 +347,31 @@ router.get('/stats', authenticateToken, async (req: Request, res: Response) => {
     escrows.forEach((escrow: any) => {
       const amount = parseFloat(escrow.amount);
 
-      // Locked funds: LOCK transaction that is CONFIRMED
-      if (escrow.transaction_type === 'LOCK' && escrow.status === 'CONFIRMED') {
-        stats.totalTerkunci += amount;
+      // For delivery-based escrows (have escrow_status)
+      if (escrow.escrow_status) {
+        if (escrow.escrow_status === 'locked') {
+          stats.totalTerkunci += amount;
+        } else if (escrow.escrow_status === 'released') {
+          stats.totalTercair += amount;
+        } else {
+          // disputed, cancelled, etc
+          stats.pendingRelease += amount;
+        }
       }
-      // Released funds: RELEASE transaction that is CONFIRMED
-      else if (escrow.transaction_type === 'RELEASE' && escrow.status === 'CONFIRMED') {
-        stats.totalTercair += amount;
-      }
-      // Pending: PENDING status or FAILED
-      else if (escrow.status === 'PENDING' || escrow.status === 'FAILED') {
-        stats.pendingRelease += amount;
+      // For allocation-based escrows (have transaction_type)
+      else {
+        // Locked funds: LOCK transaction that is CONFIRMED
+        if (escrow.transaction_type === 'LOCK' && escrow.status === 'CONFIRMED') {
+          stats.totalTerkunci += amount;
+        }
+        // Released funds: RELEASE transaction that is CONFIRMED
+        else if (escrow.transaction_type === 'RELEASE' && escrow.status === 'CONFIRMED') {
+          stats.totalTercair += amount;
+        }
+        // Pending: PENDING status or FAILED
+        else if (escrow.status === 'PENDING' || escrow.status === 'FAILED') {
+          stats.pendingRelease += amount;
+        }
       }
     });
 
