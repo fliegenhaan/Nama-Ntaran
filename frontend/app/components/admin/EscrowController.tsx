@@ -207,7 +207,7 @@ const EscrowController: React.FC<EscrowControllerProps> = ({
                     <code className="text-xs font-mono text-gray-700">{tx.txHash}</code>
                   </div>
                   <a
-                    href={`https://etherscan.io/tx/${tx.txHash}`}
+                    href={`hhttps://sepolia.etherscan.io/tx/${tx.txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"

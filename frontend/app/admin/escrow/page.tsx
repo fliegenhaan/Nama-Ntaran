@@ -331,7 +331,7 @@ export default function EscrowPage() {
                     </td>
                     <td className="p-4">
                       <a
-                        href={`https://etherscan.io/tx/${escrow.txHash}`}
+                        href={`https://sepolia.etherscan.io/tx/${escrow.txHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-purple-600 hover:text-purple-700 text-xs font-mono flex items-center gap-1 transition-smooth"
