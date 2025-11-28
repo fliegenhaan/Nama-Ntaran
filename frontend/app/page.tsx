@@ -14,7 +14,6 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import api from '@/lib/api';
 import { AlertCircle, CheckCircle, ChevronRight, Clock, ExternalLink, Loader2, Lock, MoreHorizontal, Search, Shield } from 'lucide-react';
 
 interface ChartDataItem {
@@ -92,7 +91,7 @@ export default function Home() {
   useEffect(() => {
     const fetchChartData = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/public/allocation-chart`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/public/allocation-chart`);
         const data = await response.json();
         setChartData(data.chartData || []);
       } catch (error) {
@@ -104,7 +103,7 @@ export default function Home() {
 
     const fetchPrioritySchools = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/public/priority-schools?limit=6`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/public/priority-schools?limit=6`);
         const data = await response.json();
         setPrioritySchools(data.prioritySchools || []);
       } catch (error) {
@@ -118,8 +117,8 @@ export default function Home() {
       setIsLoading(true);
       try {
         const [escrowsResponse, statsResponse] = await Promise.all([
-          api.get('/api/escrow'),
-          api.get('/api/escrow/stats'),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/escrow`).then(res => res.json()),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/escrow/stats`).then(res => res.json()),
         ]);
         setStats(statsResponse.stats || {
         totalTerkunci: 0,
@@ -129,7 +128,12 @@ export default function Home() {
         setAllEscrows(escrowsResponse.escrows || []);
       } catch (error: any) {
         console.error('Error fetching escrow data:', error);
-        alert(error.response?.data?.error || 'Gagal memuat data escrow');
+        setStats({
+          totalTerkunci: 0,
+          totalTercair: 0,
+          pendingRelease: 0,
+        });
+        setAllEscrows([]);
       } finally {
         setIsLoading(false);
       }
@@ -560,6 +564,27 @@ export default function Home() {
                 </div>
               )}
             </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            variants={containerEscrowVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-6"
+          >
+            <motion.div variants={itemEscrowVariants} className="text-center mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Transparansi Escrow Blockchain
+              </h2>
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                Pantau semua transaksi escrow yang dikelola melalui smart contract untuk transparansi dan keamanan maksimal
+              </p>
+            </motion.div>
+
             <motion.div variants={itemEscrowVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Total Terkunci */}
           <div className="bg-white rounded-xl p-6 border border-gray-200 stat-card-hover card-optimized">
@@ -653,7 +678,6 @@ export default function Home() {
                   <th className="text-left p-4 font-semibold text-gray-700 text-sm">Status</th>
                   <th className="text-left p-4 font-semibold text-gray-700 text-sm">Tanggal Terkunci</th>
                   <th className="text-left p-4 font-semibold text-gray-700 text-sm">TX Hash</th>
-                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">Aksi</th>
                 </tr>
               </thead>
               <tbody>
