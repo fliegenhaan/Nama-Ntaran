@@ -65,9 +65,11 @@ export async function releaseEscrowForDelivery(deliveryId: number) {
     console.log('   Amount:', escrow.amount, 'IDR');
     console.log('   Payee (Catering Wallet):', escrow.caterings.wallet_address);
 
-    // Call releaseFund on smart contract
+    // Call releaseFund on smart contract with gas configuration
     console.log('\n📤 Sending release transaction to blockchain...');
-    const tx = await escrowContract.releaseFund(escrowId);
+    const tx = await escrowContract.releaseFund(escrowId, {
+      gasLimit: 200000 // Set reasonable gas limit for release transactions
+    });
     console.log('✅ Transaction sent!');
     console.log('   Transaction Hash:', tx.hash);
     console.log('   Waiting for confirmation...');
@@ -156,6 +158,8 @@ export async function lockEscrowForDelivery(
   console.log('\n🔐 ====== LOCK ESCROW FUNCTION START ======');
   console.log('Input params:', { deliveryId, cateringId, schoolId, amount });
 
+  let escrowRecordId: number | null = null; // Track for rollback
+
   try {
     // Check blockchain configuration
     console.log('\n📡 Checking blockchain configuration...');
@@ -199,6 +203,26 @@ export async function lockEscrowForDelivery(
     const { wallet_address: payee } = catering;
     const { npsn } = school;
 
+    // Check for duplicate escrow
+    console.log('\n🔍 Checking for duplicate escrow...');
+    const { data: existingEscrow, error: duplicateCheckError } = await supabase
+      .from('escrow_transactions')
+      .select('id, escrow_status')
+      .eq('delivery_id', deliveryId)
+      .eq('escrow_status', 'locked')
+      .maybeSingle();
+
+    if (duplicateCheckError) {
+      console.error('❌ Error checking for duplicate escrow:', duplicateCheckError);
+      throw new Error('Failed to check for duplicate escrow');
+    }
+
+    if (existingEscrow) {
+      console.error('❌ Duplicate escrow found! Escrow already exists for this delivery');
+      throw new Error(`Escrow already exists for delivery ${deliveryId} (escrow_id: ${existingEscrow.id})`);
+    }
+    console.log('✅ No duplicate escrow found');
+
     // Create escrow transaction record first
     console.log('\n💾 Creating escrow transaction record in database...');
     const escrowData = {
@@ -226,19 +250,23 @@ export async function lockEscrowForDelivery(
     }
     console.log('✅ Escrow record created:', { escrow_id: escrowRecord.id });
 
-    const escrowRecordId = escrowRecord.id;
+    escrowRecordId = escrowRecord.id;
 
     // Generate unique escrow ID
     console.log('\n🔑 Generating unique escrow ID...');
     const escrowId = ethers.utils.id(`delivery-${deliveryId}-${escrowRecordId}`);
     console.log('   Escrow ID (hash):', escrowId);
 
-    // Convert amount to wei (for demo, 1 IDR = 1 wei, adjust as needed)
-    const amountInWei = ethers.utils.parseEther((amount / 1000000).toString()); // Convert to smaller unit
+    // Convert amount to wei with precision
+    // Using fixed conversion: 1 IDR = 10^12 wei (to avoid floating point precision loss)
+    const IDR_TO_WEI_MULTIPLIER = ethers.BigNumber.from(10).pow(12);
+    const amountInWei = ethers.BigNumber.from(Math.floor(amount)).mul(IDR_TO_WEI_MULTIPLIER);
+
     console.log('\n💰 Amount conversion:');
     console.log('   Original amount:', amount, 'IDR');
-    console.log('   Divided by 1M:', amount / 1000000);
-    console.log('   In Wei:', amountInWei.toString());
+    console.log('   Conversion rate: 1 IDR = 10^12 wei');
+    console.log('   Amount in Wei:', amountInWei.toString());
+    console.log('   Verification: Wei / 10^12 =', amountInWei.div(IDR_TO_WEI_MULTIPLIER).toString(), 'IDR');
 
     console.log('\n🔒 ====== BLOCKCHAIN TRANSACTION ======');
     console.log('   Escrow ID:', escrowId);
@@ -246,10 +274,11 @@ export async function lockEscrowForDelivery(
     console.log('   School NPSN:', npsn);
     console.log('   Amount in Wei:', amountInWei.toString());
 
-    // Call lockFund on smart contract
+    // Call lockFund on smart contract with gas configuration
     console.log('\n📤 Sending transaction to blockchain...');
     const tx = await escrowContract.lockFund(escrowId, payee, npsn, {
-      value: amountInWei
+      value: amountInWei,
+      gasLimit: 300000 // Set reasonable gas limit to prevent out-of-gas errors
     });
     console.log('✅ Transaction sent!');
     console.log('   Transaction Hash:', tx.hash);
@@ -297,6 +326,25 @@ export async function lockEscrowForDelivery(
   } catch (error) {
     console.log('\n❌ ====== LOCK ESCROW FAILED ======');
     console.error('Error details:', error);
+
+    // Rollback: Delete escrow record if blockchain transaction failed
+    if (escrowRecordId) {
+      console.log('\n⏪ Rolling back database changes...');
+      console.log(`   Deleting escrow record ${escrowRecordId}...`);
+
+      const { error: deleteError } = await supabase
+        .from('escrow_transactions')
+        .delete()
+        .eq('id', escrowRecordId);
+
+      if (deleteError) {
+        console.error('❌ Failed to rollback escrow record:', deleteError);
+        console.error('⚠️  WARNING: Database may be out of sync! Manual cleanup required.');
+      } else {
+        console.log('✅ Escrow record rolled back successfully');
+      }
+    }
+
     console.log('====================================\n');
     throw error;
   }
