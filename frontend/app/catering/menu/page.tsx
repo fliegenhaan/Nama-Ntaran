@@ -130,7 +130,7 @@ export default function MenuPage() {
       {/* main content */}
       <main className="min-h-screen ml-72" style={{ transform: 'translateZ(0)' }}>
         <motion.div
-          variants={pageVariants}
+          variants={pageVariants as any}
           initial="hidden"
           animate="visible"
           className="max-w-6xl mx-auto px-6 py-8"
@@ -198,14 +198,7 @@ export default function MenuPage() {
         </motion.div>
 
         {/* footer */}
-        <CateringFooter
-          supportUrl="mailto:support@namantaran.id"
-          socialLinks={{
-            instagram: 'https://instagram.com/namantaran',
-            twitter: 'https://twitter.com/namantaran',
-            linkedin: 'https://linkedin.com/company/namantaran',
-          }}
-        />
+        <CateringFooter/>
       </main>
 
       {/* delete confirmation modal */}

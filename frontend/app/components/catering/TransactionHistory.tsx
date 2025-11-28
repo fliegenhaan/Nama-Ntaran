@@ -222,7 +222,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   return (
     <motion.div
       ref={ref}
-      variants={containerVariants}
+      variants={containerVariants as any}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
       className="mb-8"

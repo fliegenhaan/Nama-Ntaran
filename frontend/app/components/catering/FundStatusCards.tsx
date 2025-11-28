@@ -123,7 +123,7 @@ const FundStatusCards: React.FC<FundStatusCardsProps> = ({ data }) => {
         return (
           <motion.div
             key={card.id}
-            variants={cardVariants}
+            variants={cardVariants as any}
             className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 relative overflow-hidden"
           >
             {/* icon di pojok kanan */}

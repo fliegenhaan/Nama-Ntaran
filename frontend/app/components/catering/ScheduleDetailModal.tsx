@@ -136,7 +136,7 @@ const ScheduleDetailModal: React.FC<ScheduleDetailModalProps> = ({
           onClick={onClose}
         >
           <motion.div
-            variants={modalVariants}
+            variants={modalVariants as any}
             initial="hidden"
             animate="visible"
             exit="exit"

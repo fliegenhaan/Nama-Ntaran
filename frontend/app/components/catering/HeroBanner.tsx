@@ -51,7 +51,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
   return (
     <motion.div
       ref={ref}
-      variants={containerVariants}
+      variants={containerVariants as any}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
       className="relative w-full h-64 rounded-2xl overflow-hidden mb-6"
@@ -75,7 +75,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
 
       {/* konten text */}
       <motion.div
-        variants={textVariants}
+        variants={textVariants as any}
         className="absolute inset-0 flex flex-col justify-center px-8"
       >
         <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-lg">

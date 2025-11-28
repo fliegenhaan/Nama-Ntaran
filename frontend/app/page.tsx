@@ -392,7 +392,7 @@ export default function Home() {
                       {prioritySchools.map((school, index) => (
                         <motion.tr
                           key={index}
-                          variants={itemVariants}
+                          variants={itemVariants as any}
                           className="hover:bg-gray-50 transition-colors"
                           whileHover={{ scale: 1.01 }}
                           transition={{ type: 'spring', stiffness: 300 }}

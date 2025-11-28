@@ -112,7 +112,7 @@ const UpcomingDeliveries: React.FC<UpcomingDeliveriesProps> = ({
   return (
     <motion.div
       ref={ref}
-      variants={containerVariants}
+      variants={containerVariants as any}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
       className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden"
@@ -185,7 +185,7 @@ const UpcomingDeliveries: React.FC<UpcomingDeliveriesProps> = ({
           filteredDeliveries.map((delivery) => (
             <motion.div
               key={delivery.id}
-              variants={itemVariants}
+              variants={itemVariants as any}
               className="px-5 py-4 hover:bg-gray-50 transition-colors duration-200"
             >
               <div className="flex items-center justify-between">

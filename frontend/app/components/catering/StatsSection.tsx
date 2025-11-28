@@ -94,7 +94,7 @@ const StatsSection: React.FC<StatsSectionProps> = ({
   return (
     <motion.div
       ref={ref}
-      variants={containerVariants}
+      variants={containerVariants as any}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
       className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
@@ -105,7 +105,7 @@ const StatsSection: React.FC<StatsSectionProps> = ({
     >
       {/* card dana terkunci */}
       <motion.div
-        variants={itemVariants}
+        variants={itemVariants as any}
         className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300"
       >
         <div className="flex items-center gap-3 mb-3">
@@ -125,7 +125,7 @@ const StatsSection: React.FC<StatsSectionProps> = ({
 
       {/* card distribusi hari ini */}
       <motion.div
-        variants={itemVariants}
+        variants={itemVariants as any}
         className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300"
       >
         <div className="flex items-center gap-3 mb-3">
@@ -151,7 +151,7 @@ const StatsSection: React.FC<StatsSectionProps> = ({
 
       {/* kalender mini */}
       <motion.div
-        variants={itemVariants}
+        variants={itemVariants as any}
         className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300"
       >
         <div className="flex items-center justify-between mb-3">

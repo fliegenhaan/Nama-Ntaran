@@ -85,7 +85,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ actions }) => {
   return (
     <motion.div
       ref={ref}
-      variants={containerVariants}
+      variants={containerVariants as any}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
       className="mb-6"
@@ -103,7 +103,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ actions }) => {
           return (
             <motion.button
               key={action.id}
-              variants={itemVariants}
+              variants={itemVariants as any}
               onClick={() => handleClick(action)}
               className={`
                 inline-flex items-center gap-2 px-4 py-2.5

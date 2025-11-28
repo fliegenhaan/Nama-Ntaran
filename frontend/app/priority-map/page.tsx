@@ -14,7 +14,6 @@ import {
   ChevronDown,
   Loader2
 } from 'lucide-react';
-import 'leaflet/dist/leaflet.css';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -346,7 +345,7 @@ export default function PriorityMapPage() {
         animate={heroInView ? "visible" : "hidden"}
         variants={containerVariants}
       >
-        <motion.div variants={itemVariants}>
+        <motion.div variants={itemVariants as any}>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Peta Prioritas Sekolah
           </h1>

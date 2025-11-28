@@ -44,10 +44,6 @@ export default function SchedulePage() {
       cateringId: schedule.cateringId,
       deliveryDate: schedule.deliveryDate,
       qrCodeUrl: schedule.qrCodeUrl,
-      contactName: 'Kepala Sekolah',
-      contactPhone: '081234567890',
-      contactEmail: 'sekolah@email.com',
-      notes: 'Mohon pastikan makanan diantar tepat waktu.',
     });
     setIsModalOpen(true);
   }, []);

@@ -97,7 +97,7 @@ const IssueListCard: React.FC<IssueListCardProps> = ({ issues = [] }) => {
   return (
     <motion.div
       ref={ref}
-      variants={containerVariants}
+      variants={containerVariants as any}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
       className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300"
@@ -127,7 +127,7 @@ const IssueListCard: React.FC<IssueListCardProps> = ({ issues = [] }) => {
           issues.map((issue, index) => (
             <motion.div
               key={issue.id}
-              variants={itemVariants}
+              variants={itemVariants as any}
               className="flex items-start gap-3 p-4 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-all duration-200 cursor-pointer"
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}

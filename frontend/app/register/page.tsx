@@ -143,7 +143,7 @@ export default function RegisterPage() {
           variants={containerVariants}
         >
           {/* logo dan heading */}
-          <motion.div className="mb-8" variants={itemVariants}>
+          <motion.div className="mb-8" variants={itemVariants as any}>
             <div className="flex items-center gap-3 mb-8">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-xl">M</span>
@@ -179,7 +179,7 @@ export default function RegisterPage() {
             )}
 
             {/* nama lengkap */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <label
                 htmlFor="namaLengkap"
                 className="block text-sm font-medium text-gray-700 mb-2"
@@ -218,7 +218,7 @@ export default function RegisterPage() {
             </motion.div>
 
             {/* email */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-2"
@@ -257,7 +257,7 @@ export default function RegisterPage() {
             </motion.div>
 
             {/* kata sandi */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <label
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700 mb-2"
@@ -296,7 +296,7 @@ export default function RegisterPage() {
             </motion.div>
 
             {/* konfirmasi kata sandi */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <label
                 htmlFor="confirmPassword"
                 className="block text-sm font-medium text-gray-700 mb-2"
@@ -338,7 +338,7 @@ export default function RegisterPage() {
             </motion.div>
 
             {/* peran pengguna */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <label
                 htmlFor="role"
                 className="block text-sm font-medium text-gray-700 mb-2"
@@ -380,7 +380,7 @@ export default function RegisterPage() {
             </motion.div>
 
             {/* tombol buat akun */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <motion.button
                 type="submit"
                 disabled={loading}
@@ -404,7 +404,7 @@ export default function RegisterPage() {
 
             {/* link ke login */}
             <motion.div
-              variants={itemVariants}
+              variants={itemVariants as any}
               className="text-center pt-2"
             >
               <Link

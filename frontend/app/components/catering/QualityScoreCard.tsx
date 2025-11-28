@@ -79,7 +79,7 @@ const QualityScoreCard: React.FC<QualityScoreCardProps> = ({
   return (
     <motion.div
       ref={ref}
-      variants={cardVariants}
+      variants={cardVariants as any}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
       className={`bg-white rounded-2xl p-6 border shadow-sm hover:shadow-md transition-shadow duration-300 ${getBorderColor()}`}
@@ -91,7 +91,7 @@ const QualityScoreCard: React.FC<QualityScoreCardProps> = ({
       {/* icon dan label */}
       <div className="flex items-center gap-3 mb-6">
         <motion.div
-          variants={iconVariants}
+          variants={iconVariants as any}
           className={`w-12 h-12 rounded-xl flex items-center justify-center ${getBgColor()}`}
         >
           <Award className={`w-6 h-6 ${getColor()}`} />
@@ -104,7 +104,7 @@ const QualityScoreCard: React.FC<QualityScoreCardProps> = ({
 
       {/* skor */}
       <motion.div
-        variants={scoreVariants}
+        variants={scoreVariants as any}
         className="text-center"
       >
         <div className={`text-5xl font-bold ${getColor()} mb-2`}>

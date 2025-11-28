@@ -67,7 +67,7 @@ const ScheduleCard: React.FC<ScheduleCardProps> = ({
 
   return (
     <motion.div
-      variants={cardVariants}
+      variants={cardVariants as any}
       initial="hidden"
       animate="visible"
       className="relative"

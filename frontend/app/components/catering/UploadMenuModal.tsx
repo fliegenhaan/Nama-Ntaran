@@ -192,7 +192,7 @@ const UploadMenuModal: React.FC<UploadMenuModalProps> = ({
           onClick={handleClose}
         >
           <motion.div
-            variants={modalVariants}
+            variants={modalVariants as any}
             initial="hidden"
             animate="visible"
             exit="exit"

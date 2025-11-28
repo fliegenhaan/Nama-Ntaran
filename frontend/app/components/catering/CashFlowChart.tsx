@@ -128,7 +128,7 @@ const CashFlowChart: React.FC<CashFlowChartProps> = ({
   return (
     <motion.div
       ref={ref}
-      variants={containerVariants}
+      variants={containerVariants as any}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
       className="mb-8"

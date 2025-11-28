@@ -107,7 +107,7 @@ const ReputationCard: React.FC<ReputationCardProps> = ({
   return (
     <motion.div
       ref={ref}
-      variants={cardVariants}
+      variants={cardVariants as any}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
       className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300"
@@ -125,7 +125,7 @@ const ReputationCard: React.FC<ReputationCardProps> = ({
         className="flex items-center justify-center gap-1 mb-4"
       >
         {renderStars().map((star, index) => (
-          <motion.div key={index} variants={starVariants}>
+          <motion.div key={index} variants={starVariants as any}>
             {star}
           </motion.div>
         ))}

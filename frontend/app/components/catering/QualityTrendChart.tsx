@@ -123,7 +123,7 @@ const QualityTrendChart: React.FC<QualityTrendChartProps> = ({ data = [] }) => {
   return (
     <motion.div
       ref={ref}
-      variants={containerVariants}
+      variants={containerVariants as any}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
       className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300"
@@ -179,7 +179,7 @@ const QualityTrendChart: React.FC<QualityTrendChartProps> = ({ data = [] }) => {
             <motion.path
               d={areaPath}
               fill="url(#areaGradient)"
-              variants={areaVariants}
+              variants={areaVariants as any}
             />
 
             {/* line chart */}
@@ -190,7 +190,7 @@ const QualityTrendChart: React.FC<QualityTrendChartProps> = ({ data = [] }) => {
               strokeWidth={3}
               strokeLinecap="round"
               strokeLinejoin="round"
-              variants={pathVariants}
+              variants={pathVariants as any}
             />
 
             {/* data points */}

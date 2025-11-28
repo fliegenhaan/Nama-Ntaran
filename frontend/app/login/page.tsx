@@ -127,7 +127,7 @@ export default function LoginPage() {
           variants={containerVariants}
         >
           {/* logo dan heading */}
-          <motion.div className="mb-8" variants={itemVariants}>
+          <motion.div className="mb-8" variants={itemVariants as any}>
             <div className="flex justify-center mb-8">
               <Image
                 src="/MBG-removebg-preview.png"
@@ -165,7 +165,7 @@ export default function LoginPage() {
             )}
 
             {/* nama pengguna atau email */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-2"
@@ -204,7 +204,7 @@ export default function LoginPage() {
             </motion.div>
 
             {/* kata sandi */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <label
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700 mb-2"
@@ -243,7 +243,7 @@ export default function LoginPage() {
             </motion.div>
 
             {/* pilih peran */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <label
                 htmlFor="role"
                 className="block text-sm font-medium text-gray-700 mb-2"
@@ -285,7 +285,7 @@ export default function LoginPage() {
             </motion.div>
 
             {/* tombol masuk */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <motion.button
                 type="submit"
                 disabled={loading}
@@ -309,7 +309,7 @@ export default function LoginPage() {
 
             {/* links */}
             <motion.div
-              variants={itemVariants}
+              variants={itemVariants as any}
               className="flex items-center justify-between pt-2"
             >
               <Link

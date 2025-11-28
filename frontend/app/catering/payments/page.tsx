@@ -28,7 +28,7 @@ export default function PaymentsPage() {
   // socket.io untuk realtime updates
   const { isSocketConnected } = usePaymentsDataWithSocket(
     user?.id,
-    user?.cateringId,
+    user?.catering_id,
     refreshData
   );
 
@@ -124,7 +124,7 @@ export default function PaymentsPage() {
       {/* main content */}
       <main className="min-h-screen ml-72" style={{ transform: 'translateZ(0)' }}>
         <motion.div
-          variants={pageVariants}
+          variants={pageVariants as any}
           initial="hidden"
           animate="visible"
           className="max-w-6xl mx-auto px-6 py-8"
@@ -180,14 +180,7 @@ export default function PaymentsPage() {
         </motion.div>
 
         {/* footer */}
-        <CateringFooter
-          supportUrl="mailto:support@namantaran.id"
-          socialLinks={{
-            instagram: 'https://instagram.com/namantaran',
-            twitter: 'https://twitter.com/namantaran',
-            linkedin: 'https://linkedin.com/company/namantaran',
-          }}
-        />
+        <CateringFooter/>
       </main>
     </div>
   );
