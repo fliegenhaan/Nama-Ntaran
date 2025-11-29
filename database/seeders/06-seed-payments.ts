@@ -57,8 +57,6 @@ interface PaymentInsert {
   status: string
   blockchain_tx_hash: string | null
   blockchain_block_number: number | null
-  xendit_invoice_id: string | null
-  xendit_payment_id: string | null
   paid_at: string | null
   confirmed_by_school_at: string | null
   released_to_catering_at: string | null
@@ -226,8 +224,6 @@ function generatePayment(
     status: paymentStatus,
     blockchain_tx_hash: blockchainTxHash,
     blockchain_block_number: blockchainBlockNumber,
-    xendit_invoice_id: null, // Future integration
-    xendit_payment_id: null, // Future integration
     paid_at: getPaidAt(allocation, paymentStatus),
     confirmed_by_school_at:
       paymentStatus === 'COMPLETED' || paymentStatus === 'CONFIRMED'

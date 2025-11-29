@@ -1,7 +1,7 @@
 -- ============================================
--- Migration 004: Payment System dengan Xendit & Blockchain Escrow
+-- Migration 004: Payment System dengan Blockchain Escrow
 -- ============================================
--- Purpose: Menambah tabel untuk payment system terintegrasi blockchain escrow + xendit
+-- Purpose: Menambah tabel untuk payment system terintegrasi blockchain escrow
 -- Created: 2024-11-16
 -- Author: NutriChain Dev Team
 
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS allocations (
 
 -- ============================================
 -- PAYMENTS TABLE
--- Tabel untuk tracking setiap pembayaran (invoice dari xendit / blockchain)
+-- Tabel untuk tracking setiap pembayaran (blockchain escrow)
 -- ============================================
 CREATE TABLE IF NOT EXISTS payments (
     id SERIAL PRIMARY KEY,
@@ -81,10 +81,6 @@ CREATE TABLE IF NOT EXISTS payments (
     -- Blockchain Data
     blockchain_tx_hash VARCHAR(255),
     blockchain_block_number BIGINT,
-
-    -- Xendit Integration (untuk future use)
-    xendit_invoice_id VARCHAR(255),
-    xendit_payment_id VARCHAR(255),
 
     -- Payment Completion
     paid_at TIMESTAMP,
@@ -240,7 +236,7 @@ CREATE TABLE IF NOT EXISTS refunds (
 
 -- ============================================
 -- PAYMENT METHODS TABLE
--- Untuk tracking metode pembayaran catering (optional untuk xendit payout)
+-- Untuk tracking metode pembayaran catering
 -- ============================================
 CREATE TABLE IF NOT EXISTS payment_methods (
     id SERIAL PRIMARY KEY,
@@ -267,9 +263,6 @@ CREATE TABLE IF NOT EXISTS payment_methods (
 
     -- Crypto Details
     wallet_address VARCHAR(255),
-
-    -- Xendit Integration
-    xendit_bank_account_id VARCHAR(255),
 
     -- Status
     is_active BOOLEAN DEFAULT true,

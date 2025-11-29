@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { DollarSign, CreditCard, FileText, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { DollarSign, FileText, CheckCircle, Eye, EyeOff } from 'lucide-react';
 
 // TODO: integrasikan dengan payment gateway API
 // TODO: tambahkan verifikasi bank account
@@ -11,7 +10,6 @@ import { DollarSign, CreditCard, FileText, CheckCircle, Eye, EyeOff } from 'luci
 interface PaymentInformationData {
   bankAccount: string;
   walletAddress: string;
-  xenditGateway: string;
   taxRegistration: string;
 }
 
@@ -101,38 +99,6 @@ const PaymentInformationSection: React.FC<PaymentInformationSectionProps> = ({
         </p>
       </div>
 
-      {/* xendit payment gateway */}
-      <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Xendit Payment Gateway (Optional - For IDR Conversion)
-        </label>
-        <div className="flex items-center gap-3">
-          <div className="flex-1 px-4 py-3 border border-gray-300 rounded-xl bg-gray-50">
-            <div className="flex items-center justify-between">
-              <span className="font-medium text-gray-900">{data.xenditGateway}</span>
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-bold ${
-                  data.xenditGateway === 'Active'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
-                }`}
-              >
-                {data.xenditGateway}
-              </span>
-            </div>
-          </div>
-          <button
-            className="px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-smooth font-medium whitespace-nowrap"
-            style={{ transform: 'translateZ(0)' }}
-          >
-            Configure
-          </button>
-        </div>
-        <p className="text-xs text-gray-600 mt-2 font-medium">
-          Optional: Auto-convert crypto payments to Rupiah via Xendit
-        </p>
-      </div>
-
       {/* tax registration number */}
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
@@ -149,28 +115,6 @@ const PaymentInformationSection: React.FC<PaymentInformationSectionProps> = ({
         <p className="text-xs text-gray-600 mt-2 font-medium">
           Required For Tax Reporting And Compliance
         </p>
-      </div>
-
-      {/* payment methods summary */}
-      <div className="mt-6 bg-gray-50 border border-gray-200 rounded-xl p-4">
-        <div className="flex items-center gap-3 mb-3">
-          <CreditCard className="w-5 h-5 text-gray-700" />
-          <h3 className="font-bold text-gray-900">
-            Accepted Payment Methods
-          </h3>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {['Bank Transfer', 'E-Wallet', 'Credit Card', 'Virtual Account'].map((method) => (
-            <motion.div
-              key={method}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm font-semibold will-animate shadow-sm"
-            >
-              {method}
-            </motion.div>
-          ))}
-        </div>
       </div>
     </div>
   );

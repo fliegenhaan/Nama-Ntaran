@@ -42,7 +42,6 @@ interface VendorSettings {
   paymentInformation: {
     bankAccount: string;
     walletAddress: string;
-    xenditGateway: string;
     taxRegistration: string;
   };
 }
@@ -94,7 +93,6 @@ export default function VendorSettingsPage() {
     paymentInformation: {
       bankAccount: '**** **** **** 1234',
       walletAddress: '',
-      xenditGateway: 'Inactive',
       taxRegistration: '',
     },
   });

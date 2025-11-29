@@ -36,7 +36,6 @@ interface PaymentMethodInsert {
   ewallet_provider: string | null
   ewallet_identifier: string | null
   wallet_address: string | null
-  xendit_bank_account_id: string | null
   is_active: boolean
   is_verified: boolean
 }
@@ -198,13 +197,6 @@ function generateWalletAddress(): string {
   return `0x${randomHex}`
 }
 
-function generateXenditAccountId(): string {
-  // Generate realistic Xendit account ID
-  return `ba_${Array.from({ length: 24 }, () =>
-    '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'[randomInt(0, 61)]
-  ).join('')}`
-}
-
 // ============================================================================
 // DATA FETCHING
 // ============================================================================
@@ -254,7 +246,6 @@ async function generatePaymentMethods(caterings: CateringData[]): Promise<Paymen
       // Generate bank transfer details
       const bankCode = CONFIG.BANK_CODES[randomInt(0, CONFIG.BANK_CODES.length - 1)]
       const accountNumber = generateAccountNumber(bankCode)
-      const xenditAccountId = isVerified ? generateXenditAccountId() : null
 
       paymentMethod = {
         catering_id: catering.id,
@@ -265,7 +256,6 @@ async function generatePaymentMethods(caterings: CateringData[]): Promise<Paymen
         ewallet_provider: null,
         ewallet_identifier: null,
         wallet_address: null,
-        xendit_bank_account_id: xenditAccountId,
         is_active: true,
         is_verified: isVerified
       }
@@ -283,7 +273,6 @@ async function generatePaymentMethods(caterings: CateringData[]): Promise<Paymen
         ewallet_provider: ewalletProvider,
         ewallet_identifier: ewalletIdentifier,
         wallet_address: null,
-        xendit_bank_account_id: null,
         is_active: true,
         is_verified: isVerified
       }
@@ -300,7 +289,6 @@ async function generatePaymentMethods(caterings: CateringData[]): Promise<Paymen
         ewallet_provider: null,
         ewallet_identifier: null,
         wallet_address: walletAddress,
-        xendit_bank_account_id: null,
         is_active: true,
         is_verified: isVerified
       }

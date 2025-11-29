@@ -149,17 +149,6 @@ const SYSTEM_CONFIGS: SystemConfigInsert[] = [
     updated_by: null,
   },
   {
-    key: 'payment.xendit.enabled',
-    value: {
-      enabled: false,
-      webhook_url: 'https://api.nutrichain.id/webhooks/xendit',
-    },
-    description: 'Xendit payment gateway integration',
-    category: 'payment',
-    is_public: false,
-    updated_by: null,
-  },
-  {
     key: 'payment.price_per_portion',
     value: {
       default: 15000, // Rp 15,000

@@ -356,8 +356,8 @@ export default function SchoolDashboard() {
                 <div className="text-center">
                   <div className="mb-4">
                     <img
-                      src="/component-without-background1.png"
-                      alt="Delivery Truck"
+                      src="/tempe.jpg"
+                      alt="Tempe - Makanan Bergizi"
                       className="w-full max-w-xs mx-auto"
                       onError={(e) => {
                         // fallback ke icon jika image tidak ada

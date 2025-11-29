@@ -116,10 +116,6 @@ CREATE TABLE payments (
     blockchain_tx_hash VARCHAR(255),
     blockchain_block_number BIGINT,
 
-    -- Xendit Integration
-    xendit_invoice_id VARCHAR(255),
-    xendit_payment_id VARCHAR(255),
-
     -- Payment Completion
     paid_at TIMESTAMP,
     confirmed_by_school_at TIMESTAMP,
@@ -300,9 +296,6 @@ CREATE TABLE payment_methods (
 
     -- Crypto Details
     wallet_address VARCHAR(255),
-
-    -- Xendit Integration
-    xendit_bank_account_id VARCHAR(255),
 
     -- Status
     is_active BOOLEAN DEFAULT true,

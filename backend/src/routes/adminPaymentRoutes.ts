@@ -20,7 +20,6 @@ import type { Request, Response } from 'express';
 import { supabase } from '../config/database.js';
 import { authenticateToken, authorizeRole } from '../middleware/auth.js';
 import blockchainPaymentService from '../services/blockchainPaymentService.js';
-import xenditPaymentService from '../services/xenditPaymentService.js';
 import { v4 as uuidv4 } from 'uuid';
 
 const router: Router = express.Router();
@@ -254,50 +253,7 @@ router.post(
       console.log(`   ✅ Database updated: status=LOCKED`);
 
       // ============================================
-      // STEP 5 (Optional): Create invoice di Xendit (untuk tracking)
-      // ============================================
-      let xenditResult = null;
-
-      // Get school and catering names
-      const { data: schoolData } = await supabase
-        .from('schools')
-        .select('name')
-        .eq('id', schoolId)
-        .single();
-
-      const { data: cateringData } = await supabase
-        .from('caterings')
-        .select('name')
-        .eq('id', cateringId)
-        .single();
-
-      const schoolName = schoolData?.name || 'Unknown School';
-      const cateringName = cateringData?.name || 'Unknown Catering';
-
-      xenditResult = await xenditPaymentService.createInvoice({
-        allocationId: allocationId,
-        description: `Delivery untuk ${schoolName}`,
-        amount: amount,
-        schoolName: schoolName,
-        cateringName: cateringName,
-        deliveryDate: deliveryDate,
-        portions: portions,
-      });
-
-      if (xenditResult.success) {
-        console.log(`   ✅ Xendit invoice created: ${xenditResult.invoiceId}`);
-
-        await supabase
-          .from('payments')
-          .update({
-            xendit_invoice_id: xenditResult.invoiceId,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('allocation_id', allocIdDb);
-      }
-
-      // ============================================
-      // STEP 6: Log payment event
+      // STEP 5: Log payment event
       // ============================================
       await supabase
         .from('payment_events')
@@ -330,8 +286,6 @@ router.post(
           currency: 'IDR',
           blockchainTxHash: blockchainResult.txHash,
           blockchainBlockNumber: blockchainResult.blockNumber,
-          xenditInvoiceId: xenditResult?.invoiceId || null,
-          xenditInvoiceUrl: xenditResult?.invoiceUrl || null,
           lockedAt: new Date().toISOString(),
         },
       });
