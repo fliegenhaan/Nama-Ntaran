@@ -552,33 +552,33 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-8 sm:py-12 lg:py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             variants={containerEscrowVariants}
             initial="hidden"
             animate="visible"
-            className="space-y-4 sm:space-y-6"
+            className="space-y-6"
           >
-            <motion.div variants={itemEscrowVariants} className="text-center mb-4 sm:mb-6 lg:mb-8">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4 px-2">
+            <motion.div variants={itemEscrowVariants} className="text-center mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                 Transparansi Escrow Blockchain
               </h2>
-              <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-3xl mx-auto px-4">
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
                 Pantau semua transaksi escrow yang dikelola melalui smart contract untuk transparansi dan keamanan maksimal
               </p>
             </motion.div>
 
-            <motion.div variants={itemEscrowVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+            <motion.div variants={itemEscrowVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Total Terkunci */}
-          <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200 stat-card-hover card-optimized">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+          <div className="bg-white rounded-xl p-6 border border-gray-200 stat-card-hover card-optimized">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                <Lock className="w-6 h-6 text-blue-600" />
               </div>
-              <div className="min-w-0">
-                <p className="text-xs sm:text-sm text-gray-600">Total Terkunci</p>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 stat-number truncate">
+              <div>
+                <p className="text-sm text-gray-600">Total Terkunci</p>
+                <p className="text-2xl font-bold text-gray-900 stat-number">
                   {formatCurrency(stats.totalTerkunci)}
                 </p>
               </div>
@@ -586,14 +586,14 @@ export default function Home() {
           </div>
 
           {/* Total Tercair */}
-          <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200 stat-card-hover card-optimized">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+          <div className="bg-white rounded-xl p-6 border border-gray-200 stat-card-hover card-optimized">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
-              <div className="min-w-0">
-                <p className="text-xs sm:text-sm text-gray-600">Total Tercair</p>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 stat-number truncate">
+              <div>
+                <p className="text-sm text-gray-600">Total Tercair</p>
+                <p className="text-2xl font-bold text-gray-900 stat-number">
                   {formatCurrency(stats.totalTercair)}
                 </p>
               </div>
@@ -601,14 +601,14 @@ export default function Home() {
           </div>
 
           {/* Pending Release */}
-          <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200 stat-card-hover card-optimized sm:col-span-2 lg:col-span-1">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
+          <div className="bg-white rounded-xl p-6 border border-gray-200 stat-card-hover card-optimized">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
+                <Clock className="w-6 h-6 text-yellow-600" />
               </div>
-              <div className="min-w-0">
-                <p className="text-xs sm:text-sm text-gray-600">Pending Release</p>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 stat-number truncate">
+              <div>
+                <p className="text-sm text-gray-600">Pending Release</p>
+                <p className="text-2xl font-bold text-gray-900 stat-number">
                   {formatCurrency(stats.pendingRelease)}
                 </p>
               </div>
@@ -617,17 +617,17 @@ export default function Home() {
         </motion.div>
 
         {/* Filters */}
-        <motion.div variants={itemEscrowVariants} className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+        <motion.div variants={itemEscrowVariants} className="bg-white rounded-xl p-6 border border-gray-200">
+          <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Cari Sekolah, Katering, Atau TX Hash..."
+                placeholder="Cari Berdasarkan Sekolah, Katering, Atau TX Hash..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-smooth outline-none text-xs sm:text-sm"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-smooth outline-none text-sm"
               />
             </div>
 
@@ -636,7 +636,7 @@ export default function Home() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full sm:w-auto pl-3 sm:pl-4 pr-9 sm:pr-10 py-2 sm:py-2.5 border border-gray-300 rounded-lg text-gray-900 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-smooth appearance-none bg-white text-xs sm:text-sm sm:min-w-[180px]"
+                className="pl-4 pr-10 py-2.5 border border-gray-300 rounded-lg text-gray-900 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-smooth appearance-none bg-white text-sm min-w-[180px]"
               >
                 <option value="">Semua Status</option>
                 <option value="Terkunci">Terkunci</option>
@@ -644,123 +644,118 @@ export default function Home() {
                 <option value="Tercairkan">Tercairkan</option>
                 <option value="Tertunda">Tertunda</option>
               </select>
-              <ChevronRight className="absolute right-3 top-1/2 transform -translate-y-1/2 rotate-90 w-3 h-3 sm:w-4 sm:h-4 text-gray-400 pointer-events-none" />
+              <ChevronRight className="absolute right-3 top-1/2 transform -translate-y-1/2 rotate-90 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>
           </div>
         </motion.div>
 
         {/* Escrow Table */}
-        <motion.div variants={itemEscrowVariants} className="bg-white rounded-lg sm:rounded-xl border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto -mx-4 sm:mx-0">
-            <div className="inline-block min-w-full align-middle">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="text-left px-3 py-3 sm:p-4 font-semibold text-gray-700 text-xs sm:text-sm whitespace-nowrap">ID</th>
-                    <th className="text-left px-3 py-3 sm:p-4 font-semibold text-gray-700 text-xs sm:text-sm whitespace-nowrap">Sekolah</th>
-                    <th className="text-left px-3 py-3 sm:p-4 font-semibold text-gray-700 text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">Katering</th>
-                    <th className="text-left px-3 py-3 sm:p-4 font-semibold text-gray-700 text-xs sm:text-sm whitespace-nowrap">Jumlah</th>
-                    <th className="text-left px-3 py-3 sm:p-4 font-semibold text-gray-700 text-xs sm:text-sm whitespace-nowrap">Status</th>
-                    <th className="text-left px-3 py-3 sm:p-4 font-semibold text-gray-700 text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">Tanggal</th>
-                    <th className="text-left px-3 py-3 sm:p-4 font-semibold text-gray-700 text-xs sm:text-sm whitespace-nowrap hidden xl:table-cell">TX Hash</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {currentEscrows.map((escrow, index) => (
-                    <motion.tr
-                      key={escrow.id}
-                      initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        duration: shouldReduceMotion ? 0.01 : 0.2,
-                        delay: shouldReduceMotion ? 0 : index * 0.03,
-                        ease: [0.4, 0, 0.2, 1] as const,
-                      }}
-                      className="hover:bg-gray-50 transition-smooth"
-                    >
-                      <td className="px-3 py-3 sm:p-4">
-                        <span className="font-mono text-xs sm:text-sm text-gray-600">#{escrow.id}</span>
-                      </td>
-                      <td className="px-3 py-3 sm:p-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
-                          </div>
-                          <span className="font-medium text-gray-900 text-xs sm:text-sm truncate max-w-[100px] sm:max-w-none">{escrow.school}</span>
+        <motion.div variants={itemEscrowVariants} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200 bg-gray-50">
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">ID</th>
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">Sekolah</th>
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">Katering</th>
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">Jumlah</th>
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">Status</th>
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">Tanggal Terkunci</th>
+                  <th className="text-left p-4 font-semibold text-gray-700 text-sm">TX Hash</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentEscrows.map((escrow, index) => (
+                  <motion.tr
+                    key={escrow.id}
+                    initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: shouldReduceMotion ? 0.01 : 0.2,
+                      delay: shouldReduceMotion ? 0 : index * 0.03,
+                      ease: [0.4, 0, 0.2, 1] as const,
+                    }}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-smooth"
+                  >
+                    <td className="p-4">
+                      <span className="font-mono text-sm text-gray-600">#{escrow.id}</span>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                          <Shield className="w-4 h-4 text-white" />
                         </div>
-                      </td>
-                      <td className="px-3 py-3 sm:p-4 hidden lg:table-cell">
-                        <span className="text-gray-600 text-sm">{escrow.catering}</span>
-                      </td>
-                      <td className="px-3 py-3 sm:p-4">
-                        <span className="font-semibold text-gray-900 text-xs sm:text-sm stat-number whitespace-nowrap">
-                          {formatCurrency(escrow.amount)}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3 sm:p-4">
-                        <span
-                          className={`inline-block px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold whitespace-nowrap ${getStatusBadgeClass(
-                            escrow.status
-                          )}`}
-                        >
-                          {escrow.status}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3 sm:p-4 hidden md:table-cell">
-                        <span className="text-gray-600 text-xs sm:text-sm whitespace-nowrap">
-                          {new Date(escrow.lockedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3 sm:p-4 hidden xl:table-cell">
-                        <a
-                          href={`https://sepolia.etherscan.io/tx/${escrow.txHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-purple-600 hover:text-purple-700 text-xs font-mono flex items-center gap-1 transition-smooth"
-                        >
-                          {escrow.txHash.substring(0, 10)}...
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        <span className="font-medium text-gray-900 text-sm">{escrow.school}</span>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <span className="text-gray-600 text-sm">{escrow.catering}</span>
+                    </td>
+                    <td className="p-4">
+                      <span className="font-semibold text-gray-900 text-sm stat-number">
+                        {formatCurrency(escrow.amount)}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <span
+                        className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(
+                          escrow.status
+                        )}`}
+                      >
+                        {escrow.status}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <span className="text-gray-600 text-sm">
+                        {new Date(escrow.lockedAt).toLocaleDateString('id-ID')}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <a
+                        href={`https://sepolia.etherscan.io/tx/${escrow.txHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-purple-600 hover:text-purple-700 text-xs font-mono flex items-center gap-1 transition-smooth"
+                      >
+                        {escrow.txHash.substring(0, 10)}...
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
           {/* Pagination */}
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
-              Menampilkan {startIndex + 1}-{Math.min(endIndex, filteredEscrows.length)} dari {filteredEscrows.length} Escrow
+          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Menampilkan {startIndex + 1} Dari {Math.min(endIndex, filteredEscrows.length)} Escrow
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
+                className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 Sebelumnya
               </button>
-              <span className="text-xs sm:text-sm text-gray-600 px-2">
-                {currentPage}/{totalPages}
-              </span>
               <button
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
+                className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 Berikutnya
               </button>
             </div>
           </div>
         </motion.div>
-        <motion.div variants={itemEscrowVariants} className="bg-blue-50 border border-blue-200 rounded-lg sm:rounded-xl p-3 sm:p-4">
-          <div className="flex items-start gap-2 sm:gap-3">
-            <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+        <motion.div variants={itemEscrowVariants} className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div>
-              <h4 className="text-xs sm:text-sm font-semibold text-blue-900 mb-1">Informasi Smart Contract Escrow</h4>
-              <p className="text-xs sm:text-sm text-blue-700 leading-relaxed">
+              <h4 className="text-sm font-semibold text-blue-900 mb-1">Informasi Smart Contract Escrow</h4>
+              <p className="text-sm text-blue-700">
                 Semua transaksi escrow dikelola melalui smart contract blockchain untuk transparansi dan keamanan maksimal.
                 Dana akan otomatis tercairkan ketika semua kondisi terpenuhi atau dapat di-release secara manual oleh admin.
               </p>
