@@ -328,13 +328,7 @@ export default function TransparansiPage() {
                   </div>
                 </div>
                 {/* statistik cards */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white rounded-xl p-4 shadow-md">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {loading ? 'Loading...' : `Rp ${(totalAmount / 1_000_000).toFixed(1)}M`}
-                    </div>
-                    <div className="text-sm text-gray-600">Total Dana</div>
-                  </div>
+                <div className="grid grid-cols-1 gap-4">
                   <div className="bg-white rounded-xl p-4 shadow-md">
                     <div className="text-2xl font-bold text-purple-600">
                       {loading ? '...' : totalSchools}
@@ -545,19 +539,7 @@ export default function TransparansiPage() {
               </div>
             </div>
 
-            {/* card 5: total dana dialokasikan */}
-            <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center hover:shadow-xl transition-shadow">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Total Dana Dialokasikan</h3>
-              <div className="text-5xl font-bold text-blue-600 mb-2">
-                Rp {(totalAmount / 1_000_000_000).toFixed(2)}
-              </div>
-              <div className="text-2xl font-semibold text-blue-600 mb-4">Miliar</div>
-              <p className="text-sm text-gray-600 text-center">
-                Dana terverifikasi blockchain sejak awal platform.
-              </p>
-            </div>
-
-            {/* card 6: jumlah sekolah terdampak */}
+            {/* card 5: jumlah sekolah terdampak */}
             <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center hover:shadow-xl transition-shadow">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Jumlah Sekolah Terdampak</h3>
               <div className="text-6xl font-bold text-blue-600 mb-2">{totalSchools}</div>
